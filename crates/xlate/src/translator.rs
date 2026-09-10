@@ -200,12 +200,12 @@ impl Translator {
     // ---- response path (push state machines) --------------------------------------------
 
     /// A provider → IR streaming decoder for `p`.
-    pub fn stream_decoder(&self, p: Protocol, caps: &Capabilities) -> Box<dyn StreamDecoder> {
+    pub fn stream_decoder(&self, p: Protocol, caps: &Capabilities) -> Box<dyn StreamDecoder + Send> {
         self.codec_for(p).stream_decoder(caps)
     }
 
     /// An IR → client streaming encoder for `p`, driven by `ctx`.
-    pub fn stream_encoder(&self, p: Protocol, ctx: EncodeCtx) -> Box<dyn StreamEncoder> {
+    pub fn stream_encoder(&self, p: Protocol, ctx: EncodeCtx) -> Box<dyn StreamEncoder + Send> {
         self.codec_for(p).stream_encoder(ctx)
     }
 

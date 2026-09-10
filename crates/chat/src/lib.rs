@@ -69,11 +69,11 @@ impl Codec for ChatCodec {
         encode::encode_request(req, caps, ctx)
     }
 
-    fn stream_decoder(&self, _caps: &Capabilities) -> Box<dyn StreamDecoder> {
+    fn stream_decoder(&self, _caps: &Capabilities) -> Box<dyn StreamDecoder + Send> {
         Box::new(ChatStreamDecoder::new())
     }
 
-    fn stream_encoder(&self, ctx: EncodeCtx) -> Box<dyn StreamEncoder> {
+    fn stream_encoder(&self, ctx: EncodeCtx) -> Box<dyn StreamEncoder + Send> {
         Box::new(ChatStreamEncoder::new(ctx))
     }
 

@@ -183,10 +183,10 @@ pub trait Codec {
     ) -> Result<EncodedRequest, XlateError>;
 
     /// A streaming decoder for this protocol as an upstream source (provider-facing).
-    fn stream_decoder(&self, caps: &Capabilities) -> Box<dyn StreamDecoder>;
+    fn stream_decoder(&self, caps: &Capabilities) -> Box<dyn StreamDecoder + Send>;
 
     /// A streaming encoder for this protocol as the client target (client-facing).
-    fn stream_encoder(&self, ctx: EncodeCtx) -> Box<dyn StreamEncoder>;
+    fn stream_encoder(&self, ctx: EncodeCtx) -> Box<dyn StreamEncoder + Send>;
 
     /// Decode a non-streaming provider response body into events (provider-facing).
     fn decode_response(&self, body: &[u8], caps: &Capabilities)
