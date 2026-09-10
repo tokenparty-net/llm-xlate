@@ -1,0 +1,138 @@
+{
+  "status": 200,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d06019922b295-EWR",
+    "connection": "keep-alive",
+    "content-length": "2364",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:12 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "777",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9999",
+    "x-ratelimit-remaining-tokens": "199945",
+    "x-ratelimit-reset-requests": "8.64s",
+    "x-ratelimit-reset-tokens": "16ms",
+    "x-request-id": "req_7a60874638ee4b2a9068e8a66d99a5c4"
+  },
+  "elapsed_ms": 1190,
+  "body": {
+    "id": "resp_02bf300f29725b29006aa268b3f54887d2a1e013ff4fa8ed65",
+    "object": "response",
+    "created_at": 1789028531,
+    "status": "completed",
+    "background": false,
+    "billing": {
+      "payer": "developer"
+    },
+    "completed_at": 1789028532,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": 128,
+    "max_tool_calls": null,
+    "model": "gpt-4o-mini-2024-07-18",
+    "moderation": null,
+    "output": [
+      {
+        "id": "msg_02bf300f29725b29006aa268b4667c87d2979099f392a1300d",
+        "type": "message",
+        "status": "completed",
+        "content": [
+          {
+            "type": "output_text",
+            "annotations": [],
+            "logprobs": [],
+            "text": "{\"code\":\"XYZ\"}"
+          }
+        ],
+        "role": "assistant"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "prompt_cache_retention": "in_memory",
+    "reasoning": {
+      "context": null,
+      "effort": null,
+      "summary": null
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "store": true,
+    "temperature": 1.0,
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "description": null,
+        "name": "code",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "minLength": 2,
+              "pattern": "^[A-Z]+$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "code"
+          ],
+          "type": "object"
+        },
+        "strict": true
+      },
+      "verbosity": "medium"
+    },
+    "tool_choice": "auto",
+    "tool_usage": {
+      "image_gen": {
+        "input_tokens": 0,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "output_tokens": 0,
+        "output_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "total_tokens": 0
+      },
+      "web_search": {
+        "num_requests": 0
+      }
+    },
+    "tools": [],
+    "top_logprobs": 0,
+    "top_p": 1.0,
+    "truncation": "disabled",
+    "usage": {
+      "input_tokens": 36,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 0
+      },
+      "output_tokens": 6,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 42
+    },
+    "user": null,
+    "metadata": {}
+  }
+}

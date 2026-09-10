@@ -1,0 +1,231 @@
+# translate/scenarios.toml — the translate-and-send matrix for `llm-xlate-e2e translate` (plan §8).
+#
+# ---------------------------------------------------------------------------------------------------
+# SCHEMA (for the integration engineer implementing the loader; kept deliberately simple).
+#
+# Two tables: [[scenario]] (a source request) and [[pair]] (a directed source->target hop with a target
+# model set). The runner takes the cross product and, for each (pair, scenario) where
+# `scenario.source == pair.source`, does the §8 round trip:
+#     load request -> decode(source) -> requirements -> lower(target caps) -> encode(target)
+#       -> SEND to a `pair.target_models` model -> capture -> decode reply -> encode back to `source`.
+#
+# [[scenario]]
+#   name    = "text"                     # scenario key; the report groups by this
+#   kind    = "text"                     # one of the seven core kinds below (free tag; drives what to assert)
+#   source  = "chat"                     # source wire protocol: anthropic | chat | responses
+#   request = "../xlate/tests/golden/chat/text.req.json"   # EITHER a path (relative to crates/e2e) ...
+#   probe   = "ant.example.text"         # ... OR a probe id whose [probe.body] is the source request
+#   notes   = "..."                      # optional
+#   Exactly one of `request` / `probe` is set. A `probe` source is substituted (assets/$MODEL) but its
+#   ${ref:...} chains are NOT resolved here — pick probes without refs, or fixtures, for translate sources.
+#
+# [[pair]]
+#   source        = "chat"               # must match a scenario.source to run
+#   target        = "anthropic"          # target wire protocol
+#   target_models = "anthropic_new"      # model SET name from models.toml; --cheap uses its first member
+#   notes         = "..."                # optional
+#
+# The seven core `kind`s (plan §8): text, multiturn_system, tools_loop, thinking_replay,
+# structured_strict, media, error_passthrough. Not every source has a fixture for every kind; the
+# matrix below covers each kind at least once per source protocol, using golden fixtures where they
+# exist and probe bodies otherwise. The report shows, per (pair, scenario), the upstream status and any
+# XlateError (unresolved requirements, lowering degradations).
+# ---------------------------------------------------------------------------------------------------
+
+# ============================ Directed pairs (all six) ============================
+
+[[pair]]
+source        = "chat"
+target        = "anthropic"
+target_models = "anthropic_new"
+notes         = "OpenAI Chat client -> Anthropic backend. Settles request-root cache_control and tool/id carry."
+
+[[pair]]
+source        = "chat"
+target        = "responses"
+target_models = "openai_responses"
+notes         = "Chat -> Responses (the plan's preferred OpenAI lowering; tool calling + reasoning move here)."
+
+[[pair]]
+source        = "anthropic"
+target        = "chat"
+target_models = "openai_chat"
+notes         = "Anthropic client -> Chat backend. Thinking blocks must survive as a reasoning envelope."
+
+[[pair]]
+source        = "anthropic"
+target        = "responses"
+target_models = "openai_responses"
+notes         = "Anthropic -> Responses. Thinking -> reasoning items; tool ids preserved."
+
+[[pair]]
+source        = "responses"
+target        = "chat"
+target_models = "openai_chat"
+notes         = "Responses client -> Chat backend. Reasoning downgrade; strict tool schemas."
+
+[[pair]]
+source        = "responses"
+target        = "anthropic"
+target_models = "anthropic_new"
+notes         = "Responses -> Anthropic. Encrypted reasoning has no Anthropic slot; expect a degradation."
+
+# ============================ Chat-sourced scenarios ============================
+
+[[scenario]]
+name    = "text"
+kind    = "text"
+source  = "chat"
+request = "../xlate/tests/golden/chat/text.req.json"
+notes   = "Plain single-turn text; the smoke case for every chat-> pair."
+
+[[scenario]]
+name    = "multiturn_system"
+kind    = "multiturn_system"
+source  = "chat"
+request = "../xlate/tests/golden/chat/multiturn_sysdev.req.json"
+notes   = "Multi-turn with a mid-context system/developer turn; tests §7.1 instruction lowering per target."
+
+[[scenario]]
+name    = "tools_loop"
+kind    = "tools_loop"
+source  = "chat"
+request = "../xlate/tests/golden/chat/parallel_tools.req.json"
+notes   = "Request carrying tool definitions + a prior tool_call/tool result loop; tool ids must survive the hop."
+
+[[scenario]]
+name    = "structured_strict"
+kind    = "structured_strict"
+source  = "chat"
+request = "../xlate/tests/golden/chat/json_schema.req.json"
+notes   = "Strict json_schema; the target-specific keyword sanitiser is exercised here."
+
+[[scenario]]
+name    = "media_image"
+kind    = "media"
+source  = "chat"
+request = "../xlate/tests/golden/chat/images.req.json"
+notes   = "Image content part; media lowering per target (image_url <-> image source <-> input_image)."
+
+[[scenario]]
+name    = "media_pdf"
+kind    = "media"
+source  = "chat"
+request = "../xlate/tests/golden/chat/pdf.req.json"
+notes   = "PDF file part; document lowering per target."
+
+[[scenario]]
+name    = "reasoning"
+kind    = "thinking_replay"
+source  = "chat"
+request = "../xlate/tests/golden/chat/reasoning.req.json"
+notes   = "Reasoning-effort request; effort mapping + Chat-lowers-to-Responses behaviour."
+
+[[scenario]]
+name    = "error_passthrough"
+kind    = "error_passthrough"
+source  = "chat"
+probe   = "chat.err.empty_messages"
+notes   = "A request that the target rejects; the error must decode and re-encode into the source dialect."
+
+# ============================ Anthropic-sourced scenarios ============================
+
+[[scenario]]
+name    = "text"
+kind    = "text"
+source  = "anthropic"
+probe   = "ant.example.text"
+notes   = "Plain text (no golden anthropic text fixture exists; the example probe body is the source)."
+
+[[scenario]]
+name    = "tools_loop"
+kind    = "tools_loop"
+source  = "anthropic"
+request = "../xlate/tests/golden/anthropic/interleaved_tools.req.json"
+notes   = "Interleaved text/tool_use with tool_result; the id-preservation + regroup case."
+
+[[scenario]]
+name    = "thinking_replay"
+kind    = "thinking_replay"
+source  = "anthropic"
+request = "../xlate/tests/golden/anthropic/tools_thinking.req.json"
+notes   = "Thinking + tool_use replay; thinking blocks lower to a reasoning envelope on OpenAI targets."
+
+[[scenario]]
+name    = "structured_strict"
+kind    = "structured_strict"
+source  = "anthropic"
+request = "../xlate/tests/golden/anthropic/structured.req.json"
+notes   = "output_config.format json_schema -> response_format / text.format."
+
+[[scenario]]
+name    = "media"
+kind    = "media"
+source  = "anthropic"
+request = "../xlate/tests/golden/anthropic/multimodal.req.json"
+notes   = "Image + document blocks; media lowering per target."
+
+[[scenario]]
+name    = "multiturn_system"
+kind    = "multiturn_system"
+source  = "anthropic"
+probe   = "ant.system.mid.after_user"
+notes   = "In-array system turn; on non-Anthropic targets it maps to a normal system/developer message."
+
+[[scenario]]
+name    = "error_passthrough"
+kind    = "error_passthrough"
+source  = "anthropic"
+probe   = "ant.err.bad_role"
+notes   = "Bad role -> target 400; error decode/re-encode."
+
+# ============================ Responses-sourced scenarios ============================
+
+[[scenario]]
+name    = "text"
+kind    = "text"
+source  = "responses"
+probe   = "resp.example.text"
+notes   = "Plain text via `input`."
+
+[[scenario]]
+name    = "full"
+kind    = "tools_loop"
+source  = "responses"
+request = "../xlate/tests/golden/responses/full.req.json"
+notes   = "The rich Responses request (tools + options); broad lowering coverage."
+
+[[scenario]]
+name    = "chained"
+kind    = "multiturn_system"
+source  = "responses"
+request = "../xlate/tests/golden/responses/chained.req.json"
+notes   = "previous_response_id chaining; on stateless targets the router must inline prior turns."
+
+[[scenario]]
+name    = "structured_strict"
+kind    = "structured_strict"
+source  = "responses"
+probe   = "resp.output.json_schema_strict"
+notes   = "text.format strict json_schema."
+
+[[scenario]]
+name    = "media"
+kind    = "media"
+source  = "responses"
+probe   = "resp.media.input_image_data"
+notes   = "input_image data URL; media lowering per target."
+
+[[scenario]]
+name    = "thinking_replay"
+kind    = "thinking_replay"
+source  = "responses"
+probe   = "resp.reason.effort_high"
+notes   = "Reasoning-effort request; reasoning items lower to thinking (Anthropic) / reasoning_content (Chat)."
+
+[[scenario]]
+name    = "error_passthrough"
+kind    = "error_passthrough"
+source  = "responses"
+probe   = "resp.err.empty_input"
+notes   = "Empty input -> target 400; error decode/re-encode."

@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=invalid_request status=400 retryable=false param=reasoning_effort provider_type=invalid_request_error retry_after=- upstream_request_id=req_c3dc502000c7437f86becf4b6b55d6ae
+message: Function tools with reasoning_effort are not supported for gpt-6-astra in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'.
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_c3dc502000c7437f86becf4b6b55d6ae
+body:
+{
+  "error": {
+    "message": "Function tools with reasoning_effort are not supported for gpt-6-astra in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'.",
+    "type": "invalid_request_error",
+    "param": "reasoning_effort",
+    "code": null
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"Function tools with reasoning_effort are not supported for gpt-6-astra in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'.","type":"invalid_request_error","param":"reasoning_effort","code":null}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_c3dc502000c7437f86becf4b6b55d6ae
+body:
+{
+  "error": {
+    "message": "Function tools with reasoning_effort are not supported for gpt-6-astra in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'.",
+    "type": "invalid_request_error",
+    "param": "reasoning_effort",
+    "code": null
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":null,"message":"Function tools with reasoning_effort are not supported for gpt-6-astra in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'.","param":"reasoning_effort","sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+  x-router-upstream-request-id: req_c3dc502000c7437f86becf4b6b55d6ae
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "Function tools with reasoning_effort are not supported for gpt-6-astra in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  "request_id": "req_c3dc502000c7437f86becf4b6b55d6ae"
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"Function tools with reasoning_effort are not supported for gpt-6-astra in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."},"request_id":"req_c3dc502000c7437f86becf4b6b55d6ae"}

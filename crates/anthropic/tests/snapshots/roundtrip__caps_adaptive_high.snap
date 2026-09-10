@@ -1,0 +1,25 @@
+---
+source: crates/anthropic/tests/roundtrip.rs
+expression: pretty(&out.body)
+---
+{
+  "model": "claude-opus-5",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "hi"
+        }
+      ]
+    }
+  ],
+  "max_tokens": 4096,
+  "thinking": {
+    "type": "adaptive"
+  },
+  "output_config": {
+    "effort": "high"
+  }
+}

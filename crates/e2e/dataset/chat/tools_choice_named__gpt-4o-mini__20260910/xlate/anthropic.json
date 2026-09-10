@@ -1,0 +1,1 @@
+{"id":"resp_check","type":"message","role":"assistant","model":"check-model","content":[{"type":"tool_use","id":"call_RT942yb2TUCk8U7sjFQo5yP7","name":"get_time","input":{"tz":"Asia/Tokyo"}}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":73,"cache_read_input_tokens":0,"output_tokens":8}}

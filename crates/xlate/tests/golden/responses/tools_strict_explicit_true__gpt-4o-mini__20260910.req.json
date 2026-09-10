@@ -1,0 +1,26 @@
+{
+  "input": "Make a code and call the tool.",
+  "max_output_tokens": 128,
+  "model": "gpt-4o-mini",
+  "tools": [
+    {
+      "description": "Make a code.",
+      "name": "make_code",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "strict": true,
+      "type": "function"
+    }
+  ]
+}

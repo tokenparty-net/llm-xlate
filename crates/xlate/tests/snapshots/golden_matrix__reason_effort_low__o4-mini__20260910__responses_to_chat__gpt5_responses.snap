@@ -1,0 +1,19 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is 12+30?"
+    }
+  ],
+  "reasoning_effort": "low",
+  "max_completion_tokens": 256
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

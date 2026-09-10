@@ -1,0 +1,27 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "object": "chat.completion",
+  "created": 1700000000,
+  "model": "golden-model",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "refusal": "I cannot help with that."
+      },
+      "finish_reason": "stop",
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  }
+}

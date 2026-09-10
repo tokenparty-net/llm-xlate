@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=invalid_request status=400 retryable=false param=response_format provider_type=invalid_request_error retry_after=- upstream_request_id=req_bad49e6d00e14e06a21a43237dfea1ea
+message: Invalid schema for response_format 'open': In context=(), 'additionalProperties' is required to be supplied and to be false.
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_bad49e6d00e14e06a21a43237dfea1ea
+body:
+{
+  "error": {
+    "message": "Invalid schema for response_format 'open': In context=(), 'additionalProperties' is required to be supplied and to be false.",
+    "type": "invalid_request_error",
+    "param": "response_format",
+    "code": null
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"Invalid schema for response_format 'open': In context=(), 'additionalProperties' is required to be supplied and to be false.","type":"invalid_request_error","param":"response_format","code":null}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_bad49e6d00e14e06a21a43237dfea1ea
+body:
+{
+  "error": {
+    "message": "Invalid schema for response_format 'open': In context=(), 'additionalProperties' is required to be supplied and to be false.",
+    "type": "invalid_request_error",
+    "param": "response_format",
+    "code": null
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":null,"message":"Invalid schema for response_format 'open': In context=(), 'additionalProperties' is required to be supplied and to be false.","param":"response_format","sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+  x-router-upstream-request-id: req_bad49e6d00e14e06a21a43237dfea1ea
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "Invalid schema for response_format 'open': In context=(), 'additionalProperties' is required to be supplied and to be false."
+  },
+  "request_id": "req_bad49e6d00e14e06a21a43237dfea1ea"
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"Invalid schema for response_format 'open': In context=(), 'additionalProperties' is required to be supplied and to be false."},"request_id":"req_bad49e6d00e14e06a21a43237dfea1ea"}

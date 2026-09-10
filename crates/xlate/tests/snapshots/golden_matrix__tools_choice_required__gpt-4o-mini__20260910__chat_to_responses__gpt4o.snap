@@ -1,0 +1,45 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Hello there."
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "name": "get_weather",
+      "description": "Get weather.",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "type": "object"
+      }
+    }
+  ],
+  "tool_choice": "required",
+  "max_output_tokens": 128
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

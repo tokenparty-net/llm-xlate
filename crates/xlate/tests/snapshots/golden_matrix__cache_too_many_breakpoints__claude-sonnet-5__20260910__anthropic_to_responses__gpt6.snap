@@ -1,0 +1,38 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-6-astra",
+  "instructions": "sys breakpoint padded padded padded padded padded padded padded",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "b1 padded padded padded padded"
+        },
+        {
+          "type": "input_text",
+          "text": "b2 padded padded padded padded"
+        },
+        {
+          "type": "input_text",
+          "text": "b3 padded padded padded padded"
+        },
+        {
+          "type": "input_text",
+          "text": "b4 padded padded padded padded"
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 64
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

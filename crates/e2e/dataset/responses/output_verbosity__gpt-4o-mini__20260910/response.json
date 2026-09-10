@@ -1,0 +1,31 @@
+{
+  "status": 400,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d06000f85b295-EWR",
+    "connection": "keep-alive",
+    "content-length": "242",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:11 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "58",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "req_5f1da7c90b3a476982e871bebc508e9c"
+  },
+  "elapsed_ms": 122,
+  "body": {
+    "error": {
+      "message": "Unsupported value: 'low' is not supported with the 'gpt-4o-mini' model. Supported values are: 'medium'.",
+      "type": "invalid_request_error",
+      "param": "text.verbosity",
+      "code": "unsupported_value"
+    }
+  }
+}

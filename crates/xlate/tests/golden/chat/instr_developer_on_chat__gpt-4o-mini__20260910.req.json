@@ -1,0 +1,14 @@
+{
+  "max_completion_tokens": 64,
+  "messages": [
+    {
+      "content": "Answer only in French.",
+      "role": "developer"
+    },
+    {
+      "content": "How are you?",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini"
+}

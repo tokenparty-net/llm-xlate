@@ -1,0 +1,32 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "claude-3-5-sonnet-latest",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "tool_result",
+          "tool_use_id": "call_does_not_exist",
+          "content": "18C"
+        },
+        {
+          "type": "text",
+          "text": "hi"
+        }
+      ]
+    }
+  ],
+  "max_tokens": 64,
+  "cache_control": {
+    "type": "ephemeral"
+  }
+}
+--- headers ---
+anthropic-version: 2023-06-01
+upstream_streams: false
+--- degraded ---

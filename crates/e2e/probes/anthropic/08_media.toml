@@ -1,0 +1,137 @@
+# Anthropic family 8 — media: images, PDFs, documents (plan §5.8).
+# llm-xlate assumption: §7.5 media lowering (source shapes: base64 / url; document with title / text).
+# data/caps media capability, per-mime support.
+
+[[probe]]
+id         = "ant.media.image_png_base64"
+protocol   = "anthropic"
+tags       = ["dataset", "media"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "An image content block with source base64 png is accepted (200)."
+expect     = { status = 200 }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = [ { type = "image", source = { type = "base64", media_type = "image/png", data = "$ASSET:png_1px" } }, { type = "text", text = "Describe this image in one word." } ] } ]
+
+[[probe]]
+id         = "ant.media.image_jpeg_base64"
+protocol   = "anthropic"
+tags       = ["dataset", "media"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A base64 jpeg image block is accepted (200)."
+expect     = { status = 200 }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = [ { type = "image", source = { type = "base64", media_type = "image/jpeg", data = "$ASSET:jpeg_1px" } }, { type = "text", text = "One word." } ] } ]
+
+[[probe]]
+id         = "ant.media.image_url"
+protocol   = "anthropic"
+tags       = ["explore", "media"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "An image block with source type=url is accepted (URL fetch supported)."
+expect     = "any"
+notes      = "Uses a stable public image URL; if URL sources are unsupported the error text is the evidence."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = [ { type = "image", source = { type = "url", url = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png" } }, { type = "text", text = "One word." } ] } ]
+
+[[probe]]
+id         = "ant.media.image_unsupported_mime"
+protocol   = "anthropic"
+tags       = ["explore", "media", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "An unsupported media_type (e.g. image/tiff) -> 400 with a message enumerating supported types."
+expect     = { status = 400, error_type = "invalid_request_error" }
+notes      = "Captures the supported-mime list from the error text for data/caps."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = [ { type = "image", source = { type = "base64", media_type = "image/tiff", data = "$ASSET:png_1px" } }, { type = "text", text = "One word." } ] } ]
+
+[[probe]]
+id         = "ant.media.pdf_base64"
+protocol   = "anthropic"
+tags       = ["dataset", "media"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A document block with source base64 application/pdf is accepted (200)."
+expect     = { status = 200 }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = [ { type = "document", source = { type = "base64", media_type = "application/pdf", data = "$ASSET:pdf_1page" } }, { type = "text", text = "How many pages?" } ] } ]
+
+[[probe]]
+id         = "ant.media.pdf_with_title"
+protocol   = "anthropic"
+tags       = ["dataset", "media"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A document block with a `title` (and citations off) is accepted and title is echoed/usable."
+expect     = { status = 200 }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = [ { type = "document", title = "Report.pdf", source = { type = "base64", media_type = "application/pdf", data = "$ASSET:pdf_1page" } }, { type = "text", text = "Summarise in one line." } ] } ]
+
+[[probe]]
+id         = "ant.media.text_document"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "media"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A document block with source type=text (plain-text document, media_type text/plain) is accepted — the text-document path for citations."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = [ { type = "document", title = "notes.txt", source = { type = "text", media_type = "text/plain", data = "The capital of France is Paris." } }, { type = "text", text = "What is the capital of France?" } ] } ]
+
+[[probe]]
+id         = "ant.media.document_citations"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "media", "streaming"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "A text document with citations:{enabled:true} yields citation blocks / citations_delta events (plan §5.10 citations_delta)."
+expect     = "any"
+notes      = "Feeds the streaming citations_delta observation too."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 128
+messages   = [ { role = "user", content = [ { type = "document", title = "facts.txt", source = { type = "text", media_type = "text/plain", data = "Fact 1: The Eiffel Tower is 330 metres tall. Fact 2: It was completed in 1889." }, citations = { enabled = true } }, { type = "text", text = "How tall is the Eiffel Tower? Cite the document." } ] } ]
+
+[[probe]]
+id         = "ant.media.files_api_file_id"
+protocol   = "anthropic"
+tags       = ["media", "files_api"]
+models     = "anthropic_new"
+stream     = false
+requires   = ["files_api"]
+hypothesis = "A document/image block referencing a Files-API file_id source is accepted when the Files API is enabled."
+expect     = "any"
+notes      = "requires files_api: the file_id must be uploaded first by the operator; the placeholder id below is a stand-in for dry-run only."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = [ { type = "document", source = { type = "file", file_id = "file-PLACEHOLDER" } }, { type = "text", text = "Summarise." } ] } ]
+
+[probe.headers]
+"anthropic-beta" = "files-api-2025-04-14"

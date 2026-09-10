@@ -1,0 +1,34 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "claude-opus-5",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "What is 12*12?"
+        }
+      ]
+    }
+  ],
+  "max_tokens": 128,
+  "thinking": {
+    "type": "adaptive"
+  },
+  "output_config": {
+    "effort": "low"
+  },
+  "cache_control": {
+    "type": "ephemeral"
+  }
+}
+--- headers ---
+anthropic-version: 2023-06-01
+upstream_streams: false
+--- degraded ---
+reasoning.effort=downgraded

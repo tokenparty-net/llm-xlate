@@ -1,0 +1,31 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/chat/completions",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "max_completion_tokens": 64,
+    "messages": [
+      {
+        "content": [
+          {
+            "text": "One word.",
+            "type": "text"
+          },
+          {
+            "image_url": {
+              "detail": "low",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png"
+            },
+            "type": "image_url"
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model": "gpt-4o-mini"
+  }
+}

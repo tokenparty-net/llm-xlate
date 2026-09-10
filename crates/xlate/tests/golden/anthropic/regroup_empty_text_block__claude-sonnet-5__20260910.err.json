@@ -1,0 +1,29 @@
+{
+  "status": 400,
+  "headers": {
+    "anthropic-organization-id": "<redacted>",
+    "anthropic-workspace-id": "<redacted>",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d086dbfb67327-EWR",
+    "connection": "keep-alive",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:23:50 GMT",
+    "request-id": "req_011CeuSKLHNxP7uXv8NtD6d1",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "traceresponse": "00-1c8af367b5469242a2a44b6611dcd0c7-6e9be7c7e5c36e38-01",
+    "transfer-encoding": "chunked",
+    "vary": "Accept-Encoding",
+    "x-robots-tag": "none",
+    "x-should-retry": "false"
+  },
+  "body": {
+    "type": "error",
+    "error": {
+      "type": "invalid_request_error",
+      "message": "messages: text content blocks must be non-empty"
+    },
+    "request_id": "req_011CeuSKLHNxP7uXv8NtD6d1"
+  }
+}

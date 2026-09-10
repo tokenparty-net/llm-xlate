@@ -1,0 +1,30 @@
+# Example OpenAI Chat Completions probes. Tagged `example` only.
+
+[[probe]]
+id         = "chat.example.text"
+protocol   = "chat"
+tags       = ["example"]
+models     = "openai_chat"
+stream     = "both"
+hypothesis = "A plain single-turn text request returns 200 with finish_reason stop."
+expect     = { status = 200 }
+notes      = "Smoke test: the cheapest chat model answers a trivial prompt."
+
+[probe.body]
+model               = "$MODEL"
+max_completion_tokens = 64
+messages            = [ { role = "user", content = "Say hello in one short sentence." } ]
+
+[[probe]]
+id         = "chat.example.unknown_model"
+protocol   = "chat"
+tags       = ["example"]
+models     = ["gpt-nonexistent-model-xyz"]
+stream     = false
+hypothesis = "An unknown model id is rejected 404 with error.type invalid_request_error, code model_not_found."
+expect     = { status = 404, error_type = "invalid_request_error" }
+notes      = "Error smoke test; the model id is deliberately invalid."
+
+[probe.body]
+model    = "$MODEL"
+messages = [ { role = "user", content = "This should fail." } ]

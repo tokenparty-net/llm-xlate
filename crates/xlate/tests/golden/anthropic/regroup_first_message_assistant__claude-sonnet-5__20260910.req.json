@@ -1,0 +1,14 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "I will help.",
+      "role": "assistant"
+    },
+    {
+      "content": "Great, what is 2+2?",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5"
+}

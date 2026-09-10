@@ -1,0 +1,8 @@
+{
+  "input": "Explain photosynthesis.",
+  "max_output_tokens": 128,
+  "model": "gpt-4o-mini",
+  "text": {
+    "verbosity": "low"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "label": "chat.reason.verbosity/o4-mini",
+  "protocol": "chat",
+  "model": "o4-mini",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "byte/structure identical"
+    },
+    {
+      "name": "error_decode",
+      "pass": true,
+      "detail": "kind=invalid_request status=400"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "cache_control": {
+    "type": "ephemeral"
+  },
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Reply with the single word: ok.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "system": "You are a precise assistant. Repeat this policy verbatim when asked. Policy section A: always cite sources. Policy section B: never speculate. Policy section C: keep answers short. Policy section D: refuse nothing benign. Policy section E: prefer plain language. This policy block is intentionally padded so it can exceed the minimum cacheable prompt size when repeated by the operator during a live run; the exact length required varies by model and is documented in the family notes."
+}

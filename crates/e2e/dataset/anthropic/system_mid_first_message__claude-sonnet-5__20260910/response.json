@@ -1,0 +1,30 @@
+{
+  "status": 400,
+  "headers": {
+    "anthropic-organization-id": "<redacted>",
+    "anthropic-workspace-id": "<redacted>",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d0813cf6b7327-EWR",
+    "connection": "keep-alive",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:23:36 GMT",
+    "request-id": "req_011CeuSJGiHdRmu3Dsd5dM3Y",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "traceresponse": "00-7f38d315d73a21a31f3076cc96631e70-f53ad23908a1a4c8-01",
+    "transfer-encoding": "chunked",
+    "vary": "Accept-Encoding",
+    "x-robots-tag": "none",
+    "x-should-retry": "false"
+  },
+  "elapsed_ms": 234,
+  "body": {
+    "type": "error",
+    "error": {
+      "type": "invalid_request_error",
+      "message": "messages.0: use the top-level 'system' parameter for the initial system prompt; the directive-only form (content: [] with output_config) is accepted at any position"
+    },
+    "request_id": "req_011CeuSJGiHdRmu3Dsd5dM3Y"
+  }
+}

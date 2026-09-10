@@ -1,0 +1,20 @@
+{
+  "protocol": "responses",
+  "stream": false,
+  "status": 400,
+  "verdict": "pass",
+  "error": {
+    "type": "invalid_request_error",
+    "code": "invalid_value",
+    "param": "reasoning.effort",
+    "message": "Invalid value: 'turbo'. Supported values are: 'none', 'minimal', 'low', 'medium', 'high', 'xhigh', and 'max'."
+  },
+  "request_id": "req_efd6b57be56c42f09bb797439b2e9227",
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-EMULOWklpZQM9CLtwEqXHEPdrk7CE",
+  "object": "chat.completion",
+  "created": 1789028566,
+  "model": "gpt-4o-mini-2024-07-18",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\"code\":\"# Here is a simple Python code example that generates Fibonacci numbers.\\n\\ndef fibonacci(n):\\n    fib_sequence = [0, 1]\\n    while len(fib_sequence) < n:\\n        next_fib = fib_sequence[-1] + fib_sequence[-2]\\n        fib_sequence.append(next_fib)\\n    return fib_sequence[:n]\\n\\n# Generate the first 10 Fibonacci numbers\\nprint(fibonacci(10))\"}",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 39,
+    "completion_tokens": 97,
+    "total_tokens": 136,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_ea9d9536ad"
+}

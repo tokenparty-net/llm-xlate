@@ -1,0 +1,5 @@
+---
+source: crates/chat/tests/request.rs
+expression: "encode_request_str(&ir, &gpt4o())"
+---
+{"model":"gpt-4o","messages":[{"role":"user","content":[{"type":"text","text":"Compare these two images."},{"type":"image_url","image_url":{"url":"data:image/jpeg;base64,/9j/4AAQSkZJRg=="}},{"type":"image_url","image_url":{"url":"https://example.com/cat.png","detail":"high"}}]}]}

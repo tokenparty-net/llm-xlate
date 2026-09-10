@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=invalid_request status=400 retryable=false param=reasoning.effort provider_type=invalid_request_error retry_after=- upstream_request_id=req_ce7cd437a7cb476488170694a625ad56
+message: Unsupported parameter: 'reasoning.effort' is not supported with this model.
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_ce7cd437a7cb476488170694a625ad56
+body:
+{
+  "error": {
+    "message": "Unsupported parameter: 'reasoning.effort' is not supported with this model.",
+    "type": "invalid_request_error",
+    "param": "reasoning.effort",
+    "code": "unsupported_parameter"
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"Unsupported parameter: 'reasoning.effort' is not supported with this model.","type":"invalid_request_error","param":"reasoning.effort","code":"unsupported_parameter"}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_ce7cd437a7cb476488170694a625ad56
+body:
+{
+  "error": {
+    "message": "Unsupported parameter: 'reasoning.effort' is not supported with this model.",
+    "type": "invalid_request_error",
+    "param": "reasoning.effort",
+    "code": "unsupported_parameter"
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":"unsupported_parameter","message":"Unsupported parameter: 'reasoning.effort' is not supported with this model.","param":"reasoning.effort","sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+  x-router-upstream-request-id: req_ce7cd437a7cb476488170694a625ad56
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "Unsupported parameter: 'reasoning.effort' is not supported with this model."
+  },
+  "request_id": "req_ce7cd437a7cb476488170694a625ad56"
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"Unsupported parameter: 'reasoning.effort' is not supported with this model."},"request_id":"req_ce7cd437a7cb476488170694a625ad56"}

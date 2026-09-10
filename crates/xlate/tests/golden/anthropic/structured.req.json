@@ -1,0 +1,6 @@
+{
+  "model": "claude-opus-5",
+  "max_tokens": 512,
+  "output_config": {"format": {"type": "json_schema", "schema": {"type": "object", "properties": {"answer": {"type": "string"}}, "required": ["answer"]}}},
+  "messages": [{"role": "user", "content": "Answer as JSON"}]
+}

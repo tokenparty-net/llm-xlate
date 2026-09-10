@@ -1,0 +1,19 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "llama-x",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What number did I ask you to remember?"
+    }
+  ],
+  "max_tokens": 64
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---
+previous_response_id=dropped

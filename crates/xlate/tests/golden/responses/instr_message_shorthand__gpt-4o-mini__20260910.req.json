@@ -1,0 +1,10 @@
+{
+  "input": [
+    {
+      "content": "What is 2+2?",
+      "role": "user"
+    }
+  ],
+  "max_output_tokens": 64,
+  "model": "gpt-4o-mini"
+}

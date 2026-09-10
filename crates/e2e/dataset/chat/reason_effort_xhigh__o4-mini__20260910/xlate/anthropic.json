@@ -1,0 +1,1 @@
+{"id":"resp_check","type":"message","role":"assistant","model":"check-model","content":[{"type":"text","text":"The 10th Fibonacci number is 55."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":15,"cache_read_input_tokens":0,"output_tokens":28}}

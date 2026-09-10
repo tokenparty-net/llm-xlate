@@ -1,0 +1,30 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-6-astra",
+  "instructions": "System policy block padded for caching: aaaa bbbb cccc dddd eeee ffff gggg hhhh iiii jjjj kkkk llll mmmm nnnn oooo pppp qqqq rrrr ssss tttt uuuu vvvv wwww xxxx yyyy zzzz repeated to exceed the minimum cacheable size during a live run.",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "A reference document that is padded for caching: one two three four five six seven eight nine ten, repeated to exceed the minimum cacheable size during a live run."
+        },
+        {
+          "type": "input_text",
+          "text": "Reply with the single word: ok."
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 64
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

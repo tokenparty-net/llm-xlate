@@ -1,0 +1,11 @@
+{
+  "max_completion_tokens": 64,
+  "messages": [
+    {
+      "content": "Say hi to bob.",
+      "name": "alice",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini"
+}

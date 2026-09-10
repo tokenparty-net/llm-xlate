@@ -1,0 +1,20 @@
+{
+  "protocol": "responses",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "code": "invalid_value",
+    "param": "url",
+    "message": "Error while downloading file. Upstream status code: 400."
+  },
+  "request_id": "req_98d84a97914e41e1ac7038566648060f",
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

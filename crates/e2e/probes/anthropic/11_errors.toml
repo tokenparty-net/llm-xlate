@@ -1,0 +1,175 @@
+# Anthropic family 11 — error variants & headers (plan §5.11).
+# llm-xlate assumption: §10 error mapping (status + error.type -> ErrorKind), request-id / retry-after
+# header handling. Each probe pins one error shape.
+
+[[probe]]
+id         = "ant.err.bad_role"
+protocol   = "anthropic"
+tags       = ["dataset", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "An unknown message role -> 400 invalid_request_error."
+expect     = { status = 400, error_type = "invalid_request_error" }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "wizard", content = "cast a spell" } ]
+
+[[probe]]
+id         = "ant.err.bad_block_type"
+protocol   = "anthropic"
+tags       = ["dataset", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "An unknown content block type -> 400 invalid_request_error."
+expect     = { status = 400, error_type = "invalid_request_error" }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = [ { type = "hologram", data = "x" } ] } ]
+
+[[probe]]
+id         = "ant.err.missing_max_tokens"
+protocol   = "anthropic"
+tags       = ["dataset", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "Omitting max_tokens -> 400 invalid_request_error (max_tokens is required)."
+expect     = { status = 400, error_type = "invalid_request_error" }
+notes      = "Body deliberately has no max_tokens; the clamp only lowers existing values, so nothing is added."
+
+[probe.body]
+model    = "$MODEL"
+messages = [ { role = "user", content = "Say hi." } ]
+
+[[probe]]
+id         = "ant.err.max_tokens_too_large"
+protocol   = "anthropic"
+tags       = ["explore", "errors"]
+models     = "anthropic_new"
+stream     = false
+allow_long = true
+hypothesis = "max_tokens above the model's output ceiling -> 400 with a message naming the per-model maximum (evidence for data/caps max_output_tokens)."
+expect     = { status = 400, error_type = "invalid_request_error" }
+notes      = "allow_long so the clamp does not lower the deliberately huge value."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 100000000
+messages   = [ { role = "user", content = "Say hi." } ]
+
+[[probe]]
+id         = "ant.err.prompt_too_long"
+protocol   = "anthropic"
+tags       = ["explore", "errors", "expensive"]
+models     = "anthropic_new"
+stream     = false
+allow_long = true
+hypothesis = "A prompt exceeding the context window -> 400 with context-length text (the string llm-xlate maps to ContextLengthExceeded per §10)."
+expect     = { status = 400, error_type = "invalid_request_error" }
+requires   = ["manual"]
+notes      = "Schema gap: no `repeat` helper to build a >200k-token prompt inline. Tagged expensive + manual; the operator supplies a body_file with a large paragraph, or lengthens the string below. Kept on the cheap model."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "This prompt is a placeholder; replace with a body_file large enough to exceed the context window before a live run. Repeat this sentence tens of thousands of times to exceed the window." } ]
+
+[[probe]]
+id         = "ant.err.unknown_top_field"
+protocol   = "anthropic"
+tags       = ["explore", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "An unknown top-level field -> 400 invalid_request_error (strict body validation), naming the field."
+expect     = "any"
+notes      = "Determines whether Anthropic ignores or rejects unknown top-level keys — matters for forward-compatible encoding."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 64
+frobnicate    = true
+messages      = [ { role = "user", content = "Say hi." } ]
+
+[[probe]]
+id         = "ant.err.unknown_beta_header"
+protocol   = "anthropic"
+tags       = ["explore", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "An unknown anthropic-beta value -> 400 (or is silently ignored?); documents beta-header strictness."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." } ]
+
+[probe.headers]
+"anthropic-beta" = "totally-made-up-beta-2099-01-01"
+
+[[probe]]
+id         = "ant.err.bad_key"
+protocol   = "anthropic"
+tags       = ["dataset", "errors"]
+models     = "anthropic_new"
+stream     = false
+requires   = ["manual"]
+hypothesis = "A bad API key -> 401 authentication_error with request-id header (the 401 shape llm-xlate maps per §10)."
+expect     = { status = 401, error_type = "authentication_error" }
+notes      = "requires manual: the client sends the real key; to trigger 401 the operator must run with a deliberately invalid key (never checked in). Dry-run only otherwise."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." } ]
+
+[[probe]]
+id         = "ant.err.rate_limit"
+protocol   = "anthropic"
+tags       = ["errors"]
+models     = "anthropic_new"
+stream     = false
+requires   = ["manual"]
+hypothesis = "429 rate_limit_error carries a retry-after header (llm-xlate reads retry-after per §10)."
+expect     = { status = 429, error_type = "rate_limit_error" }
+notes      = "Cannot be triggered on demand; captured opportunistically during a burst."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." } ]
+
+[[probe]]
+id         = "ant.err.overloaded"
+protocol   = "anthropic"
+tags       = ["errors"]
+models     = "anthropic_new"
+stream     = false
+requires   = ["manual"]
+hypothesis = "529 overloaded_error is a retryable server error (llm-xlate maps 529 -> Overloaded/retryable)."
+expect     = { status = 529, error_type = "overloaded_error" }
+notes      = "Server-side; cannot be triggered on demand."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." } ]
+
+[[probe]]
+id         = "ant.err.content_filter"
+protocol   = "anthropic"
+tags       = ["errors"]
+models     = "anthropic_new"
+stream     = false
+requires   = ["manual"]
+hypothesis = "A blocked prompt yields stop_reason=refusal (or a content-filter error); the refusal shape llm-xlate must surface."
+expect     = "any"
+notes      = "requires manual: we do not send genuinely harmful content in an automated run; operator triggers deliberately if needed."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." } ]

@@ -1,0 +1,28 @@
+{
+  "label": "resp.tools.function_reasoning_capture/o4-mini",
+  "protocol": "responses",
+  "model": "o4-mini",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "2 path(s) differ (normalizations): ~/input, +/reasoning/summary"
+    },
+    {
+      "name": "response_decode_nonstream",
+      "pass": true,
+      "detail": "decoded 5 event(s)"
+    },
+    {
+      "name": "cross_client",
+      "pass": true,
+      "detail": "rendered 2 target dialect(s)"
+    }
+  ]
+}

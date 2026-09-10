@@ -1,0 +1,45 @@
+event: response.created
+data: {"type":"response.created","sequence_number":0,"response":{"id":"resp_check","object":"response","created_at":1700000000,"status":"in_progress","background":null,"error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"metadata":{},"model":"check-model","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":null,"service_tier":null,"store":null,"temperature":null,"text":null,"tool_choice":"auto","tools":[],"top_p":null,"truncation":"disabled","usage":null,"user":null}}
+
+event: response.in_progress
+data: {"type":"response.in_progress","sequence_number":1,"response":{"id":"resp_check","object":"response","created_at":1700000000,"status":"in_progress","background":null,"error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"metadata":{},"model":"check-model","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":null,"service_tier":null,"store":null,"temperature":null,"text":null,"tool_choice":"auto","tools":[],"top_p":null,"truncation":"disabled","usage":null,"user":null}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","sequence_number":2,"output_index":0,"item":{"id":"msg_resp_check_0","type":"message","status":"in_progress","role":"assistant","content":[]}}
+
+event: response.content_part.added
+data: {"type":"response.content_part.added","sequence_number":3,"item_id":"msg_resp_check_0","output_index":0,"content_index":0,"part":{"type":"output_text","text":"","annotations":[]}}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","sequence_number":4,"item_id":"msg_resp_check_0","output_index":0,"content_index":0,"delta":"Checking now"}
+
+event: response.output_text.done
+data: {"type":"response.output_text.done","sequence_number":5,"item_id":"msg_resp_check_0","output_index":0,"content_index":0,"text":"Checking now"}
+
+event: response.content_part.done
+data: {"type":"response.content_part.done","sequence_number":6,"item_id":"msg_resp_check_0","output_index":0,"content_index":0,"part":{"type":"output_text","text":"Checking now","annotations":[]}}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","sequence_number":7,"output_index":0,"item":{"id":"msg_resp_check_0","type":"message","status":"completed","role":"assistant","content":[{"type":"output_text","text":"Checking now","annotations":[]}]}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","sequence_number":8,"output_index":1,"item":{"id":"fc_resp_check_1","type":"function_call","status":"in_progress","call_id":"toolu_013s3uzBBgMEQEMUTxkya7kV","name":"get_weather","arguments":""}}
+
+event: response.function_call_arguments.delta
+data: {"type":"response.function_call_arguments.delta","sequence_number":9,"item_id":"fc_resp_check_1","output_index":1,"delta":""}
+
+event: response.function_call_arguments.delta
+data: {"type":"response.function_call_arguments.delta","sequence_number":10,"item_id":"fc_resp_check_1","output_index":1,"delta":"{\"cit"}
+
+event: response.function_call_arguments.delta
+data: {"type":"response.function_call_arguments.delta","sequence_number":11,"item_id":"fc_resp_check_1","output_index":1,"delta":"y\": \"Paris\"}"}
+
+event: response.function_call_arguments.done
+data: {"type":"response.function_call_arguments.done","sequence_number":12,"item_id":"fc_resp_check_1","output_index":1,"arguments":"{\"city\": \"Paris\"}"}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","sequence_number":13,"output_index":1,"item":{"id":"fc_resp_check_1","type":"function_call","status":"completed","call_id":"toolu_013s3uzBBgMEQEMUTxkya7kV","name":"get_weather","arguments":"{\"city\": \"Paris\"}"}}
+
+event: response.completed
+data: {"type":"response.completed","sequence_number":14,"response":{"id":"resp_check","object":"response","created_at":1700000000,"status":"completed","background":null,"error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"metadata":{},"model":"check-model","output":[{"id":"msg_resp_check_0","type":"message","status":"completed","role":"assistant","content":[{"type":"output_text","text":"Checking now","annotations":[]}]},{"id":"fc_resp_check_1","type":"function_call","status":"completed","call_id":"toolu_013s3uzBBgMEQEMUTxkya7kV","name":"get_weather","arguments":"{\"city\": \"Paris\"}"}],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":null,"service_tier":null,"store":null,"temperature":null,"text":null,"tool_choice":"auto","tools":[],"top_p":null,"truncation":"disabled","usage":{"input_tokens":457,"input_tokens_details":{"cached_tokens":0},"output_tokens":55,"output_tokens_details":{"reasoning_tokens":0},"total_tokens":512},"user":null}}
+

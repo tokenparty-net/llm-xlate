@@ -1,0 +1,30 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "One word."
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png"
+          }
+        }
+      ]
+    }
+  ],
+  "max_completion_tokens": 64
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---
+ext.responses.image_detail=dropped

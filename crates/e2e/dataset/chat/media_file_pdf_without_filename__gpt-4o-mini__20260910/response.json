@@ -1,0 +1,38 @@
+{
+  "status": 400,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d0703b91cb295-EWR",
+    "connection": "keep-alive",
+    "content-length": "235",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:52 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "34",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-openai-proxy-wasm": "v0.1",
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9969",
+    "x-ratelimit-remaining-tokens": "191674",
+    "x-ratelimit-reset-requests": "4m21.728s",
+    "x-ratelimit-reset-tokens": "2.497s",
+    "x-request-id": "req_6c24ad4a81c349cd9e7d0c0786acad77"
+  },
+  "elapsed_ms": 100,
+  "body": {
+    "error": {
+      "message": "Missing required parameter: 'messages[0].content[1].file.file_id'.",
+      "type": "invalid_request_error",
+      "param": "messages[0].content[1].file.file_id",
+      "code": "missing_required_parameter"
+    }
+  }
+}

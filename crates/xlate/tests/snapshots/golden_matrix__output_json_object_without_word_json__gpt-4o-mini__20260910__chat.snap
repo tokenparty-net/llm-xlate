@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=invalid_request status=400 retryable=false param=messages provider_type=invalid_request_error retry_after=- upstream_request_id=req_a46b6f50d8bd4e1290ace3eedb1964f8
+message: 'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_a46b6f50d8bd4e1290ace3eedb1964f8
+body:
+{
+  "error": {
+    "message": "'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.",
+    "type": "invalid_request_error",
+    "param": "messages",
+    "code": null
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.","type":"invalid_request_error","param":"messages","code":null}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_a46b6f50d8bd4e1290ace3eedb1964f8
+body:
+{
+  "error": {
+    "message": "'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.",
+    "type": "invalid_request_error",
+    "param": "messages",
+    "code": null
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":null,"message":"'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.","param":"messages","sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+  x-router-upstream-request-id: req_a46b6f50d8bd4e1290ace3eedb1964f8
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'."
+  },
+  "request_id": "req_a46b6f50d8bd4e1290ace3eedb1964f8"
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'."},"request_id":"req_a46b6f50d8bd4e1290ace3eedb1964f8"}

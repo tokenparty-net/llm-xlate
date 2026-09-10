@@ -1,0 +1,32 @@
+{
+  "max_completion_tokens": 128,
+  "messages": [
+    {
+      "content": "Weather in Paris? Use the tool.",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-5.4",
+  "reasoning_effort": "high",
+  "tools": [
+    {
+      "function": {
+        "description": "Get weather.",
+        "name": "get_weather",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "city": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "city"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    }
+  ]
+}

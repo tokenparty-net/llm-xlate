@@ -1,0 +1,19 @@
+{
+  "protocol": "anthropic",
+  "stream": false,
+  "status": 400,
+  "verdict": "fail",
+  "verdict_detail": "expected status 200, got 400",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "messages.2: role 'system' must follow a 'user' message or an 'assistant' message ending in a server tool result; the directive-only form (content: [] with output_config) is accepted at any position"
+  },
+  "request_id": "req_011CeuSJEYKghHQzeULLbXUQ",
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

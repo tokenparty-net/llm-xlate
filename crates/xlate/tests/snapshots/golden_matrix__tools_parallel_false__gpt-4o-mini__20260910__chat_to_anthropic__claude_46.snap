@@ -1,0 +1,49 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "claude-opus-4-6",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Weather in Paris and Tokyo?"
+        }
+      ]
+    }
+  ],
+  "max_tokens": 128,
+  "tools": [
+    {
+      "name": "get_weather",
+      "description": "Get weather.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "type": "object"
+      }
+    }
+  ],
+  "tool_choice": {
+    "type": "auto",
+    "disable_parallel_tool_use": true
+  },
+  "cache_control": {
+    "type": "ephemeral"
+  }
+}
+--- headers ---
+anthropic-version: 2023-06-01
+upstream_streams: false
+--- degraded ---

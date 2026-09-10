@@ -1,0 +1,41 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Weather in Paris, London and Rome please."
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get weather.",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "city": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "city"
+          ],
+          "type": "object"
+        }
+      }
+    }
+  ],
+  "tool_choice": "required",
+  "parallel_tool_calls": false,
+  "max_completion_tokens": 128
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

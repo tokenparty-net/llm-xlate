@@ -1,0 +1,27 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-6-astra",
+  "instructions": "Padded cacheable system: alpha beta gamma delta epsilon zeta eta theta iota kappa, repeated for size, repeated for size, repeated for size, repeated for size.",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Say ok."
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 64,
+  "stream": true
+}
+--- headers ---
+content-type: application/json
+upstream_streams: true
+--- degraded ---

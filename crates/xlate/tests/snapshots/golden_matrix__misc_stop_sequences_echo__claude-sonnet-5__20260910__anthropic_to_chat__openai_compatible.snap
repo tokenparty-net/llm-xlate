@@ -1,0 +1,23 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "llama-x",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Write the word START then the word END and nothing after."
+    }
+  ],
+  "max_tokens": 128,
+  "stop": "END",
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  }
+}
+--- headers ---
+upstream_streams: true
+--- degraded ---

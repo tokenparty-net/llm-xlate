@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=invalid_request status=400 retryable=false param=messages.[1].role provider_type=invalid_request_error retry_after=- upstream_request_id=req_2050a7f9d7a443968b17379b00d7353d
+message: Invalid parameter: messages with role 'tool' must be a response to a preceeding message with 'tool_calls'.
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_2050a7f9d7a443968b17379b00d7353d
+body:
+{
+  "error": {
+    "message": "Invalid parameter: messages with role 'tool' must be a response to a preceeding message with 'tool_calls'.",
+    "type": "invalid_request_error",
+    "param": "messages.[1].role",
+    "code": null
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"Invalid parameter: messages with role 'tool' must be a response to a preceeding message with 'tool_calls'.","type":"invalid_request_error","param":"messages.[1].role","code":null}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_2050a7f9d7a443968b17379b00d7353d
+body:
+{
+  "error": {
+    "message": "Invalid parameter: messages with role 'tool' must be a response to a preceeding message with 'tool_calls'.",
+    "type": "invalid_request_error",
+    "param": "messages.[1].role",
+    "code": null
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":null,"message":"Invalid parameter: messages with role 'tool' must be a response to a preceeding message with 'tool_calls'.","param":"messages.[1].role","sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+  x-router-upstream-request-id: req_2050a7f9d7a443968b17379b00d7353d
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "Invalid parameter: messages with role 'tool' must be a response to a preceeding message with 'tool_calls'."
+  },
+  "request_id": "req_2050a7f9d7a443968b17379b00d7353d"
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"Invalid parameter: messages with role 'tool' must be a response to a preceeding message with 'tool_calls'."},"request_id":"req_2050a7f9d7a443968b17379b00d7353d"}

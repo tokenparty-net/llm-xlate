@@ -1,0 +1,18 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "type": "message",
+  "role": "assistant",
+  "model": "golden-model",
+  "content": [],
+  "stop_reason": "max_tokens",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 17,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 256
+  }
+}

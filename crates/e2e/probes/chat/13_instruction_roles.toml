@@ -1,0 +1,103 @@
+# Chat family 13 — instruction roles: developer vs system (plan §5.13).
+# llm-xlate assumption: §7.1 instructions — developer/system role mapping across chat + reasoning models,
+# mid-context instruction turns. data/caps instruction_role.
+
+[[probe]]
+id         = "chat.instr.system_basic"
+protocol   = "chat"
+tags       = ["dataset", "instructions"]
+models     = "openai_chat"
+stream     = "both"
+hypothesis = "A leading system message is accepted (200) and steers the reply on chat models."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "system", content = "Answer only in French." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "chat.instr.developer_on_chat"
+protocol   = "chat"
+tags       = ["explore", "instructions"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "A `developer` role message is accepted on gpt-4o-family chat models (developer supersedes system on newer models)."
+expect     = "any"
+notes      = "Documents whether developer is accepted on non-reasoning chat models or only reasoning ones."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "developer", content = "Answer only in French." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "chat.instr.developer_on_reasoning"
+protocol   = "chat"
+tags       = ["explore", "instructions"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "A `developer` role is the preferred instruction slot on reasoning models (o-series); accepted 200."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+messages              = [ { role = "developer", content = "Be terse." }, { role = "user", content = "What is 2+2?" } ]
+
+[[probe]]
+id         = "chat.instr.system_on_reasoning"
+protocol   = "chat"
+tags       = ["explore", "instructions"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "A `system` role is still accepted on reasoning models (mapped to developer internally) — 200, not an error."
+expect     = "any"
+notes      = "Determines whether llm-xlate must rewrite system->developer for reasoning models or the API tolerates system."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+messages              = [ { role = "system", content = "Be terse." }, { role = "user", content = "What is 2+2?" } ]
+
+[[probe]]
+id         = "chat.instr.mid_context_system"
+protocol   = "chat"
+tags       = ["explore", "dataset", "instructions"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "A system message mid-conversation (after an assistant turn) is accepted on chat models (no ordering constraint like Anthropic)."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "user", content = "Say hi." }, { role = "assistant", content = "Hi." }, { role = "system", content = "From now on answer in French." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "chat.instr.both_system_and_developer"
+protocol   = "chat"
+tags       = ["explore", "instructions"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "system + developer together are both accepted; documents precedence (which wins) on reasoning models."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+messages              = [ { role = "system", content = "Answer in French." }, { role = "developer", content = "Answer in German." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "chat.instr.name_field"
+protocol   = "chat"
+tags       = ["explore", "instructions"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "A message `name` field is accepted and preserved (multi-participant naming)."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "user", name = "alice", content = "Say hi to bob." } ]

@@ -1,0 +1,42 @@
+{
+  "protocol": "anthropic",
+  "stream": false,
+  "status": 200,
+  "verdict": "pass",
+  "request_id": "req_011CeuSH8JVw9f5sAXsn7svB",
+  "rate_limit": {
+    "anthropic-ratelimit-input-tokens-limit": "5000000",
+    "anthropic-ratelimit-input-tokens-remaining": "5000000",
+    "anthropic-ratelimit-input-tokens-reset": "2026-09-10T08:23:21Z",
+    "anthropic-ratelimit-output-tokens-limit": "1000000",
+    "anthropic-ratelimit-output-tokens-remaining": "1000000",
+    "anthropic-ratelimit-output-tokens-reset": "2026-09-10T08:23:22Z",
+    "anthropic-ratelimit-requests-limit": "5000",
+    "anthropic-ratelimit-requests-remaining": "4999",
+    "anthropic-ratelimit-requests-reset": "2026-09-10T08:23:20Z",
+    "anthropic-ratelimit-tokens-limit": "6000000",
+    "anthropic-ratelimit-tokens-remaining": "6000000",
+    "anthropic-ratelimit-tokens-reset": "2026-09-10T08:23:21Z"
+  },
+  "stop_reason": "end_turn",
+  "usage": {
+    "cache_creation.ephemeral_1h_input_tokens": 0,
+    "cache_creation.ephemeral_5m_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "input_tokens": 15,
+    "output_tokens": 150,
+    "output_tokens_details.thinking_tokens": 78
+  },
+  "type_sequence": [
+    "thinking",
+    "text"
+  ],
+  "tool_call_count": 0,
+  "has_signature": true,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

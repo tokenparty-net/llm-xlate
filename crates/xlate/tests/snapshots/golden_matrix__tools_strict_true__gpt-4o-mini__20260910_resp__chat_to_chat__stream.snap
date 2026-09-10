@@ -1,0 +1,15 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: render_frames(&frames)
+---
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_hJton5oCQyb5Ou9jG6QlLFOX","type":"function","function":{"name":"get_weather","arguments":""}}]},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"{\"city\":\"Paris\"}"}}]},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[],"usage":{"prompt_tokens":48,"completion_tokens":14,"total_tokens":62,"prompt_tokens_details":{"cached_tokens":0,"audio_tokens":0},"completion_tokens_details":{"reasoning_tokens":0,"accepted_prediction_tokens":0,"audio_tokens":0,"rejected_prediction_tokens":0}}}
+
+data: [DONE]

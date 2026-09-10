@@ -1,0 +1,33 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Describe these"
+        },
+        {
+          "type": "input_image",
+          "image_url": "data:image/png;base64,aGVsbG8="
+        },
+        {
+          "type": "input_text",
+          "text": "<document title=\"Notes\">\ninline text doc\n</document>"
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 1024
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

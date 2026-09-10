@@ -1,0 +1,48 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "object": "chat.completion",
+  "created": 1700000000,
+  "model": "golden-model",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "I'll get the weather for both cities now.",
+        "refusal": null,
+        "tool_calls": [
+          {
+            "id": "toolu_01NcBmmQLYPVEZabgndS6Esr",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": "{\"city\":\"Paris\"}"
+            }
+          },
+          {
+            "id": "toolu_01SLub878vFZRjnD3YKHXYdK",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": "{\"city\":\"Tokyo\"}"
+            }
+          }
+        ]
+      },
+      "finish_reason": "tool_calls",
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 463,
+    "completion_tokens": 113,
+    "total_tokens": 576,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  }
+}

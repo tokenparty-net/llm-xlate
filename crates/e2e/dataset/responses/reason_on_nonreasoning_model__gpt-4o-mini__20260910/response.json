@@ -1,0 +1,31 @@
+{
+  "status": 400,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d05cf9b1ab295-EWR",
+    "connection": "keep-alive",
+    "content-length": "220",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:03 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "76",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "req_ce7cd437a7cb476488170694a625ad56"
+  },
+  "elapsed_ms": 153,
+  "body": {
+    "error": {
+      "message": "Unsupported parameter: 'reasoning.effort' is not supported with this model.",
+      "type": "invalid_request_error",
+      "param": "reasoning.effort",
+      "code": "unsupported_parameter"
+    }
+  }
+}

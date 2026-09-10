@@ -1,0 +1,32 @@
+# Example Anthropic Messages probes. Tagged `example` only, so they are excluded from
+# `--tag explore` / `--tag dataset` runs and serve to prove the pipeline (`run --dry-run`).
+
+[[probe]]
+id         = "ant.example.text"
+protocol   = "anthropic"
+tags       = ["example"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "A plain single-turn text request returns 200 with a text block and stop_reason end_turn."
+expect     = { status = 200 }
+notes      = "Smoke test: the cheapest current Anthropic model answers a trivial prompt."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hello in one short sentence." } ]
+
+[[probe]]
+id         = "ant.example.unknown_model"
+protocol   = "anthropic"
+tags       = ["example"]
+models     = ["claude-nonexistent-model-xyz"]
+stream     = false
+hypothesis = "An unknown model id is rejected 404 with error.type not_found_error."
+expect     = { status = 404, error_type = "not_found_error" }
+notes      = "Error smoke test; the model id is deliberately invalid."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "This should fail." } ]

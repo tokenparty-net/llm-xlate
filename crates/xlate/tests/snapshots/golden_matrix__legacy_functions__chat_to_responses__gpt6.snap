@@ -1,0 +1,55 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-6-astra",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Call the lookup function."
+        }
+      ]
+    },
+    {
+      "type": "function_call",
+      "call_id": "lookup",
+      "name": "lookup",
+      "arguments": "{\"q\":\"cats\"}"
+    },
+    {
+      "type": "function_call_output",
+      "call_id": "lookup",
+      "output": "cats are great"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "name": "lookup",
+      "description": "Look something up",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "tool_choice": {
+    "type": "function",
+    "name": "lookup"
+  }
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---
+ext.chat.msg_ext=dropped

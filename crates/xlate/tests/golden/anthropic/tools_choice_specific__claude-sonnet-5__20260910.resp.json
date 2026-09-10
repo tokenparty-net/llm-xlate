@@ -1,0 +1,49 @@
+{
+  "model": "claude-sonnet-5",
+  "id": "msg_011CeuSGMmbd5HD4EKd4S9Hc",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_01Xdmz229YvEcc9xA7qCSKxj",
+      "name": "get_weather",
+      "input": {
+        "city": "Tokyo"
+      },
+      "caller": {
+        "type": "direct"
+      }
+    },
+    {
+      "type": "tool_use",
+      "id": "toolu_01YYAnbHg5RLSDH86ptmP3Tb",
+      "name": "get_time",
+      "input": {
+        "tz": "Asia/Tokyo"
+      },
+      "caller": {
+        "type": "direct"
+      }
+    }
+  ],
+  "container": null,
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 651,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 89,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "service_tier": "standard",
+    "inference_geo": "global"
+  }
+}

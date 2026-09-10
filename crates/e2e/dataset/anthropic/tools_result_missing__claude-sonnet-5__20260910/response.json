@@ -1,0 +1,30 @@
+{
+  "status": 400,
+  "headers": {
+    "anthropic-organization-id": "<redacted>",
+    "anthropic-workspace-id": "<redacted>",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d07672ab57327-EWR",
+    "connection": "keep-alive",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:23:08 GMT",
+    "request-id": "req_011CeuSGEexm4Tmr24DkRsC6",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "traceresponse": "00-20011d411cd83e37048ab1da455cc7ba-ee41085639a625c4-01",
+    "transfer-encoding": "chunked",
+    "vary": "Accept-Encoding",
+    "x-robots-tag": "none",
+    "x-should-retry": "false"
+  },
+  "elapsed_ms": 250,
+  "body": {
+    "type": "error",
+    "error": {
+      "type": "invalid_request_error",
+      "message": "messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_01NcBmmQLYPVEZabgndS6Esr, toolu_01SLub878vFZRjnD3YKHXYdK. Each `tool_use` block must have a corresponding `tool_result` block in the next message."
+    },
+    "request_id": "req_011CeuSGEexm4Tmr24DkRsC6"
+  }
+}

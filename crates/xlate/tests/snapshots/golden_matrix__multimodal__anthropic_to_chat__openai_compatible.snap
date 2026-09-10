@@ -1,0 +1,33 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "llama-x",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Describe these"
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "data:image/png;base64,aGVsbG8="
+          }
+        },
+        {
+          "type": "text",
+          "text": "<document title=\"Notes\">\ninline text doc\n</document>"
+        }
+      ]
+    }
+  ],
+  "max_tokens": 1024
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

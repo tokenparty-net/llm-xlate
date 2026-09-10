@@ -1,0 +1,20 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is 17*23?"
+    }
+  ],
+  "temperature": 0.5,
+  "max_completion_tokens": 256
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---
+reasoning=dropped

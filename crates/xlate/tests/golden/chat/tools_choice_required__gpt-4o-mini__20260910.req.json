@@ -1,0 +1,32 @@
+{
+  "max_completion_tokens": 128,
+  "messages": [
+    {
+      "content": "Hello there.",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini",
+  "tool_choice": "required",
+  "tools": [
+    {
+      "function": {
+        "description": "Get weather.",
+        "name": "get_weather",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "city": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "city"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    }
+  ]
+}

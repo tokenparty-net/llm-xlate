@@ -1,0 +1,16 @@
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[{"index":0,"delta":{"annotations":[{"type":"char_location","cited_text":"The Eiffel Tower is 330 metres tall and was completed in 1889.","document_index":0,"document_title":"facts.txt","start_char_index":0,"end_char_index":62}]},"finish_reason":null}]}
+
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[{"index":0,"delta":{"content":"The Eiff"},"finish_reason":null}]}
+
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[{"index":0,"delta":{"content":"el Tower is 330 "},"finish_reason":null}]}
+
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[{"index":0,"delta":{"content":"metres tall and was completed in 1889."},"finish_reason":null}]}
+
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[],"usage":{"prompt_tokens":838,"completion_tokens":47,"total_tokens":885,"prompt_tokens_details":{"cached_tokens":0}}}
+
+data: [DONE]
+

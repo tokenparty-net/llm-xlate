@@ -1,0 +1,22 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "type": "message",
+  "role": "assistant",
+  "model": "golden-model",
+  "content": [
+    {
+      "type": "text",
+      "text": "I can't help with that."
+    }
+  ],
+  "stop_reason": "refusal",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 15,
+    "output_tokens": 8
+  }
+}

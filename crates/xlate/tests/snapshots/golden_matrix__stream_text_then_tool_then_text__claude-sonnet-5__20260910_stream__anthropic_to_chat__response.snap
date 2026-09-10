@@ -1,0 +1,40 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "object": "chat.completion",
+  "created": 1700000000,
+  "model": "golden-model",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Checking now",
+        "refusal": null,
+        "tool_calls": [
+          {
+            "id": "toolu_013s3uzBBgMEQEMUTxkya7kV",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ]
+      },
+      "finish_reason": "tool_calls",
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 457,
+    "completion_tokens": 55,
+    "total_tokens": 512,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  }
+}

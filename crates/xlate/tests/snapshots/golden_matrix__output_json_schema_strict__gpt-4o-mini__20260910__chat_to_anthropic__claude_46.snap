@@ -1,0 +1,49 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "claude-opus-4-6",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Give the city Paris and a rough population."
+        }
+      ]
+    }
+  ],
+  "max_tokens": 128,
+  "output_config": {
+    "format": {
+      "type": "json_schema",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          },
+          "population": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "city",
+          "population"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "stream": true,
+  "cache_control": {
+    "type": "ephemeral"
+  }
+}
+--- headers ---
+anthropic-version: 2023-06-01
+upstream_streams: true
+--- degraded ---

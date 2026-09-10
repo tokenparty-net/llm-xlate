@@ -1,0 +1,31 @@
+{
+  "status": 400,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d05d71b7db295-EWR",
+    "connection": "keep-alive",
+    "content-length": "246",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:04 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "28",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "req_efd6b57be56c42f09bb797439b2e9227"
+  },
+  "elapsed_ms": 91,
+  "body": {
+    "error": {
+      "message": "Invalid value: 'turbo'. Supported values are: 'none', 'minimal', 'low', 'medium', 'high', 'xhigh', and 'max'.",
+      "type": "invalid_request_error",
+      "param": "reasoning.effort",
+      "code": "invalid_value"
+    }
+  }
+}

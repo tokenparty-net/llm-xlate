@@ -1,0 +1,28 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "instructions": "You are a helpful assistant.",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Hello, who won the world cup in 2018?"
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 256,
+  "temperature": 0.7,
+  "top_p": 1.0
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

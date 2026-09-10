@@ -1,0 +1,1 @@
+{"id":"resp_check","object":"chat.completion","created":1700000000,"model":"check-model","choices":[{"index":0,"message":{"role":"assistant","content":"START ","refusal":null},"finish_reason":"stop","logprobs":null}],"usage":{"prompt_tokens":21,"completion_tokens":2,"total_tokens":23,"prompt_tokens_details":{"cached_tokens":0}}}

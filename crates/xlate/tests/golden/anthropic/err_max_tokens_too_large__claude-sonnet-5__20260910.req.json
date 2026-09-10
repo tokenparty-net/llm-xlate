@@ -1,0 +1,10 @@
+{
+  "max_tokens": 100000000,
+  "messages": [
+    {
+      "content": "Say hi.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5"
+}

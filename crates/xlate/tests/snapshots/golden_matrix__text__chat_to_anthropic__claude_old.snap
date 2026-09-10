@@ -1,0 +1,35 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "claude-3-5-sonnet-latest",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Hello, who won the world cup in 2018?"
+        }
+      ]
+    }
+  ],
+  "max_tokens": 256,
+  "system": [
+    {
+      "type": "text",
+      "text": "You are a helpful assistant."
+    }
+  ],
+  "temperature": 0.7,
+  "top_p": 1.0,
+  "cache_control": {
+    "type": "ephemeral"
+  }
+}
+--- headers ---
+anthropic-version: 2023-06-01
+upstream_streams: false
+--- degraded ---

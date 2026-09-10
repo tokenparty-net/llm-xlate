@@ -1,0 +1,23 @@
+{
+  "label": "ant.system.mid.with_effort_field/claude-sonnet-5",
+  "protocol": "anthropic",
+  "model": "claude-sonnet-5",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "7 path(s) differ (normalizations): ~/messages[len 4!=3], ~/messages/0/content, ~/messages/1/content, ~/messages/2/content[len 1!=2], ~/messages/2/content/0/text, -/messages/2/effort, … (+1)"
+    },
+    {
+      "name": "error_decode",
+      "pass": true,
+      "detail": "kind=invalid_request status=400"
+    }
+  ]
+}

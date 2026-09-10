@@ -1,0 +1,31 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": "Hello there.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "tool_choice": {
+    "type": "any"
+  },
+  "tools": [
+    {
+      "description": "Get weather for a city.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "type": "object"
+      },
+      "name": "get_weather"
+    }
+  ]
+}

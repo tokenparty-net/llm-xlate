@@ -1,0 +1,28 @@
+{
+  "max_completion_tokens": 128,
+  "messages": [
+    {
+      "content": "Give a city.",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini",
+  "response_format": {
+    "json_schema": {
+      "name": "open",
+      "schema": {
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "type": "object"
+      },
+      "strict": true
+    },
+    "type": "json_schema"
+  }
+}

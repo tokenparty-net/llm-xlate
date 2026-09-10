@@ -1,0 +1,31 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "llama-x",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "<document title=\"facts.txt\">\nFact 1: The Eiffel Tower is 330 metres tall. Fact 2: It was completed in 1889.\n</document>"
+        },
+        {
+          "type": "text",
+          "text": "How tall is the Eiffel Tower? Cite the document."
+        }
+      ]
+    }
+  ],
+  "max_tokens": 128,
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  }
+}
+--- headers ---
+upstream_streams: true
+--- degraded ---

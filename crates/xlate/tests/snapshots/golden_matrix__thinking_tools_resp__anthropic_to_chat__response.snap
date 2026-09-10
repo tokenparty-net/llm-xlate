@@ -1,0 +1,44 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "object": "chat.completion",
+  "created": 1700000000,
+  "model": "golden-model",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "calling",
+        "refusal": null,
+        "tool_calls": [
+          {
+            "id": "toolu_1",
+            "type": "function",
+            "function": {
+              "name": "get",
+              "arguments": "{\"q\":\"x\"}"
+            }
+          }
+        ],
+        "reasoning_content": "reason",
+        "reasoning_details": [
+          {
+            "type": "router.opaque",
+            "data": "rtr1.eyJ2IjoxLCJwIjoiYW50aHJvcGljIiwibSI6ImNsYXVkZS1vcHVzLTUiLCJrIjoic2lnbmF0dXJlIiwiZCI6IlNJRz09IiwiaCI6ImFZUmNvcjJEWjQtS183M1NRalNqMnl5Z05nbDZLWjVtOHAzZnhaMmdscDgifQ"
+          }
+        ]
+      },
+      "finish_reason": "tool_calls",
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 5,
+    "completion_tokens": 10,
+    "total_tokens": 15
+  }
+}

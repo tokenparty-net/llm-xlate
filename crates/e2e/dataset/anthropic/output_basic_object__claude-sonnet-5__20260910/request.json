@@ -1,0 +1,42 @@
+{
+  "method": "POST",
+  "url": "https://api.anthropic.com/v1/messages",
+  "stream": true,
+  "headers": {
+    "anthropic-version": "2023-06-01",
+    "content-type": "application/json",
+    "x-api-key": "<redacted>"
+  },
+  "body": {
+    "max_tokens": 128,
+    "messages": [
+      {
+        "content": "Give the city Paris and a rough population.",
+        "role": "user"
+      }
+    ],
+    "model": "claude-sonnet-5",
+    "output_config": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "city": {
+              "type": "string"
+            },
+            "population": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "city",
+            "population"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "stream": true
+  }
+}

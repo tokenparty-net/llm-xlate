@@ -1,0 +1,14 @@
+{
+  "max_tokens": 256,
+  "messages": [
+    {
+      "content": "What is 17*23? Think first.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-haiku-4-5-20251001",
+  "thinking": {
+    "budget_tokens": 128,
+    "type": "enabled"
+  }
+}

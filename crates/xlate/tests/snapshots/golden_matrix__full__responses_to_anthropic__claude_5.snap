@@ -1,0 +1,6 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+ERROR kind=incompatible_history status=400 param=-
+message: the backend requires reasoning on the last tool turn but none is available to replay

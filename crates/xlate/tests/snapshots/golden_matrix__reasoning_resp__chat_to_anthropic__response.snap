@@ -1,0 +1,28 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "type": "message",
+  "role": "assistant",
+  "model": "golden-model",
+  "content": [
+    {
+      "type": "thinking",
+      "thinking": "17 times 23 is 391.",
+      "signature": "rtr1.eyJ2IjoxLCJwIjoib3BlbmFpIiwibSI6ImdwdC01LjQiLCJrIjoiZW5jcnlwdGVkIiwiZCI6ImVuYy1uYXRpdmUtYmxvYi14eXoiLCJoIjoiMXdiNXpnWTVHQ0tYb2V2X0hJU2RLN0hiT0tTY3p1Tm5FOGFoS1BXY2haTSJ9"
+    },
+    {
+      "type": "text",
+      "text": "The answer is 391."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 25,
+    "cache_read_input_tokens": 10,
+    "output_tokens": 40
+  }
+}

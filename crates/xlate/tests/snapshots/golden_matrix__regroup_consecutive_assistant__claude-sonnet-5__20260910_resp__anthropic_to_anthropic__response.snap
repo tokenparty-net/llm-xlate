@@ -1,0 +1,32 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "type": "message",
+  "role": "assistant",
+  "model": "golden-model",
+  "content": [
+    {
+      "type": "redacted_thinking",
+      "data": "EowCCpABCBEYAipAPm0ztQ9Ib/hBCvmjKtkriHFjxWRTErwhJuTJ8U9VqF6F5jDGLS8j748xqqClOTrD0+f+MySfXbY/AGQuxGNeZDIPY2xhdWRlLXNvbm5ldC01OABCCHRoaW5raW5nWiRkZmQ0NTJkMC00NWEyLTQ4YjAtODhiZS05NWExMWU3YTQ1ZjCoAZnSidUGEgxXIL4G1Rf3CmDd9WIaDL0wAjlP4ai0joZGZCIw43ZjlpYiSiVPCZh7jLGEbsN7ATEC8Pw71Q5EHv71Tn9MjVhQxv0lDAg0MDX+dzGuKikPsSDuzxgDjIekXYQHGcQg+wJ5290l5tWd3pFzn0z2l8IjQde777nkSRgB"
+    },
+    {
+      "type": "text",
+      "text": "I'm doing well, thanks for asking! How about you—how's your day going?"
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 28,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 36
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "model": "gpt-5.4",
+  "messages": [
+    { "role": "system", "content": "Global system prompt." },
+    { "role": "user", "content": "First question." },
+    { "role": "assistant", "content": "First answer." },
+    { "role": "developer", "content": "Mid-context developer instruction." },
+    { "role": "user", "content": "Second question." }
+  ],
+  "max_completion_tokens": 1024
+}

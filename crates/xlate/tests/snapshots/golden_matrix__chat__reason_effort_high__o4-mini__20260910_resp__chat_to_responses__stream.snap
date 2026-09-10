@@ -1,0 +1,18 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: render_frames(&frames)
+---
+event: response.created
+data: {"type":"response.created","sequence_number":0,"response":{"id":"resp_golden","object":"response","created_at":1700000000,"status":"in_progress","background":null,"error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"metadata":{},"model":"golden-model","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":null,"service_tier":null,"store":null,"temperature":null,"text":null,"tool_choice":"auto","tools":[],"top_p":null,"truncation":"disabled","usage":null,"user":null}}
+
+event: response.in_progress
+data: {"type":"response.in_progress","sequence_number":1,"response":{"id":"resp_golden","object":"response","created_at":1700000000,"status":"in_progress","background":null,"error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"metadata":{},"model":"golden-model","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":null,"service_tier":null,"store":null,"temperature":null,"text":null,"tool_choice":"auto","tools":[],"top_p":null,"truncation":"disabled","usage":null,"user":null}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","sequence_number":2,"output_index":0,"item":{"id":"msg_resp_golden_0","type":"message","status":"in_progress","role":"assistant","content":[]}}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","sequence_number":3,"output_index":0,"item":{"id":"msg_resp_golden_0","type":"message","status":"completed","role":"assistant","content":[]}}
+
+event: response.incomplete
+data: {"type":"response.incomplete","sequence_number":4,"response":{"id":"resp_golden","object":"response","created_at":1700000000,"status":"incomplete","background":null,"error":null,"incomplete_details":{"reason":"max_output_tokens"},"instructions":null,"max_output_tokens":null,"metadata":{},"model":"golden-model","output":[{"id":"msg_resp_golden_0","type":"message","status":"completed","role":"assistant","content":[]}],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":null,"service_tier":null,"store":null,"temperature":null,"text":null,"tool_choice":"auto","tools":[],"top_p":null,"truncation":"disabled","usage":{"input_tokens":17,"input_tokens_details":{"cached_tokens":0},"output_tokens":256,"output_tokens_details":{"reasoning_tokens":256},"total_tokens":273},"user":null}}

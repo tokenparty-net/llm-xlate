@@ -1,0 +1,16 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Hi.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "output_config": {
+    "effort": "ultra"
+  },
+  "thinking": {
+    "type": "adaptive"
+  }
+}

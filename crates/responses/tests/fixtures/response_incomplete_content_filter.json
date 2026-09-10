@@ -1,0 +1,14 @@
+{
+  "id": "resp_cf",
+  "object": "response",
+  "created_at": 1726000000,
+  "status": "incomplete",
+  "model": "gpt-5.4",
+  "incomplete_details": {"reason": "content_filter"},
+  "output": [
+    {"id": "msg_1", "type": "message", "role": "assistant", "status": "incomplete", "content": [
+      {"type": "output_text", "text": "Here is the start", "annotations": []}
+    ]}
+  ],
+  "usage": {"input_tokens": 30, "output_tokens": 5, "total_tokens": 35}
+}

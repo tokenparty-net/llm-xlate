@@ -1,0 +1,15 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/responses",
+  "stream": true,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "input": "Say hello in one short sentence.",
+    "max_output_tokens": 64,
+    "model": "gpt-6-astra",
+    "stream": true
+  }
+}

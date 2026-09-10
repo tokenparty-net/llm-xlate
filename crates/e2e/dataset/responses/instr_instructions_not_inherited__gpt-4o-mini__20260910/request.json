@@ -1,0 +1,15 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/responses",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "input": "Reply with a short greeting.",
+    "max_output_tokens": 64,
+    "model": "gpt-4o-mini",
+    "previous_response_id": "resp_0f0d5cd7e4f07592006aa268baa12487d2a00750042dfb41b8"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Complete: the sky is",
+      "role": "user"
+    },
+    {
+      "content": "blue ",
+      "role": "assistant"
+    }
+  ],
+  "model": "claude-sonnet-5"
+}

@@ -1,0 +1,65 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=content_filter status=400 retryable=false param=- provider_type=content_filter retry_after=- upstream_request_id=-
+message: The response was filtered due to content management policy.
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+body:
+{
+  "error": {
+    "message": "The response was filtered due to content management policy.",
+    "type": "content_filter",
+    "param": null,
+    "code": "content_filter"
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"The response was filtered due to content management policy.","type":"content_filter","param":null,"code":"content_filter"}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+body:
+{
+  "error": {
+    "message": "The response was filtered due to content management policy.",
+    "type": "content_filter",
+    "param": null,
+    "code": "content_filter"
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":"content_filter","message":"The response was filtered due to content management policy.","param":null,"sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "The response was filtered due to content management policy."
+  }
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"The response was filtered due to content management policy."}}

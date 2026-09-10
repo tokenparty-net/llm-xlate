@@ -1,0 +1,12 @@
+{
+  "model": "gpt-4o",
+  "messages": [
+    { "role": "user", "content": "Call the lookup function." },
+    { "role": "assistant", "content": null, "function_call": { "name": "lookup", "arguments": "{\"q\":\"cats\"}" } },
+    { "role": "function", "name": "lookup", "content": "cats are great" }
+  ],
+  "functions": [
+    { "name": "lookup", "description": "Look something up", "parameters": { "type": "object", "properties": { "q": { "type": "string" } } } }
+  ],
+  "function_call": { "name": "lookup" }
+}

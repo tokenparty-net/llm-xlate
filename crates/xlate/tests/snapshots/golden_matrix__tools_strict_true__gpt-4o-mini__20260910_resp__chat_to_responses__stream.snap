@@ -1,0 +1,30 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: render_frames(&frames)
+---
+event: response.created
+data: {"type":"response.created","sequence_number":0,"response":{"id":"resp_golden","object":"response","created_at":1700000000,"status":"in_progress","background":null,"error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"metadata":{},"model":"golden-model","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":null,"service_tier":null,"store":null,"temperature":null,"text":null,"tool_choice":"auto","tools":[],"top_p":null,"truncation":"disabled","usage":null,"user":null}}
+
+event: response.in_progress
+data: {"type":"response.in_progress","sequence_number":1,"response":{"id":"resp_golden","object":"response","created_at":1700000000,"status":"in_progress","background":null,"error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"metadata":{},"model":"golden-model","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":null,"service_tier":null,"store":null,"temperature":null,"text":null,"tool_choice":"auto","tools":[],"top_p":null,"truncation":"disabled","usage":null,"user":null}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","sequence_number":2,"output_index":0,"item":{"id":"msg_resp_golden_0","type":"message","status":"in_progress","role":"assistant","content":[]}}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","sequence_number":3,"output_index":0,"item":{"id":"msg_resp_golden_0","type":"message","status":"completed","role":"assistant","content":[]}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","sequence_number":4,"output_index":1,"item":{"id":"fc_resp_golden_1","type":"function_call","status":"in_progress","call_id":"call_hJton5oCQyb5Ou9jG6QlLFOX","name":"get_weather","arguments":""}}
+
+event: response.function_call_arguments.delta
+data: {"type":"response.function_call_arguments.delta","sequence_number":5,"item_id":"fc_resp_golden_1","output_index":1,"delta":"{\"city\":\"Paris\"}"}
+
+event: response.function_call_arguments.done
+data: {"type":"response.function_call_arguments.done","sequence_number":6,"item_id":"fc_resp_golden_1","output_index":1,"arguments":"{\"city\":\"Paris\"}"}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","sequence_number":7,"output_index":1,"item":{"id":"fc_resp_golden_1","type":"function_call","status":"completed","call_id":"call_hJton5oCQyb5Ou9jG6QlLFOX","name":"get_weather","arguments":"{\"city\":\"Paris\"}"}}
+
+event: response.completed
+data: {"type":"response.completed","sequence_number":8,"response":{"id":"resp_golden","object":"response","created_at":1700000000,"status":"completed","background":null,"error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"metadata":{},"model":"golden-model","output":[{"id":"msg_resp_golden_0","type":"message","status":"completed","role":"assistant","content":[]},{"id":"fc_resp_golden_1","type":"function_call","status":"completed","call_id":"call_hJton5oCQyb5Ou9jG6QlLFOX","name":"get_weather","arguments":"{\"city\":\"Paris\"}"}],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":null,"service_tier":null,"store":null,"temperature":null,"text":null,"tool_choice":"auto","tools":[],"top_p":null,"truncation":"disabled","usage":{"input_tokens":48,"input_tokens_details":{"cached_tokens":0},"output_tokens":14,"output_tokens_details":{"reasoning_tokens":0},"total_tokens":62},"user":null}}

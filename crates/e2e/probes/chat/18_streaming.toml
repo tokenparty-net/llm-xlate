@@ -1,0 +1,92 @@
+# Chat family 18 — streaming shapes (plan §5.18).
+# llm-xlate assumption: §8 streaming codecs — stream_options.include_usage usage chunk, tool-call argument
+# deltas, refusal deltas, [DONE], finish_reason=length. Raw SSE fixtures for the Chat stream decoder.
+
+[[probe]]
+id         = "chat.stream.text_basic"
+protocol   = "chat"
+tags       = ["dataset", "streaming"]
+models     = "openai_chat"
+stream     = true
+hypothesis = "A text stream emits role delta then content deltas then a finish_reason=stop chunk and a terminal [DONE] sentinel."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+messages              = [ { role = "user", content = "Count one to five." } ]
+
+[[probe]]
+id         = "chat.stream.include_usage"
+protocol   = "chat"
+tags       = ["explore", "dataset", "streaming"]
+models     = "openai_chat"
+stream     = true
+hypothesis = "stream_options.include_usage:true adds a final usage-only chunk (empty choices, populated usage) before [DONE]."
+expect     = { status = 200 }
+notes      = "Documents the usage-chunk shape the aggregator must fold in."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+stream_options        = { include_usage = true }
+messages              = [ { role = "user", content = "Count one to five." } ]
+
+[[probe]]
+id         = "chat.stream.no_include_usage"
+protocol   = "chat"
+tags       = ["explore", "streaming"]
+models     = "openai_chat"
+stream     = true
+hypothesis = "Without include_usage there is NO usage chunk; usage must be inferred as absent."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+messages              = [ { role = "user", content = "Count one to five." } ]
+
+[[probe]]
+id         = "chat.stream.tool_argument_deltas"
+protocol   = "chat"
+tags       = ["dataset", "streaming", "tools"]
+models     = "openai_chat"
+stream     = true
+hypothesis = "A tool-call stream emits tool_calls delta chunks whose function.arguments fragments concatenate to valid JSON; finish_reason=tool_calls."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Weather in Paris? Use the tool." } ]
+
+[[probe]]
+id         = "chat.stream.finish_length"
+protocol   = "chat"
+tags       = ["dataset", "streaming"]
+models     = "openai_chat"
+stream     = true
+hypothesis = "A tiny max_completion_tokens yields a terminal chunk with finish_reason=length."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 16
+messages              = [ { role = "user", content = "Write a 300-word essay about rivers." } ]
+
+[[probe]]
+id         = "chat.stream.refusal_delta"
+protocol   = "chat"
+tags       = ["streaming", "errors"]
+models     = "openai_chat"
+stream     = true
+requires   = ["manual"]
+hypothesis = "A refused prompt emits a refusal delta field instead of content (the refusal-stream shape)."
+expect     = "any"
+notes      = "requires manual: we do not automate genuinely disallowed content; operator triggers deliberately."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "user", content = "Say hi." } ]

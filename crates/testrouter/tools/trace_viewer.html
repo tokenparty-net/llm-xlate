@@ -1,0 +1,1226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>llm-xlate testrouter — trace viewer</title>
+<style>
+:root{
+  --bg:#f7f7f8; --panel:#ffffff; --panel2:#f2f2f4; --fg:#1b1c1e; --dim:#63666c;
+  --line:#dcdde1; --line2:#c9cbd1; --accent:#2f6feb; --accent-bg:#e8f0fe;
+  --err:#c0272d; --err-bg:#fdecec; --warn:#9a6400; --warn-bg:#fdf3dd;
+  --info:#2a6a8f; --info-bg:#e6f2f8; --ok:#1f7a41; --purple:#6a3fb5; --purple-bg:#f0eafb;
+  --key:#8a4bab; --str:#1f7a41; --num:#1f5fa9; --bool:#9a6400; --null:#8a8d94;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+:root{
+  --bg:#131417; --panel:#1b1d21; --panel2:#232529; --fg:#e6e7ea; --dim:#9a9da5;
+  --line:#2c2f35; --line2:#3a3e46; --accent:#6ea0ff; --accent-bg:#1d2941;
+  --err:#ff8080; --err-bg:#3a1f21; --warn:#e6b95c; --warn-bg:#3a2f18;
+  --info:#7fc4e8; --info-bg:#172c36; --ok:#77d29a; --purple:#b79af3; --purple:#b49af3; --purple-bg:#2a2140;
+  --key:#d6a2f0; --str:#8fd6a8; --num:#8ab6f5; --bool:#e6b95c; --null:#8a8d94;
+}
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font:13px/1.45 var(--sans);}
+button,input,select{font:inherit;color:inherit}
+button{background:var(--panel2);border:1px solid var(--line2);border-radius:5px;padding:3px 8px;cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+input[type=text],input[type=search],select{background:var(--panel);border:1px solid var(--line2);border-radius:5px;padding:4px 7px}
+input[type=search]{min-width:min(320px,60vw)}
+a{color:var(--accent)}
+code,pre,.mono{font-family:var(--mono)}
+
+/* ── header ─────────────────────────────────────────────────────────── */
+header{position:sticky;top:0;z-index:20;background:var(--panel);border-bottom:1px solid var(--line);padding:8px 12px}
+.titlerow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.titlerow h1{font-size:14px;margin:0;font-weight:650;letter-spacing:.01em}
+.titlerow .sp{flex:1}
+.hint{color:var(--dim);font-size:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.chip{border:1px solid var(--line2);border-radius:99px;padding:1px 9px;font-size:12px;background:var(--panel2);white-space:nowrap}
+.chip b{font-weight:650}
+.chip.err{background:var(--err-bg);border-color:var(--err);color:var(--err)}
+.chip.warn{background:var(--warn-bg);border-color:var(--warn);color:var(--warn)}
+.chip.info{background:var(--info-bg);border-color:var(--info);color:var(--info)}
+.filters{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:8px}
+.filters label{display:flex;gap:5px;align-items:center;color:var(--dim);font-size:12px}
+#progress{height:3px;background:var(--panel2);border-radius:2px;overflow:hidden;margin-top:7px;display:none}
+#progress.on{display:block}
+#progressbar{height:100%;width:0;background:var(--accent);transition:width .1s linear}
+
+/* ── drop zone ──────────────────────────────────────────────────────── */
+#drop{position:fixed;inset:0;z-index:100;background:rgba(47,111,235,.14);border:3px dashed var(--accent);
+  display:none;align-items:center;justify-content:center;font-size:20px;color:var(--accent);font-weight:650}
+#drop.on{display:flex}
+#empty{padding:36px 16px;text-align:center;color:var(--dim)}
+#empty h2{font-size:15px;color:var(--fg);margin:0 0 6px}
+#empty kbd{font-family:var(--mono);border:1px solid var(--line2);border-radius:4px;padding:0 4px;background:var(--panel2)}
+
+/* ── rows ───────────────────────────────────────────────────────────── */
+#list{padding:0}
+.rec{border-bottom:1px solid var(--line);background:var(--panel)}
+.row{display:flex;flex-wrap:wrap;gap:5px 9px;align-items:baseline;padding:5px 12px 5px 10px;cursor:pointer;
+  border-left:4px solid transparent;font-family:var(--mono);font-size:12px}
+.row:hover{background:var(--panel2)}
+.rec.sel > .row{background:var(--accent-bg);outline:1px solid var(--accent);outline-offset:-1px}
+.rec.k-err > .row{border-left-color:var(--err);background:var(--err-bg)}
+.rec.k-check > .row{border-left-color:var(--warn);background:var(--warn-bg)}
+.rec.k-cancel > .row{border-left-color:var(--purple);background:var(--purple-bg)}
+.rec.k-degr > .row{border-left-color:var(--info)}
+.rec.k-err.sel > .row,.rec.k-check.sel > .row,.rec.k-cancel.sel > .row{background:var(--accent-bg)}
+.tw{color:var(--dim);cursor:pointer;width:10px;display:inline-block;user-select:none}
+.t{color:var(--dim)}
+.tid{color:var(--accent);cursor:copy;text-decoration:underline dotted}
+.tid.copied{color:var(--ok)}
+.arrow{color:var(--dim)}
+.pill{border-radius:4px;padding:0 5px;border:1px solid var(--line2);background:var(--panel2);font-size:11px;white-space:nowrap}
+.pill.s2{color:var(--ok);border-color:var(--ok)}
+.pill.s4{color:var(--err);border-color:var(--err)}
+.pill.s5{color:var(--err);border-color:var(--err);font-weight:700}
+.pill.s0{color:var(--dim)}
+.pill.stream{color:var(--info);border-color:var(--info)}
+.pill.deg{color:var(--info);border-color:var(--info)}
+.pill.chk{color:var(--warn);border-color:var(--warn)}
+.pill.err{color:var(--err);border-color:var(--err);background:var(--err-bg)}
+.pill.tag{color:var(--purple);border-color:var(--purple)}
+.grow{flex:1}
+.dim{color:var(--dim)}
+.nowrap{white-space:nowrap}
+
+/* ── detail ─────────────────────────────────────────────────────────── */
+.detail{padding:8px 12px 14px 14px;background:var(--bg);border-top:1px dashed var(--line2)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:1000px){.cols{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:7px;overflow:hidden;min-width:0}
+.panel > h3{margin:0;font-size:12px;font-weight:650;padding:5px 9px;background:var(--panel2);border-bottom:1px solid var(--line);
+  display:flex;gap:7px;align-items:center}
+.panel > h3 .sp{flex:1}
+.panel > h3 button{padding:1px 6px;font-size:11px}
+.sec{border-top:1px solid var(--line)}
+.sec:first-of-type{border-top:none}
+.sec > .sh{display:flex;gap:7px;align-items:baseline;padding:4px 9px;background:var(--panel);cursor:pointer;font-size:12px;font-weight:600}
+.sec > .sh:hover{background:var(--panel2)}
+.sec > .sh .sp{flex:1}
+.sec > .sh .meta{font-weight:400;color:var(--dim);font-family:var(--mono);font-size:11px}
+.sec > .sb{padding:4px 9px 8px;border-top:1px dashed var(--line)}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:3px 14px;font-family:var(--mono);font-size:11.5px}
+.meta-grid > div{display:flex;gap:6px;min-width:0}
+.meta-grid b{font-weight:600;color:var(--dim);flex:0 0 auto}
+.meta-grid span{overflow-wrap:anywhere}
+
+/* ── json tree ──────────────────────────────────────────────────────── */
+.tree{font-family:var(--mono);font-size:11.5px;line-height:1.5;overflow-x:auto}
+.jn{padding-left:12px;border-left:1px solid transparent}
+.jn.top{padding-left:0}
+.jn-h{display:flex;gap:5px;align-items:baseline;flex-wrap:nowrap;white-space:pre-wrap;overflow-wrap:anywhere}
+.jn-h.clk{cursor:pointer}
+.jn-h.clk:hover{background:var(--panel2)}
+.jk{color:var(--key)}
+.jv-s{color:var(--str)}
+.jv-n{color:var(--num)}
+.jv-b{color:var(--bool)}
+.jv-x{color:var(--null)}
+.jsum{color:var(--dim)}
+.more{color:var(--accent);cursor:pointer;text-decoration:underline dotted}
+.redacted{color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn);border-radius:4px;padding:0 4px;font-size:11px}
+pre.raw{margin:4px 0 0;padding:6px 8px;background:var(--panel2);border:1px solid var(--line);border-radius:6px;
+  white-space:pre-wrap;overflow-wrap:anywhere;max-height:60vh;overflow:auto;font-size:11.5px}
+table.ev{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11.5px;table-layout:fixed}
+table.ev th{text-align:left;color:var(--dim);font-weight:600;border-bottom:1px solid var(--line);padding:2px 5px}
+table.ev td{padding:2px 5px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+table.ev tr.evr{cursor:pointer}
+table.ev tr.evr:hover{background:var(--panel2)}
+table.ev th.t,table.ev td.t{width:66px;text-align:right;color:var(--dim)}
+table.ev th.ty,table.ev td.ty{width:150px}
+table.ev th.ix,table.ev td.ix{width:40px;text-align:right;color:var(--dim)}
+table.ev th.t{text-align:right}
+.frame{display:flex;gap:8px;border-bottom:1px solid var(--line);padding:2px 0;font-family:var(--mono);font-size:11.5px}
+.frame .t{flex:0 0 58px;text-align:right;color:var(--dim)}
+.frame pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;flex:1;min-width:0}
+.frame.ka{opacity:.55}
+.badrow{color:var(--err)}
+.deglist{margin:0;padding-left:16px}
+.deglist li{margin:1px 0;font-family:var(--mono);font-size:11.5px}
+.errbox{border:1px solid var(--err);background:var(--err-bg);border-radius:6px;padding:5px 8px;margin:4px 0}
+.errbox .em{white-space:pre-wrap;overflow-wrap:anywhere;max-height:220px;overflow:auto;font-family:var(--mono);font-size:11.5px;margin-top:3px}
+.toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);
+  padding:5px 12px;border-radius:99px;font-size:12px;z-index:200;opacity:0;transition:opacity .15s;pointer-events:none}
+.toast.on{opacity:.92}
+#more{padding:10px 10px 40vh;text-align:center}
+</style>
+</head>
+<body>
+<div id="drop">Drop .jsonl trace files</div>
+<div class="toast" id="toast"></div>
+
+<header>
+  <div class="titlerow">
+    <h1>trace viewer <span class="dim" style="font-weight:400">· llm-xlate testrouter</span></h1>
+    <input type="file" id="file" multiple accept=".jsonl,.json,.txt,application/json">
+    <span class="hint">or drop files anywhere · <kbd>j</kbd>/<kbd>k</kbd> move · <kbd>enter</kbd> expand · <kbd>/</kbd> search</span>
+    <span class="sp"></span>
+    <button id="clear" title="Drop all loaded records">clear</button>
+  </div>
+  <div id="progress"><div id="progressbar"></div></div>
+  <div class="chips" id="chips"></div>
+  <div class="filters" id="filters">
+    <input type="search" id="q" placeholder="search: trace id, tag, model, path, provider, error…">
+    <select id="proto"><option value="">all protocols</option></select>
+    <select id="provider"><option value="">all providers</option></select>
+    <select id="status"><option value="">all statuses</option><option value="2">2xx</option><option value="4">4xx</option><option value="5">5xx</option><option value="0">no status</option></select>
+    <select id="tag"><option value="">all tags</option></select>
+    <select id="sort">
+      <option value="time">time ↑</option>
+      <option value="-time">time ↓</option>
+      <option value="-dur">duration ↓</option>
+      <option value="dur">duration ↑</option>
+      <option value="-ttfb">ttfb ↓</option>
+    </select>
+    <label><input type="checkbox" id="anom"> anomalies only</label>
+    <label><input type="checkbox" id="stream"> streaming only</label>
+    <span class="grow"></span>
+    <span class="hint" id="count"></span>
+  </div>
+</header>
+
+<div id="empty">
+  <h2>No traces loaded</h2>
+  <div>Pick or drop one or more <code>crates/testrouter/data/traces/&lt;date&gt;.jsonl</code> files.<br>
+  Everything runs locally in this page — no network, nothing uploaded.</div>
+</div>
+<div id="list"></div>
+<div id="more" hidden></div>
+
+<script>
+"use strict";
+/* ════════════════════════════════════════════════════════════════════════
+   llm-xlate testrouter trace viewer — single file, offline, no deps.
+   Reads the `TraceRecord` JSONL written by crates/testrouter/src/trace.rs.
+   Every field access is defensive: an older/newer record never throws.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── tiny DOM helpers ─────────────────────────────────────────────── */
+function el(tag, cls, text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+function frag(){ return document.createDocumentFragment(); }
+function on(node, ev, fn){ node.addEventListener(ev, fn); return node; }
+function clear(node){ while(node.firstChild) node.removeChild(node.firstChild); }
+function isObj(v){ return v!==null && typeof v==='object' && !Array.isArray(v); }
+function has(v){ return v!==null && v!==undefined; }
+function num(v){ return (typeof v==='number' && isFinite(v)) ? v : null; }
+function str(v){ return (typeof v==='string') ? v : null; }
+function get(o, path){ let c=o; for(const k of path){ if(c===null||typeof c!=='object') return undefined; c=c[k]; } return c; }
+function arr(v){ return Array.isArray(v) ? v : []; }
+function jstr(v){ try{ return JSON.stringify(v, null, 2); }catch(e){ return String(v); } }
+function short(s, n){ s=String(s); return s.length>n ? s.slice(0,n)+'…' : s; }
+
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('on'), 1200);
+}
+function copyText(s, note){
+  const done=()=>toast(note||'copied');
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(s).then(done, ()=>fallback(s,done)); return; }
+  }catch(e){}
+  fallback(s, done);
+}
+function fallback(s, done){
+  const ta=el('textarea'); ta.value=s; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ toast('copy failed'); }
+  document.body.removeChild(ta);
+}
+function copyBtn(label, getter, note){
+  return on(el('button', null, label), 'click', ev=>{ ev.stopPropagation(); copyText(getter(), note||'copied JSON'); });
+}
+
+/* ── state ────────────────────────────────────────────────────────── */
+const S = {
+  recs: [],                 // normalized records
+  files: [],                // {name, records, blank, bad}
+  view: [],                 // filtered/sorted indices into recs
+  rendered: 0,
+  sel: -1,
+  open: new Set(),          // record ids currently expanded
+  blank: 0, bad: 0,
+  f: { q:'', proto:'', provider:'', status:'', tag:'', sort:'time', anom:false, stream:false }
+};
+const PAGE = 150;
+
+/* ── normalization / summary ──────────────────────────────────────── */
+const XLATE_STAGES = ['decode','lower','encode','decode_response'];
+const SLOW_TTFB_MS = 10000;
+
+function normalize(raw, file, line){
+  // An `index.jsonl` entry has no `client` object — synthesize enough to display it.
+  let r = raw;
+  if(!isObj(r.client) && str(r.client_protocol)!==null){
+    r = Object.assign({}, raw, {
+      client:{protocol:raw.client_protocol, method:'', path:'', headers:{}, body:null, stream:false},
+      ts_start: raw.ts, ts_end: raw.ts,
+      route:{provider:raw.provider, upstream_protocol:raw.upstream_protocol},
+      client_response:{status:raw.status, headers:{}},
+      errors: raw.error_kind ? [{stage:'?', kind:raw.error_kind, status:raw.status, message:''}] : [],
+      checks:{aggregate_matches_encode_response: !raw.check_failures, reencode_client_request_diff:[], degradation_count: raw.degradation_count||0},
+      __index_only:true
+    });
+  }
+  return summarize(r, file, line);
+}
+
+function summarize(r, file, line){
+  const client = isObj(r.client) ? r.client : {};
+  const route  = isObj(r.route) ? r.route : {};
+  const up     = isObj(r.upstream) ? r.upstream : null;
+  const cr     = isObj(r.client_response) ? r.client_response : null;
+  const checks = isObj(r.checks) ? r.checks : {};
+  const timing = isObj(r.timing) ? r.timing : {};
+  const errors = arr(r.errors).filter(isObj);
+  const degr   = arr(get(r,['lowered','degradations']));
+
+  const cancelled = errors.some(e => e.stage === 'cancelled');
+  const firstErr  = errors.find(e => e.stage !== 'cancelled') || null;
+  const frames    = cr && Array.isArray(cr.frames) ? cr.frames : null;
+  const reencode  = arr(checks.reencode_client_request_diff);
+  const checkFail = checks.aggregate_matches_encode_response === false;
+
+  // Anomalies — mirrors tracecli::anomalies (plus `reencode_diff`, viewer-only).
+  const an = [];
+  if(cancelled) an.push('cancelled');
+  if(firstErr){
+    an.push('error:'+(firstErr.kind||'?'));
+    if(XLATE_STAGES.indexOf(firstErr.stage)>=0) an.push('xlate_error');
+  }
+  if(checkFail) an.push('failed_check');
+  if(route.caps_source === 'unknown') an.push('caps_unknown');
+  if(frames && frames.length && frames.every(f => isObj(f) && f.keepalive === true)) an.push('keepalive_only');
+  if(up){
+    if(num(up.ttfb_ms) !== null && up.ttfb_ms > SLOW_TTFB_MS) an.push('slow_ttfb');
+    const st = num(up.status);
+    if(st !== null && st >= 200 && st < 300 && !has(up.request_id)) an.push('missing_request_id');
+  }
+
+  const tsStart = str(r.ts_start);
+  const tMs = Date.parse(tsStart || '');
+  let total = num(timing.total_ms);
+  if(total === null && tsStart && str(r.ts_end)){
+    const d = Date.parse(r.ts_end) - tMs;
+    if(isFinite(d) && d >= 0) total = d;
+  }
+
+  const degCount = num(checks.degradation_count) !== null ? checks.degradation_count : degr.length;
+
+  const s = {
+    raw: r, file: file, line: line,
+    id: str(r.trace_id) || '(no id)',
+    ts: tsStart, tms: isFinite(tMs) ? tMs : 0,
+    tag: str(r.tag),
+    proto: str(client.protocol) || '?',
+    method: str(client.method) || '',
+    path: str(client.path) || '',
+    stream: client.stream === true,
+    provider: str(route.provider) || null,
+    upProto: str(route.upstream_protocol) || null,
+    clientModel: str(route.client_model) || str(get(r,['client','body','model'])) || null,
+    upModel: str(route.upstream_model) || null,
+    capsSource: str(route.caps_source) || null,
+    upStatus: up ? num(up.status) : null,
+    clStatus: cr ? num(cr.status) : null,
+    ttfb: up ? num(up.ttfb_ms) : null,
+    total: total,
+    degCount: degCount || 0,
+    errors: errors,
+    firstErr: firstErr,
+    cancelled: cancelled,
+    checkFail: checkFail,
+    reencode: reencode,
+    frameCount: frames ? frames.length : null,
+    eventCount: arr(r.ir_events).length,
+    anomalies: an,
+    indexOnly: r.__index_only === true
+  };
+
+  s.kind = s.firstErr ? 'err' : (s.cancelled ? 'cancel' : (s.checkFail ? 'check' : (s.degCount ? 'degr' : '')));
+
+  // Bounded haystack for free-text search.
+  const hay = [
+    s.id, s.tag, s.proto, s.path, s.method, s.provider, s.upProto, s.clientModel, s.upModel,
+    s.capsSource, file,
+    s.firstErr ? s.firstErr.kind : '', s.firstErr ? s.firstErr.stage : '',
+    s.firstErr ? short(s.firstErr.message || '', 2000) : '',
+    up ? short(str(up.url) || '', 300) : '',
+    reencode.length ? 'reencode_diff ' + reencode.join(' ') : '',
+    an.join(' ')
+  ].filter(Boolean).join(' ').toLowerCase();
+  s.hay = hay;
+  return s;
+}
+
+/* ── parsing ──────────────────────────────────────────────────────── */
+// Yield to the event loop between chunks. Idle callbacks are preferred (they let the browser
+// paint first) but are raced against a timer so parsing can never stall if idle time never comes.
+function yieldUI(){
+  return new Promise(res => {
+    let done = false;
+    const fin = ()=>{ if(!done){ done = true; res(); } };
+    if(typeof requestIdleCallback === 'function') requestIdleCallback(fin, {timeout:50});
+    setTimeout(fin, 30);
+  });
+}
+
+async function loadFiles(files){
+  const bar = document.getElementById('progress');
+  const inner = document.getElementById('progressbar');
+  bar.classList.add('on');
+  for(const f of files){
+    const st = {blank:0, bad:0, records:0};
+    await parseFile(f, st, (done, size)=>{ inner.style.width = (size ? (done/size*100) : 100).toFixed(1)+'%'; });
+    S.files.push({name:f.name, records:st.records, blank:st.blank, bad:st.bad});
+    S.blank += st.blank; S.bad += st.bad;
+  }
+  bar.classList.remove('on');
+  inner.style.width='0';
+  rebuildFacets();
+  applyFilters();
+}
+
+async function parseFile(file, st, onProgress){
+  const CHUNK = 4 * 1024 * 1024;
+  const dec = new TextDecoder('utf-8');
+  let offset = 0, tail = '', lineNo = 0;
+  const handle = (line)=>{
+    lineNo++;
+    if(!line || !line.trim()){ st.blank++; return; }
+    let obj;
+    try{ obj = JSON.parse(line); }
+    catch(e){ st.bad++; return; }
+    if(!isObj(obj)){ st.bad++; return; }
+    try{ S.recs.push(normalize(obj, file.name, lineNo)); st.records++; }
+    catch(e){ st.bad++; }
+  };
+  while(offset < file.size){
+    const buf = await file.slice(offset, offset + CHUNK).arrayBuffer();
+    offset += CHUNK;
+    const streaming = offset < file.size;
+    const text = tail + dec.decode(buf, {stream: streaming});
+    const parts = text.split('\n');
+    tail = parts.pop();
+    for(const p of parts) handle(p.charCodeAt(p.length-1) === 13 ? p.slice(0,-1) : p);
+    onProgress(Math.min(offset, file.size), file.size);
+    await yieldUI();
+  }
+  if(tail.length) handle(tail.charCodeAt(tail.length-1) === 13 ? tail.slice(0,-1) : tail);
+}
+
+/* ── filters / facets ─────────────────────────────────────────────── */
+function rebuildFacets(){
+  const protos = new Set(), provs = new Set(), tags = new Set();
+  for(const r of S.recs){
+    if(r.proto) protos.add(r.proto);
+    provs.add(r.provider || '(none)');
+    if(r.tag) tags.add(r.tag);
+  }
+  fillSelect('proto', protos, 'all protocols');
+  fillSelect('provider', provs, 'all providers');
+  fillSelect('tag', tags, 'all tags');
+}
+function fillSelect(id, values, allLabel){
+  const sel = document.getElementById(id);
+  const cur = sel.value;
+  clear(sel);
+  sel.appendChild(new Option(allLabel, ''));
+  for(const v of Array.from(values).sort()) sel.appendChild(new Option(v, v));
+  sel.value = cur;
+  if(sel.value !== cur) sel.value = '';
+}
+
+function matches(r){
+  const f = S.f;
+  if(f.proto && r.proto !== f.proto) return false;
+  if(f.provider && (r.provider || '(none)') !== f.provider) return false;
+  if(f.tag && r.tag !== f.tag) return false;
+  if(f.anom && !r.anomalies.length) return false;
+  if(f.stream && !r.stream) return false;
+  if(f.status){
+    const st = r.clStatus;
+    if(f.status === '0'){ if(st !== null && st !== 0) return false; }
+    else {
+      if(st === null || st === 0) return false;
+      if(Math.floor(st/100) !== Number(f.status)) return false;
+    }
+  }
+  if(f.q){
+    for(const term of f.q.split(/\s+/)){
+      if(term && r.hay.indexOf(term) < 0) return false;
+    }
+  }
+  return true;
+}
+
+function applyFilters(){
+  S.view = [];
+  for(let i=0;i<S.recs.length;i++) if(matches(S.recs[i])) S.view.push(i);
+  const dir = S.f.sort.charAt(0)==='-' ? -1 : 1;
+  const key = S.f.sort.replace('-','');
+  const val = i => {
+    const r = S.recs[i];
+    if(key==='dur') return r.total===null ? -1 : r.total;
+    if(key==='ttfb') return r.ttfb===null ? -1 : r.ttfb;
+    return r.tms;
+  };
+  S.view.sort((a,b)=>{ const d = val(a)-val(b); return d!==0 ? d*dir : (a-b); });
+  S.sel = -1;
+  S.rendered = 0;
+  clear(document.getElementById('list'));
+  renderChips();
+  renderMore();
+  document.getElementById('empty').hidden = S.recs.length > 0;
+  document.getElementById('count').textContent =
+    S.recs.length ? (S.view.length + ' / ' + S.recs.length + ' records') : '';
+  writeHash();
+}
+
+/* ── summary chips ────────────────────────────────────────────────── */
+function renderChips(){
+  const c = document.getElementById('chips');
+  clear(c);
+  if(!S.recs.length) return;
+  const byProto = new Map(), byAnom = new Map();
+  let errs=0, anoms=0, streams=0, degr=0, reenc=0;
+  for(const r of S.recs){
+    byProto.set(r.proto, (byProto.get(r.proto)||0)+1);
+    if(r.firstErr) errs++;
+    if(r.anomalies.length){ anoms++; for(const a of r.anomalies) { const k=a.split(':')[0]; byAnom.set(k,(byAnom.get(k)||0)+1); } }
+    if(r.stream) streams++;
+    if(r.degCount) degr++;
+    if(r.reencode.length) reenc++;
+  }
+  const add=(cls, label, n)=>{ const e=el('span','chip'+(cls?' '+cls:'')); e.appendChild(el('b', null, String(n))); e.appendChild(document.createTextNode(' '+label)); c.appendChild(e); };
+  add('', 'records', S.recs.length);
+  add(errs?'err':'', 'errors', errs);
+  add(anoms?'warn':'', 'anomalies', anoms);
+  add('info', 'streaming', streams);
+  add(degr?'info':'', 'with degradations', degr);
+  if(reenc) add('', 'reencode diffs', reenc);
+  for(const [p,n] of Array.from(byProto).sort()) add('', p, n);
+  for(const [a,n] of Array.from(byAnom).sort()) add('warn', a, n);
+  if(S.bad) add('err','corrupt lines', S.bad);
+  if(S.blank) add('', 'blank lines', S.blank);
+  if(S.files.length){
+    const e = el('span','chip', S.files.map(f=>f.name+' ('+f.records+')').join(' · '));
+    c.appendChild(e);
+  }
+}
+
+/* ── list rendering ───────────────────────────────────────────────── */
+function renderMore(){
+  const list = document.getElementById('list');
+  const end = Math.min(S.rendered + PAGE, S.view.length);
+  const f = frag();
+  for(let i = S.rendered; i < end; i++) f.appendChild(rowEl(S.view[i], i));
+  list.appendChild(f);
+  S.rendered = end;
+  const more = document.getElementById('more');
+  clear(more);
+  if(S.rendered < S.view.length){
+    more.hidden = false;
+    const b = on(el('button', null, 'show ' + Math.min(PAGE, S.view.length-S.rendered) + ' more (' + (S.view.length-S.rendered) + ' remaining)'), 'click', ()=>renderMore());
+    more.appendChild(b);
+    observeMore(b);
+  } else {
+    more.hidden = S.view.length === 0;
+    if(S.view.length) more.appendChild(el('span','hint','— end of ' + S.view.length + ' records —'));
+    else if(S.recs.length) more.appendChild(el('span','hint','no records match the filters'));
+  }
+}
+let mo = null;
+function observeMore(node){
+  if(!('IntersectionObserver' in window)) return;
+  if(mo) mo.disconnect();
+  mo = new IntersectionObserver(entries=>{
+    for(const e of entries) if(e.isIntersecting){ mo.disconnect(); renderMore(); }
+  }, {rootMargin:'400px'});
+  mo.observe(node);
+}
+
+function statusPill(st, label){
+  const cls = st===null ? 's0' : (st>=500?'s5': st>=400?'s4': st>=200?'s2':'s0');
+  return el('span','pill '+cls, label + (st===null ? 'n/a' : String(st)));
+}
+function fmtTime(r){
+  if(!r.ts) return 'n/a';
+  const d = new Date(r.tms);
+  if(!isFinite(d.getTime())) return r.ts;
+  const p = n => String(n).padStart(2,'0');
+  return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())+'.'+String(d.getMilliseconds()).padStart(3,'0');
+}
+function fmtMs(v){ return v===null||v===undefined ? 'n/a' : (v>=1000 ? (v/1000).toFixed(2)+'s' : v+'ms'); }
+function shortId(id){ return id.length > 14 ? id.slice(0, 14) : id; }
+
+function rowEl(ri, viewPos){
+  const r = S.recs[ri];
+  const wrap = el('div','rec' + (r.kind ? ' k-'+r.kind : ''));
+  wrap.dataset.ri = String(ri);
+  wrap.dataset.pos = String(viewPos);
+  const row = el('div','row');
+
+  row.appendChild(el('span','tw', S.open.has(ri) ? '▾' : '▸'));
+  const tcell = el('span','t', fmtTime(r));
+  tcell.title = (r.ts || 'n/a') + ' (row shows local time)';
+  row.appendChild(tcell);
+
+  const tid = el('span','tid', shortId(r.id));
+  tid.title = r.id + '  (click to copy)';
+  on(tid, 'click', ev=>{ ev.stopPropagation(); copyText(r.id, 'trace id copied'); tid.classList.add('copied'); setTimeout(()=>tid.classList.remove('copied'), 800); });
+  row.appendChild(tid);
+
+  if(r.tag) row.appendChild(el('span','pill tag', r.tag));
+
+  const route = el('span', null);
+  route.appendChild(el('b', null, r.proto));
+  route.appendChild(el('span','arrow', ' → '));
+  route.appendChild(document.createTextNode((r.provider || 'no-route') + (r.upProto ? '/'+r.upProto : '')));
+  row.appendChild(route);
+
+  if(r.clientModel || r.upModel){
+    const m = el('span','dim');
+    m.textContent = (r.clientModel||'?') + (r.upModel && r.upModel !== r.clientModel ? ' → ' + r.upModel : '');
+    m.title = 'client model → upstream model';
+    row.appendChild(m);
+  }
+  if(r.path) row.appendChild(el('span','dim nowrap', r.path));
+
+  row.appendChild(statusPill(r.upStatus, 'up '));
+  row.appendChild(statusPill(r.clStatus, 'cl '));
+  if(r.stream) row.appendChild(el('span','pill stream', 'stream' + (r.frameCount!==null ? ' ' + r.frameCount + 'f' : '')));
+  row.appendChild(el('span','dim nowrap', 'ttfb ' + fmtMs(r.ttfb) + ' · ' + fmtMs(r.total)));
+  if(r.degCount) row.appendChild(el('span','pill deg', 'deg ' + r.degCount));
+  if(r.checkFail) row.appendChild(el('span','pill chk','check failed'));
+  if(r.reencode.length){
+    const p = el('span','pill','reencode ' + r.reencode.length);
+    p.title = 'client request re-encode diff: ' + r.reencode.join(', ');
+    row.appendChild(p);
+  }
+  if(r.cancelled) row.appendChild(el('span','pill','cancelled'));
+  if(r.firstErr) row.appendChild(el('span','pill err', r.firstErr.stage + '/' + r.firstErr.kind));
+  if(r.indexOnly) row.appendChild(el('span','pill','index-only'));
+
+  on(row, 'click', ()=>{ select(viewPos, false); toggle(ri); });
+  wrap.appendChild(row);
+  if(S.open.has(ri)) wrap.appendChild(detailEl(r));
+  return wrap;
+}
+
+function toggle(ri){
+  const node = document.querySelector('.rec[data-ri="'+ri+'"]');
+  if(!node) return;
+  if(S.open.has(ri)){
+    S.open.delete(ri);
+    const d = node.querySelector(':scope > .detail');
+    if(d) d.remove();
+    node.querySelector('.tw').textContent = '▸';
+  } else {
+    S.open.add(ri);
+    let d;
+    try{ d = detailEl(S.recs[ri]); }
+    catch(e){ d = el('div','detail'); d.appendChild(el('div','errbox','viewer error rendering this record: ' + (e && e.message))); }
+    node.appendChild(d);
+    node.querySelector('.tw').textContent = '▾';
+  }
+}
+
+function select(pos, scroll){
+  const prev = document.querySelector('.rec.sel');
+  if(prev) prev.classList.remove('sel');
+  S.sel = pos;
+  const node = document.querySelector('.rec[data-pos="'+pos+'"]');
+  if(node){
+    node.classList.add('sel');
+    if(scroll) node.scrollIntoView({block:'nearest'});
+  }
+}
+
+/* ── JSON tree ────────────────────────────────────────────────────── */
+const STR_LIMIT = 180;
+
+function treeEl(value, opts){
+  opts = opts || {};
+  const root = el('div','tree');
+  root.appendChild(nodeEl(null, value, true));
+  return root;
+}
+
+function typeSummary(v){
+  if(Array.isArray(v)) return '[ ' + v.length + (v.length===1?' item':' items') + ' ]';
+  const ks = Object.keys(v);
+  return '{ ' + ks.length + (ks.length===1?' key':' keys') + ' }';
+}
+
+function scalarEl(v){
+  if(v === null) return el('span','jv-x','null');
+  if(v === undefined) return el('span','jv-x','n/a');
+  const t = typeof v;
+  if(t === 'number') return el('span','jv-n', String(v));
+  if(t === 'boolean') return el('span','jv-b', String(v));
+  if(t === 'string'){
+    if(v.length <= STR_LIMIT) return el('span','jv-s', JSON.stringify(v));
+    const span = el('span','jv-s');
+    const cut = el('span', null, JSON.stringify(v.slice(0, STR_LIMIT)).slice(0,-1) + '…"');
+    span.appendChild(cut);
+    const more = el('span','more', ' +' + (v.length - STR_LIMIT) + ' chars');
+    on(more, 'click', ev=>{
+      ev.stopPropagation();
+      span.replaceChildren(el('span', null, JSON.stringify(v)));
+    });
+    span.appendChild(more);
+    return span;
+  }
+  return el('span','jv-x', String(v));
+}
+
+// `{"$redacted":{sha256,len}}` is how trace.rs replaces oversize media.
+function redactedEl(v){
+  const r = v['$redacted'] || {};
+  return el('span','redacted','⟨redacted ' + (has(r.len) ? r.len + ' bytes' : '') + (r.sha256 ? ' sha256:'+String(r.sha256).slice(0,12) : '') + '⟩');
+}
+
+function nodeEl(key, value, isTop){
+  const n = el('div','jn' + (isTop ? ' top' : ''));
+  const head = el('div','jn-h');
+  n.appendChild(head);
+
+  const container = (value !== null && typeof value === 'object');
+  const redacted = isObj(value) && Object.keys(value).length === 1 && has(value['$redacted']);
+
+  if(container && !redacted){
+    const tw = el('span','tw','▸');
+    head.appendChild(tw);
+    head.classList.add('clk');
+    if(key !== null) head.appendChild(el('span','jk', key + ':'));
+    const sum = el('span','jsum', typeSummary(value));
+    head.appendChild(sum);
+    let body = null;
+    n.__expand = function(){
+      if(body) return;
+      body = el('div');
+      const entries = Array.isArray(value) ? value.map((v,i)=>[String(i), v]) : Object.keys(value).map(k=>[k, value[k]]);
+      const f = frag();
+      const CAP = 500;
+      entries.slice(0, CAP).forEach(([k, v])=>f.appendChild(nodeEl(k, v, false)));
+      if(entries.length > CAP){
+        const rest = el('div','jn');
+        const b = on(el('span','more','… ' + (entries.length-CAP) + ' more — render all'), 'click', ev=>{
+          ev.stopPropagation();
+          const f2 = frag();
+          entries.slice(CAP).forEach(([k,v])=>f2.appendChild(nodeEl(k, v, false)));
+          rest.replaceWith(f2);
+        });
+        rest.appendChild(b); f.appendChild(rest);
+      }
+      body.appendChild(f);
+      n.appendChild(body);
+    };
+    n.__set = function(open){
+      if(open){ n.__expand(); body.hidden = false; tw.textContent='▾'; n.__open = true; }
+      else if(body){ body.hidden = true; tw.textContent='▸'; n.__open = false; }
+      else { tw.textContent='▸'; n.__open = false; }
+    };
+    n.__open = false;
+    on(head, 'click', ev=>{ ev.stopPropagation(); n.__set(!n.__open); });
+    if(isTop) n.__set(true);   // top level open: keys visible, children collapsed
+  } else {
+    head.appendChild(el('span','tw',' '));
+    if(key !== null) head.appendChild(el('span','jk', key + ':'));
+    head.appendChild(redacted ? redactedEl(value) : scalarEl(value));
+  }
+  return n;
+}
+
+function treeSetAll(root, open){
+  let budget = 4000;
+  const walk = node => {
+    if(budget-- <= 0) return;
+    if(node.__set){ node.__set(open); }
+    if(open){
+      for(const c of Array.from(node.children)){
+        if(c.classList && c.classList.contains('jn')) walk(c);
+        else for(const cc of Array.from(c.children||[])) if(cc.classList && cc.classList.contains('jn')) walk(cc);
+      }
+    } else {
+      for(const c of Array.from(node.querySelectorAll('.jn'))) if(c.__set) c.__set(false);
+      return;
+    }
+  };
+  for(const c of Array.from(root.children)) walk(c);
+  if(open && budget <= 0) toast('expanded the first 4000 nodes');
+}
+
+/* ── detail sections ──────────────────────────────────────────────── */
+function section(title, meta, bodyFn, openByDefault){
+  const s = el('div','sec');
+  const h = el('div','sh');
+  const tw = el('span','tw', openByDefault ? '▾' : '▸');
+  h.appendChild(tw);
+  h.appendChild(el('span', null, title));
+  if(meta) h.appendChild(el('span','meta', meta));
+  h.appendChild(el('span','sp'));
+  s.appendChild(h);
+  let body = null;
+  const set = open => {
+    if(open && !body){
+      body = el('div','sb');
+      try{ bodyFn(body); }
+      catch(e){ body.appendChild(el('div','errbox','render error: ' + (e && e.message))); }
+      s.appendChild(body);
+    }
+    if(body) body.hidden = !open;
+    tw.textContent = open ? '▾' : '▸';
+    s.__open = open;
+  };
+  on(h, 'click', ()=>set(!s.__open));
+  set(!!openByDefault);
+  s.__set = set;
+  return s;
+}
+
+function jsonSection(title, value, openByDefault, extraMeta){
+  if(value === undefined || value === null){
+    const s = el('div','sec');
+    const h = el('div','sh');
+    h.appendChild(el('span','tw',' '));
+    h.appendChild(el('span','dim', title));
+    h.appendChild(el('span','meta','n/a'));
+    s.appendChild(h);
+    s.__tree = null;
+    return s;
+  }
+  return section(title, extraMeta || (typeof value === 'object' ? typeSummary(value) : ''), body=>{
+    const bar = el('div', null);
+    bar.style.marginBottom = '3px';
+    bar.appendChild(copyBtn('copy', ()=>jstr(value)));
+    body.appendChild(bar);
+    body.appendChild(treeEl(value));
+  }, openByDefault);
+}
+
+function panel(title, sections){
+  const p = el('div','panel');
+  const h = el('h3');
+  h.appendChild(el('span', null, title));
+  h.appendChild(el('span','sp'));
+  h.appendChild(on(el('button', null, 'expand all'), 'click', ev=>{
+    ev.stopPropagation();
+    for(const s of p.querySelectorAll('.sec')) if(s.__set) s.__set(true);
+    for(const t of p.querySelectorAll('.tree')) treeSetAll(t, true);
+  }));
+  h.appendChild(on(el('button', null, 'collapse all'), 'click', ev=>{
+    ev.stopPropagation();
+    for(const t of p.querySelectorAll('.tree')) treeSetAll(t, false);
+    for(const s of p.querySelectorAll('.sec')) if(s.__set) s.__set(false);
+  }));
+  p.appendChild(h);
+  for(const s of sections) if(s) p.appendChild(s);
+  return p;
+}
+
+function kvGrid(pairs){
+  const g = el('div','meta-grid');
+  for(const [k, v] of pairs){
+    if(v === undefined) continue;
+    const d = el('div');
+    d.appendChild(el('b', null, k));
+    d.appendChild(el('span', null, v === null || v === '' ? 'n/a' : String(v)));
+    g.appendChild(d);
+  }
+  return g;
+}
+
+function eventSummary(ev){
+  if(!isObj(ev)) return String(ev);
+  const t = ev.type;
+  if(t === 'delta' && isObj(ev.delta)){
+    const d = ev.delta;
+    const parts = [];
+    for(const k of Object.keys(d)){
+      const v = d[k];
+      parts.push(k + '=' + (typeof v === 'string' ? JSON.stringify(short(v, 60)) : short(jstr(v).replace(/\s+/g,' '), 60)));
+    }
+    return parts.join(' ');
+  }
+  if(t === 'item_start') return [ev.kind ? 'kind='+ev.kind : null, ev.id ? 'id='+short(ev.id,24) : null,
+      isObj(ev.call) && ev.call.name ? 'call='+ev.call.name : null].filter(Boolean).join(' ') || '';
+  if(t === 'start') return [ev.model ? 'model='+ev.model : null, ev.response_id ? 'id='+short(ev.response_id,24) : null].filter(Boolean).join(' ');
+  if(t === 'stop'){
+    const u = isObj(ev.usage) ? ev.usage : null;
+    return [ev.reason ? 'reason='+ev.reason : null, u ? 'in='+u.input+' out='+u.output : null].filter(Boolean).join(' ');
+  }
+  if(t === 'error') return short(String(ev.message || jstr(ev)), 120);
+  const rest = Object.keys(ev).filter(k => k!=='type' && k!=='index');
+  return rest.length ? short(rest.map(k=>k+'='+short(jstr(ev[k]).replace(/\s+/g,' '), 40)).join(' '), 160) : '';
+}
+
+function eventsSection(events, openByDefault){
+  const n = events.length;
+  return section('IR events', n + (n===1?' event':' events'), body=>{
+    if(!n){ body.appendChild(el('div','dim','none')); return; }
+    const bar = el('div');
+    bar.appendChild(copyBtn('copy', ()=>jstr(events)));
+    body.appendChild(bar);
+    const table = el('table','ev');
+    const thead = el('thead');
+    const tr = el('tr');
+    for(const [h, c] of [['t_ms','t'],['type','ty'],['idx','ix'],['summary','']]){
+      const th = el('th', c, h); tr.appendChild(th);
+    }
+    thead.appendChild(tr); table.appendChild(thead);
+    const tb = el('tbody');
+    const CAP = 400;
+    const render = (from, to)=>{
+      for(let i=from;i<to;i++){
+        const e = events[i];
+        const ev = isObj(e) ? e.event : undefined;
+        const row = el('tr','evr');
+        row.appendChild(el('td','t', has(get(e,['t_ms'])) ? String(e.t_ms) : 'n/a'));
+        row.appendChild(el('td','ty', isObj(ev) && ev.type ? String(ev.type) : 'n/a'));
+        row.appendChild(el('td','ix', isObj(ev) && has(ev.index) ? String(ev.index) : ''));
+        row.appendChild(el('td', null, eventSummary(ev)));
+        tb.appendChild(row);
+        let det = null;
+        on(row, 'click', ()=>{
+          if(det){ det.remove(); det = null; return; }
+          det = el('tr');
+          const td = el('td'); td.colSpan = 4;
+          td.appendChild(treeEl(ev === undefined ? e : ev));
+          det.appendChild(td);
+          row.after(det);
+        });
+      }
+    };
+    render(0, Math.min(CAP, n));
+    table.appendChild(tb);
+    body.appendChild(table);
+    if(n > CAP){
+      const b = on(el('button', null, 'render remaining ' + (n-CAP) + ' events'), 'click', ev=>{ ev.stopPropagation(); render(CAP, n); b.remove(); });
+      body.appendChild(b);
+    }
+  }, openByDefault);
+}
+
+function framesSection(cr){
+  const frames = cr && Array.isArray(cr.frames) ? cr.frames : null;
+  if(!frames) return null;
+  const ka = frames.filter(f=>isObj(f) && f.keepalive).length;
+  return section('client frames', frames.length + ' frames' + (ka ? ' · ' + ka + ' keepalive' : ''), body=>{
+    if(!frames.length){ body.appendChild(el('div','dim','no frames recorded (raw capture off?)')); return; }
+    const bar = el('div');
+    let rawMode = false;
+    const holder = el('div');
+    const draw = ()=>{
+      clear(holder);
+      if(rawMode){
+        const pre = el('pre','raw', frames.map(f=>isObj(f)?String(f.data||''):'').join(''));
+        holder.appendChild(pre);
+      } else {
+        const CAP = 500;
+        const show = (from, to)=>{
+          for(let i=from;i<to;i++){
+            const f = frames[i];
+            const d = el('div','frame' + (isObj(f) && f.keepalive ? ' ka' : ''));
+            d.appendChild(el('span','t', has(get(f,['t_ms'])) ? f.t_ms+'ms' : 'n/a'));
+            d.appendChild(el('pre', null, isObj(f) ? String(f.data == null ? '' : f.data) : String(f)));
+            holder.appendChild(d);
+          }
+        };
+        show(0, Math.min(CAP, frames.length));
+        if(frames.length > CAP){
+          const b = on(el('button', null, 'render remaining ' + (frames.length-CAP)), 'click', ev=>{ ev.stopPropagation(); show(CAP, frames.length); b.remove(); });
+          holder.appendChild(b);
+        }
+      }
+    };
+    const tgl = on(el('button', null, 'raw'), 'click', ev=>{ ev.stopPropagation(); rawMode = !rawMode; tgl.classList.toggle('on', rawMode); draw(); });
+    bar.appendChild(tgl);
+    bar.appendChild(copyBtn('copy', ()=>frames.map(f=>isObj(f)?String(f.data||''):'').join(''), 'frames copied'));
+    body.appendChild(bar);
+    body.appendChild(holder);
+    draw();
+  }, false);
+}
+
+function rawSection(title, text){
+  if(typeof text !== 'string') return null;
+  return section(title, text.length + ' bytes', body=>{
+    const bar = el('div');
+    bar.appendChild(copyBtn('copy', ()=>text, 'raw copied'));
+    body.appendChild(bar);
+    const LIMIT = 400000;
+    const pre = el('pre','raw', text.length > LIMIT ? text.slice(0, LIMIT) : text);
+    body.appendChild(pre);
+    if(text.length > LIMIT){
+      const b = on(el('button', null, 'show all ' + text.length + ' bytes'), 'click', ev=>{ ev.stopPropagation(); pre.textContent = text; b.remove(); });
+      body.appendChild(b);
+    }
+  }, false);
+}
+
+function degradationsSection(degr){
+  if(!degr.length) return null;
+  return section('degradations', String(degr.length), body=>{
+    const ul = el('ul','deglist');
+    for(const d of degr){
+      const li = el('li');
+      if(isObj(d)){
+        li.appendChild(el('b', null, (d.kind || '?') + ' '));
+        li.appendChild(el('span','jk', (d.field || '?') + ' '));
+        li.appendChild(el('span','dim', d.detail == null ? '' : String(d.detail)));
+        const extra = Object.keys(d).filter(k=>['kind','field','detail'].indexOf(k)<0);
+        if(extra.length) li.appendChild(el('span','dim', ' ' + short(jstr(d), 200)));
+      } else li.textContent = jstr(d);
+      ul.appendChild(li);
+    }
+    body.appendChild(ul);
+  }, true);
+}
+
+function errorsSection(errors){
+  if(!errors.length) return null;
+  return section('errors', errors.map(e=>e.stage+'/'+e.kind).join(', '), body=>{
+    for(const e of errors){
+      const box = el('div','errbox');
+      const head = el('div');
+      head.appendChild(el('b', null, (e.stage||'?') + ' / ' + (e.kind||'?')));
+      head.appendChild(document.createTextNode('  status ' + (has(e.status) ? e.status : 'n/a')));
+      box.appendChild(head);
+      box.appendChild(el('div','em', e.message == null ? '' : String(e.message)));
+      if(has(e.rendered)){
+        const s = jsonSection('rendered client error body', e.rendered, false);
+        box.appendChild(s);
+      }
+      body.appendChild(box);
+    }
+  }, true);
+}
+
+function detailEl(r){
+  const raw = r.raw;
+  const d = el('div','detail');
+  const client = isObj(raw.client) ? raw.client : {};
+  const up = isObj(raw.upstream) ? raw.upstream : null;
+  const cr = isObj(raw.client_response) ? raw.client_response : null;
+  const lowered = isObj(raw.lowered) ? raw.lowered : null;
+  const degr = arr(get(raw, ['lowered','degradations']));
+  const checks = isObj(raw.checks) ? raw.checks : {};
+  const timing = isObj(raw.timing) ? raw.timing : {};
+  const route = isObj(raw.route) ? raw.route : null;
+
+  /* ── metadata strip ── */
+  const metaSec = section('record', r.id, body=>{
+    body.appendChild(kvGrid([
+      ['trace_id', r.id],
+      ['schema v', has(raw.v) ? raw.v : 'n/a'],
+      ['ts_start', r.ts || 'n/a'],
+      ['ts_end', str(raw.ts_end) || 'n/a'],
+      ['tag', r.tag || 'n/a'],
+      ['source', r.file + ':' + r.line],
+      ['client', (r.method||'?') + ' ' + (r.path||'?') + (r.stream ? '  (stream)' : '')],
+      ['route', (r.provider||'no-route') + (r.upProto ? '/'+r.upProto : '') + (r.capsSource ? '  caps:'+r.capsSource : '')],
+      ['models', (r.clientModel||'n/a') + ' → ' + (r.upModel||'n/a')],
+      ['upstream url', up ? (str(up.url) || 'n/a') : 'n/a'],
+      ['upstream request_id', up ? (has(up.request_id) ? String(up.request_id) : 'n/a') : 'n/a'],
+      ['status', 'upstream ' + (r.upStatus===null?'n/a':r.upStatus) + ' · client ' + (r.clStatus===null?'n/a':r.clStatus)],
+      ['timing', 'decode ' + (has(timing.decode_us)?timing.decode_us+'µs':'n/a') +
+                 ' · lower ' + (has(timing.lower_us)?timing.lower_us+'µs':'n/a') +
+                 ' · encode ' + (has(timing.encode_us)?timing.encode_us+'µs':'n/a') +
+                 ' · upstream ' + (has(timing.upstream_ms)?timing.upstream_ms+'ms':'n/a') +
+                 ' · total ' + fmtMs(r.total)],
+      ['ttfb', fmtMs(r.ttfb)],
+      ['checks', 'aggregate=' + (has(checks.aggregate_matches_encode_response) ? checks.aggregate_matches_encode_response : 'n/a') +
+                 ' · degradations=' + r.degCount +
+                 ' · reencode_diff=' + (r.reencode.length ? r.reencode.join(',') : 'none')],
+      ['chain', has(get(raw,['chain','previous_response_id'])) ? String(raw.chain.previous_response_id) : 'none'],
+      ['store', isObj(raw.store) ? ('stored=' + (raw.store.stored_id||'none') + ' prev=' + (raw.store.previous||'none')) : 'n/a'],
+      ['anomalies', r.anomalies.length ? r.anomalies.join(', ') : 'none'],
+      ['body sha256', str(client.body_raw_sha256) ? short(client.body_raw_sha256, 20) : 'n/a']
+    ]));
+    const bar = el('div');
+    bar.style.marginTop = '5px';
+    bar.appendChild(copyBtn('copy whole record', ()=>jstr(raw), 'record copied'));
+    bar.appendChild(document.createTextNode(' '));
+    bar.appendChild(copyBtn('copy trace id', ()=>r.id, 'trace id copied'));
+    body.appendChild(bar);
+    body.appendChild(degradationsSection(degr) || el('span'));
+    body.appendChild(errorsSection(r.errors) || el('span'));
+  }, true);
+  d.appendChild(metaSec);
+
+  /* ── two panels ── */
+  const cols = el('div','cols');
+  cols.appendChild(panel('Request  ·  client → IR → lowered → upstream', [
+    jsonSection('client body', has(client.body) ? client.body : null, true),
+    jsonSection('client headers (redacted)', isObj(client.headers) ? client.headers : null, false),
+    jsonSection('ir_request', has(raw.ir_request) ? raw.ir_request : null, false),
+    jsonSection('lowered IR', lowered && has(lowered.ir) ? lowered.ir : null, false,
+      degr.length ? degr.length + ' degradations' : ''),
+    degradationsSection(degr),
+    jsonSection('upstream body', up && has(up.body) ? up.body : null, false),
+    jsonSection('upstream request headers (redacted)', up && isObj(up.headers) ? up.headers : null, false),
+    jsonSection('route + caps', route, false, (r.provider||'-') + '/' + (r.upProto||'-')),
+    jsonSection('requirements', has(raw.requirements) ? raw.requirements : null, false),
+    jsonSection('resolutions_summary', has(raw.resolutions_summary) ? raw.resolutions_summary : null, false),
+    jsonSection('chain', isObj(raw.chain) ? raw.chain : null, false)
+  ]));
+
+  cols.appendChild(panel('Response  ·  upstream → IR events → IR → client', [
+    section('upstream response', (r.upStatus===null?'n/a':r.upStatus) + ' · ttfb ' + fmtMs(r.ttfb) + ' · ' + fmtMs(up ? num(up.elapsed_ms) : null), body=>{
+      if(!up){ body.appendChild(el('div','dim','no upstream leg (n/a)')); return; }
+      body.appendChild(kvGrid([
+        ['status', has(up.status)?up.status:'n/a'],
+        ['request_id', has(up.request_id)?String(up.request_id):'n/a'],
+        ['elapsed', fmtMs(num(up.elapsed_ms))],
+        ['ttfb', fmtMs(num(up.ttfb_ms))],
+        ['stream', String(up.stream === true)],
+        ['url', str(up.url) || 'n/a']
+      ]));
+      const hs = jsonSection('response headers (redacted)', isObj(up.resp_headers) ? up.resp_headers : null, false);
+      body.appendChild(hs);
+      const rs = rawSection(up.stream ? 'raw upstream SSE' : 'raw upstream body', typeof up.raw === 'string' ? up.raw : undefined);
+      if(rs) body.appendChild(rs);
+      else body.appendChild(el('div','dim','raw bytes not captured (trace.include_raw_sse = false)'));
+    }, true),
+    eventsSection(arr(raw.ir_events), true),
+    jsonSection('ir_response', has(raw.ir_response) ? raw.ir_response : null, false),
+    section('client response', (r.clStatus===null?'n/a':r.clStatus) + (r.frameCount!==null ? ' · ' + r.frameCount + ' frames' : ' · body'), body=>{
+      if(!cr){ body.appendChild(el('div','dim','no client response recorded (n/a)')); return; }
+      body.appendChild(kvGrid([['status', has(cr.status)?cr.status:'n/a']]));
+      body.appendChild(jsonSection('response headers', isObj(cr.headers) ? cr.headers : null, false));
+      const fs = framesSection(cr);
+      if(fs) body.appendChild(fs);
+      body.appendChild(jsonSection('body', has(cr.body) ? cr.body : null, !fs));
+    }, true),
+    jsonSection('checks', isObj(raw.checks) ? raw.checks : null, false),
+    jsonSection('timing', isObj(raw.timing) ? raw.timing : null, false),
+    jsonSection('store', has(raw.store) ? raw.store : null, false)
+  ]));
+  d.appendChild(cols);
+  return d;
+}
+
+/* ── URL hash persistence ─────────────────────────────────────────── */
+let hashLock = false;
+function writeHash(){
+  const p = new URLSearchParams();
+  const f = S.f;
+  if(f.q) p.set('q', f.q);
+  if(f.proto) p.set('proto', f.proto);
+  if(f.provider) p.set('provider', f.provider);
+  if(f.status) p.set('status', f.status);
+  if(f.tag) p.set('tag', f.tag);
+  if(f.sort !== 'time') p.set('sort', f.sort);
+  if(f.anom) p.set('anom', '1');
+  if(f.stream) p.set('stream', '1');
+  const s = p.toString();
+  hashLock = true;
+  try{ history.replaceState(null, '', s ? '#'+s : location.pathname + location.search); }
+  catch(e){ location.hash = s; }
+  setTimeout(()=>{ hashLock = false; }, 0);
+}
+function readHash(){
+  const h = location.hash.replace(/^#/, '');
+  if(!h) return;
+  const p = new URLSearchParams(h);
+  const f = S.f;
+  f.q = (p.get('q') || '').toLowerCase();
+  f.proto = p.get('proto') || '';
+  f.provider = p.get('provider') || '';
+  f.status = p.get('status') || '';
+  f.tag = p.get('tag') || '';
+  f.sort = p.get('sort') || 'time';
+  f.anom = p.get('anom') === '1';
+  f.stream = p.get('stream') === '1';
+  document.getElementById('q').value = p.get('q') || '';
+  document.getElementById('proto').value = f.proto;
+  document.getElementById('provider').value = f.provider;
+  document.getElementById('status').value = f.status;
+  document.getElementById('tag').value = f.tag;
+  document.getElementById('sort').value = f.sort;
+  document.getElementById('anom').checked = f.anom;
+  document.getElementById('stream').checked = f.stream;
+}
+
+/* ── wiring ───────────────────────────────────────────────────────── */
+function bind(){
+  const q = document.getElementById('q');
+  let qt = null;
+  on(q, 'input', ()=>{ clearTimeout(qt); qt = setTimeout(()=>{ S.f.q = q.value.trim().toLowerCase(); applyFilters(); }, 140); });
+  for(const id of ['proto','provider','status','tag','sort']){
+    on(document.getElementById(id), 'change', ev=>{ S.f[id] = ev.target.value; applyFilters(); });
+  }
+  on(document.getElementById('anom'), 'change', ev=>{ S.f.anom = ev.target.checked; applyFilters(); });
+  on(document.getElementById('stream'), 'change', ev=>{ S.f.stream = ev.target.checked; applyFilters(); });
+
+  on(document.getElementById('file'), 'change', ev=>{
+    const fs = Array.from(ev.target.files || []);
+    if(fs.length) loadFiles(fs);
+  });
+  on(document.getElementById('clear'), 'click', ()=>{
+    S.recs = []; S.files = []; S.open.clear(); S.blank = 0; S.bad = 0;
+    document.getElementById('file').value = '';
+    rebuildFacets(); applyFilters();
+  });
+
+  // drag & drop anywhere
+  const dz = document.getElementById('drop');
+  let dragDepth = 0;
+  on(window, 'dragenter', ev=>{ ev.preventDefault(); dragDepth++; dz.classList.add('on'); });
+  on(window, 'dragover', ev=>{ ev.preventDefault(); });
+  on(window, 'dragleave', ev=>{ ev.preventDefault(); if(--dragDepth <= 0){ dragDepth = 0; dz.classList.remove('on'); } });
+  on(window, 'drop', ev=>{
+    ev.preventDefault(); dragDepth = 0; dz.classList.remove('on');
+    const fs = Array.from((ev.dataTransfer && ev.dataTransfer.files) || []);
+    if(fs.length) loadFiles(fs);
+  });
+
+  on(window, 'hashchange', ()=>{ if(hashLock) return; readHash(); applyFilters(); });
+
+  on(document, 'keydown', ev=>{
+    const tgt = ev.target;
+    const typing = tgt && (tgt.tagName === 'INPUT' || tgt.tagName === 'SELECT' || tgt.tagName === 'TEXTAREA');
+    if(ev.key === '/' && !typing){ ev.preventDefault(); document.getElementById('q').focus(); document.getElementById('q').select(); return; }
+    if(ev.key === 'Escape' && typing){ tgt.blur(); return; }
+    if(typing) return;
+    if(ev.key === 'j' || ev.key === 'ArrowDown'){ ev.preventDefault(); move(1); }
+    else if(ev.key === 'k' || ev.key === 'ArrowUp'){ ev.preventDefault(); move(-1); }
+    else if(ev.key === 'Enter'){
+      ev.preventDefault();
+      if(S.sel >= 0 && S.sel < S.view.length) toggle(S.view[S.sel]);
+    }
+    else if(ev.key === 'x'){
+      if(S.sel >= 0) copyText(S.recs[S.view[S.sel]].id, 'trace id copied');
+    }
+  });
+}
+function move(delta){
+  if(!S.view.length) return;
+  let next = S.sel + delta;
+  if(next < 0) next = 0;
+  if(next >= S.view.length) next = S.view.length - 1;
+  while(next >= S.rendered) renderMore();
+  select(next, true);
+}
+
+/* Debug handle: lets a console session (or a scripted check) drive the viewer —
+   __viewer.S.recs, __viewer.loadFiles([file]), __viewer.applyFilters(), … */
+window.__viewer = {S, loadFiles, applyFilters, toggle, select, renderMore, normalize, summarize};
+
+readHash();
+bind();
+applyFilters();
+</script>
+</body>
+</html>

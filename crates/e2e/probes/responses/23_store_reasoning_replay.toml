@@ -1,0 +1,117 @@
+# Responses family 23 — store & encrypted-reasoning replay (plan §5.23).
+# llm-xlate assumption: plan §2 row 7 + §9 — store:false + include:["reasoning.encrypted_content"] returns
+# replayable reasoning; encrypted items are bound to the producing org/key; reasoning items must be followed
+# by their paired function_call/message in stateless replay. Credential pinning for in-flight encrypted reasoning.
+
+[[probe]]
+id         = "resp.state.encrypted_capture"
+protocol   = "responses"
+tags       = ["explore", "dataset", "state", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "store:false + include:[reasoning.encrypted_content] returns a reasoning item carrying encrypted_content (opaque, replayable)."
+expect     = { status = 200 }
+notes      = "Base capture for the encrypted-replay chain. output[0] expected to be the reasoning item."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 256
+store             = false
+include           = ["reasoning.encrypted_content"]
+reasoning         = { effort = "medium" }
+input             = "What is 17*23? Think, then answer with just the number."
+
+[[probe]]
+id         = "resp.state.replay_verbatim"
+protocol   = "responses"
+tags       = ["explore", "dataset", "state", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+after      = ["resp.state.encrypted_capture"]
+hypothesis = "Replaying the encrypted reasoning item verbatim (store:false, same key) as prior input is accepted (200) — stateless reasoning carry works with the producing credential."
+expect     = "any"
+notes      = "Whole-ref of output[0] preserves the reasoning item incl. encrypted_content; followed by a fresh user turn."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 256
+store             = false
+include           = ["reasoning.encrypted_content"]
+reasoning         = { effort = "medium" }
+input             = [ { role = "user", content = "What is 17*23? Think, then answer with just the number." }, "${ref:resp.state.encrypted_capture:/output/0}", { role = "user", content = "Now multiply that result by 2." } ]
+
+[[probe]]
+id         = "resp.state.replay_second_key"
+protocol   = "responses"
+tags       = ["state", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+after      = ["resp.state.encrypted_capture"]
+requires   = ["manual"]
+hypothesis = "Replaying the encrypted item under a DIFFERENT org/key -> 400 (encrypted items are org-bound; the credential-pinning claim, plan §2 row 7)."
+expect     = "any"
+notes      = "requires manual: needs a second key/project; the client uses the default key so the operator must swap credentials. Dry-run only otherwise."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 256
+store             = false
+include           = ["reasoning.encrypted_content"]
+reasoning         = { effort = "medium" }
+input             = [ { role = "user", content = "What is 17*23?" }, "${ref:resp.state.encrypted_capture:/output/0}", { role = "user", content = "Continue." } ]
+
+[[probe]]
+id         = "resp.state.replay_reasoning_without_pair"
+protocol   = "responses"
+tags       = ["explore", "state", "reasoning", "errors"]
+models     = "openai_reasoning"
+stream     = false
+after      = ["resp.tools.function_reasoning_capture"]
+hypothesis = "A reasoning item NOT followed by its paired function_call/message in stateless replay -> 400 (the pairing rule, plan §2 row 7)."
+expect     = "any"
+notes      = "References a captured reasoning item that preceded a function_call, then omits the function_call — isolating the pairing constraint."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+store             = false
+include           = ["reasoning.encrypted_content"]
+reasoning         = { effort = "medium" }
+tools             = [ { type = "function", name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+input             = [ { role = "user", content = "Weather in Paris? Use the tool." }, "${ref:resp.tools.function_reasoning_capture:/output/0}", { role = "user", content = "Never mind, just say hi." } ]
+
+[[probe]]
+id         = "resp.state.get_response"
+protocol   = "responses"
+tags       = ["state"]
+models     = "openai_responses"
+stream     = false
+after      = ["resp.instr.store_chain"]
+requires   = ["manual"]
+hypothesis = "GET /responses/{id}, GET /responses/{id}/input_items and DELETE are supported for a stored response."
+expect     = "any"
+notes      = "Schema gap: the probe body is POST-shaped only; the client sends POST /messages|/responses. GET/DELETE on a stored id cannot be expressed as a body. Documented for E4 to exercise via a dedicated client path; left as a placeholder POST here."
+
+[probe.body]
+model                = "$MODEL"
+max_output_tokens    = 32
+previous_response_id = "${ref:resp.instr.store_chain:/id}"
+input                = "ping"
+
+[[probe]]
+id         = "resp.state.background_cancel"
+protocol   = "responses"
+tags       = ["state"]
+models     = "openai_responses"
+stream     = false
+requires   = ["manual"]
+hypothesis = "background:true returns a queued/in_progress response that can be cancelled; documents the background lifecycle."
+expect     = "any"
+notes      = "requires manual: cancel is a separate POST the client cannot yet issue. Documented for E4."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+background        = true
+store             = true
+input             = "Write a very long essay about the sea."

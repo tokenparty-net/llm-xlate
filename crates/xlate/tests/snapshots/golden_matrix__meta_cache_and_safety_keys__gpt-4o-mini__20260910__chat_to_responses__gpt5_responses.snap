@@ -1,0 +1,27 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Say ok."
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 32,
+  "safety_identifier": "e2e-user-20260910-042135",
+  "prompt_cache_key": "e2e-cache-20260910-042135"
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

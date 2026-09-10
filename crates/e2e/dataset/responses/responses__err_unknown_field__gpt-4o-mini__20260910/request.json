@@ -1,0 +1,15 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/responses",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "frobnicate": true,
+    "input": "Say ok.",
+    "max_output_tokens": 32,
+    "model": "gpt-4o-mini"
+  }
+}

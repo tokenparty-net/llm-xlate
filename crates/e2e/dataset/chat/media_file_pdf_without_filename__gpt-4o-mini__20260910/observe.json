@@ -1,0 +1,28 @@
+{
+  "protocol": "chat",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "code": "missing_required_parameter",
+    "param": "messages[0].content[1].file.file_id",
+    "message": "Missing required parameter: 'messages[0].content[1].file.file_id'."
+  },
+  "request_id": "req_6c24ad4a81c349cd9e7d0c0786acad77",
+  "rate_limit": {
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9969",
+    "x-ratelimit-remaining-tokens": "191674",
+    "x-ratelimit-reset-requests": "4m21.728s",
+    "x-ratelimit-reset-tokens": "2.497s"
+  },
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

@@ -1,0 +1,48 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": "What time is it in Tokyo?",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "tool_choice": {
+    "name": "get_weather",
+    "type": "tool"
+  },
+  "tools": [
+    {
+      "description": "Get weather.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "type": "object"
+      },
+      "name": "get_weather"
+    },
+    {
+      "description": "Get time.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "tz": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tz"
+        ],
+        "type": "object"
+      },
+      "name": "get_time"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=not_found status=404 retryable=false param=model provider_type=invalid_request_error retry_after=- upstream_request_id=-
+message: The model `gpt-9` does not exist.
+
+--- chat (non-streaming) ---
+status: 404
+headers:
+  content-type: application/json
+body:
+{
+  "error": {
+    "message": "The model `gpt-9` does not exist.",
+    "type": "invalid_request_error",
+    "param": "model",
+    "code": "model_not_found"
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 404
+frames:
+data: {"error":{"message":"The model `gpt-9` does not exist.","type":"invalid_request_error","param":"model","code":"model_not_found"}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 404
+headers:
+  content-type: application/json
+body:
+{
+  "error": {
+    "message": "The model `gpt-9` does not exist.",
+    "type": "invalid_request_error",
+    "param": "model",
+    "code": "model_not_found"
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 404
+frames:
+event: error
+data: {"type":"error","code":"model_not_found","message":"The model `gpt-9` does not exist.","param":"model","sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 404
+headers:
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "not_found_error",
+    "message": "The model `gpt-9` does not exist."
+  }
+}
+--- anthropic (streaming, pre-start) ---
+status: 404
+frames:
+event: error
+data: {"type":"error","error":{"type":"not_found_error","message":"The model `gpt-9` does not exist."}}

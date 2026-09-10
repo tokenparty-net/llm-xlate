@@ -1,0 +1,28 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "type": "message",
+  "role": "assistant",
+  "model": "golden-model",
+  "content": [
+    {
+      "type": "redacted_thinking",
+      "data": "Er0CCpABCBEYAipAT4vox3Bud9qojZP6SGu8rjTeaEXpgqwCmf0L1RzL0kwJQ4MNX/BOxysEnpq9ABsnpt/yn7kaRi1H8c8DbyIHszIPY2xhdWRlLXNvbm5ldC01OABCCHRoaW5raW5nWiRkZmQ0NTJkMC00NWEyLTQ4YjAtODhiZS05NWExMWU3YTQ1ZjCoAfHRidUGEgxpU4XwtNizauDbkBcaDJlNiZx0rmEL164SsyIw7tLZ2VrqzhTMAVABI+XMbt0UGkj+W4nThURb4dtC2QL0SX9xBe6VFAy6Xv0Iz3SlKlpL4kUW4VeSfvpycVoj+ond7+FvSxaEAeJWkb2oy69TOkWhidOxQ7C7yGat8oVFJZVJj0ytFpK0YfEecCxeliV5Gj8mwdYRGpjf/PuJFW1GAks6q5Mav6Xea7wYAQ=="
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 447,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 28
+  }
+}

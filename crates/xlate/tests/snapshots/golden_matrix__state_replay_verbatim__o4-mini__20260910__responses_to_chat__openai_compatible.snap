@@ -1,0 +1,27 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "llama-x",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is 17*23? Think, then answer with just the number."
+    },
+    {
+      "role": "assistant",
+      "content": null
+    },
+    {
+      "role": "user",
+      "content": "Now multiply that result by 2."
+    }
+  ],
+  "max_tokens": 256
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---
+reasoning=dropped;store=dropped;include=dropped;reasoning.opaque=dropped

@@ -1,0 +1,29 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-6-astra",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "<document title=\"notes.txt\">\nThe capital of France is Paris.\n</document>"
+        },
+        {
+          "type": "input_text",
+          "text": "What is the capital of France?"
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 64
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

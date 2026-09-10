@@ -1,0 +1,30 @@
+[package]
+name = "llm-xlate"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Cross-API translation core (Chat Completions / Responses / Anthropic Messages) for an LLM router. Sans-IO, pure data."
+
+# Phase-3: the `Translator` façade wires the three codec crates onto core + this crate's
+# lowering / requirements / store building blocks. All five crates now build green, so the
+# codecs are dependencies again (they were unlisted during parallel phase-2 development).
+[dependencies]
+llm-xlate-core.workspace = true
+llm-xlate-chat.workspace = true
+llm-xlate-responses.workspace = true
+llm-xlate-anthropic.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+bytes.workspace = true
+base64.workspace = true
+regex.workspace = true
+thiserror.workspace = true
+http.workspace = true
+indexmap.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+insta.workspace = true
+pretty_assertions.workspace = true
+sha2.workspace = true

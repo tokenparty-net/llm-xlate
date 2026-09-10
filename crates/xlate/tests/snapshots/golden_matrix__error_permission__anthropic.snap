@@ -1,0 +1,65 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=permission status=403 retryable=false param=- provider_type=permission_error retry_after=- upstream_request_id=-
+message: Your API key does not have permission to use the specified resource.
+
+--- chat (non-streaming) ---
+status: 403
+headers:
+  content-type: application/json
+body:
+{
+  "error": {
+    "message": "Your API key does not have permission to use the specified resource.",
+    "type": "permission_error",
+    "param": null,
+    "code": null
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 403
+frames:
+data: {"error":{"message":"Your API key does not have permission to use the specified resource.","type":"permission_error","param":null,"code":null}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 403
+headers:
+  content-type: application/json
+body:
+{
+  "error": {
+    "message": "Your API key does not have permission to use the specified resource.",
+    "type": "permission_error",
+    "param": null,
+    "code": null
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 403
+frames:
+event: error
+data: {"type":"error","code":null,"message":"Your API key does not have permission to use the specified resource.","param":null,"sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 403
+headers:
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "permission_error",
+    "message": "Your API key does not have permission to use the specified resource."
+  }
+}
+--- anthropic (streaming, pre-start) ---
+status: 403
+frames:
+event: error
+data: {"type":"error","error":{"type":"permission_error","message":"Your API key does not have permission to use the specified resource."}}

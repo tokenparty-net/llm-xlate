@@ -1,0 +1,6 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+ERROR kind=unsupported status=400 param=file_id
+message: file id "file-abc123" from family openai could not be resolved for the anthropic backend

@@ -1,0 +1,28 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Prove there are infinitely many primes in two lines."
+        }
+      ]
+    }
+  ],
+  "reasoning": {
+    "effort": "high"
+  },
+  "max_output_tokens": 256
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

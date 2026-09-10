@@ -1,0 +1,34 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "claude-opus-4-6",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Remember the number 42."
+        }
+      ]
+    }
+  ],
+  "max_tokens": 64,
+  "system": [
+    {
+      "type": "text",
+      "text": "Always answer only in French."
+    }
+  ],
+  "cache_control": {
+    "type": "ephemeral"
+  }
+}
+--- headers ---
+anthropic-version: 2023-06-01
+upstream_streams: false
+--- degraded ---
+store=dropped

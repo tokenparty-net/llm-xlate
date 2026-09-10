@@ -1,0 +1,14 @@
+{
+  "max_completion_tokens": 32,
+  "messages": [
+    {
+      "content": "Say ok.",
+      "role": "user"
+    }
+  ],
+  "metadata": {
+    "run": "20260910-042135"
+  },
+  "model": "gpt-4o-mini",
+  "store": true
+}

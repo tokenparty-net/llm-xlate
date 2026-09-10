@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=context_length_exceeded status=400 retryable=false param=- provider_type=invalid_request_error retry_after=- upstream_request_id=req_ctx_1
+message: prompt is too long: 250000 tokens > 200000 maximum
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_ctx_1
+body:
+{
+  "error": {
+    "message": "prompt is too long: 250000 tokens > 200000 maximum",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": "context_length_exceeded"
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"prompt is too long: 250000 tokens > 200000 maximum","type":"invalid_request_error","param":null,"code":"context_length_exceeded"}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_ctx_1
+body:
+{
+  "error": {
+    "message": "prompt is too long: 250000 tokens > 200000 maximum",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": "context_length_exceeded"
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":"context_length_exceeded","message":"prompt is too long: 250000 tokens > 200000 maximum","param":null,"sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+  x-router-upstream-request-id: req_ctx_1
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "prompt is too long: 250000 tokens > 200000 maximum"
+  },
+  "request_id": "req_ctx_1"
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"prompt is too long: 250000 tokens > 200000 maximum"},"request_id":"req_ctx_1"}

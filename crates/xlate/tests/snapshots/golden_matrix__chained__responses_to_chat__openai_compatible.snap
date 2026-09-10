@@ -1,0 +1,20 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "llama-x",
+  "messages": [
+    {
+      "role": "user",
+      "content": "And what about Boston?"
+    }
+  ],
+  "temperature": 0.5,
+  "max_tokens": 512
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---
+store=dropped;previous_response_id=dropped

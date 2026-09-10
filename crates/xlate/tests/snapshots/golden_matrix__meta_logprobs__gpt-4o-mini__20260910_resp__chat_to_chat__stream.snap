@@ -1,0 +1,13 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: render_frames(&frames)
+---
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"content":"Yes."},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[],"usage":{"prompt_tokens":13,"completion_tokens":2,"total_tokens":15,"prompt_tokens_details":{"cached_tokens":0,"audio_tokens":0},"completion_tokens_details":{"reasoning_tokens":0,"accepted_prediction_tokens":0,"audio_tokens":0,"rejected_prediction_tokens":0}}}
+
+data: [DONE]

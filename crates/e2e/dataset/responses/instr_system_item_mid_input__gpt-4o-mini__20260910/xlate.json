@@ -1,0 +1,28 @@
+{
+  "label": "resp.instr.system_item_mid_input/gpt-4o-mini",
+  "protocol": "responses",
+  "model": "gpt-4o-mini",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "8 path(s) differ (normalizations): ~/input/0/content, +/input/0/type, ~/input/1/content, +/input/1/type, ~/input/2/content, +/input/2/type, … (+2)"
+    },
+    {
+      "name": "response_decode_nonstream",
+      "pass": true,
+      "detail": "decoded 5 event(s)"
+    },
+    {
+      "name": "cross_client",
+      "pass": true,
+      "detail": "rendered 2 target dialect(s)"
+    }
+  ]
+}

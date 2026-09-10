@@ -1,0 +1,15 @@
+{
+  "cache_control": {
+    "ttl": "1h",
+    "type": "ephemeral"
+  },
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Reply with the single word: ok.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "system": "Padded system for caching: lorem ipsum dolor sit amet consectetur adipiscing elit, repeated for size, repeated for size, repeated for size."
+}

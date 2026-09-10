@@ -1,0 +1,150 @@
+# Responses family 25 — tools (plan §5.25).
+# llm-xlate assumption: plan §2 row 7 — Resp function tools attempt strict by default and fall back to
+# non-strict; §7.4 tool lowering; function_call_output content shapes. data/caps tools.
+
+[[probe]]
+id         = "resp.tools.function_call"
+protocol   = "responses"
+tags       = ["dataset", "tools"]
+models     = "openai_responses"
+stream     = "both"
+hypothesis = "A function tool yields a function_call output item with arguments; status completed with the call present."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+tools             = [ { type = "function", name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+input             = "Weather in Paris? Use the tool."
+
+[[probe]]
+id         = "resp.tools.strict_default_fallback"
+protocol   = "responses"
+tags       = ["explore", "tools"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "A function schema that cannot be strict (minLength present) is SILENTLY accepted via non-strict fallback (plan §2 row 7: attempt strict, fall back)."
+expect     = "any"
+notes      = "If it 400s instead of falling back, the 'silent fallback' claim is wrong; record either way."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+tools             = [ { type = "function", name = "make_code", description = "Make a code.", parameters = { type = "object", properties = { code = { type = "string", minLength = 2 } }, required = ["code"], additionalProperties = false } } ]
+input             = "Make a code and call the tool."
+
+[[probe]]
+id         = "resp.tools.strict_explicit_true"
+protocol   = "responses"
+tags       = ["explore", "tools", "errors"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "strict:true on an unsatisfiable schema -> 400 (no silent fallback when strict is explicit)."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+tools             = [ { type = "function", name = "make_code", description = "Make a code.", strict = true, parameters = { type = "object", properties = { code = { type = "string", minLength = 2 } }, required = ["code"], additionalProperties = false } } ]
+input             = "Make a code and call the tool."
+
+[[probe]]
+id         = "resp.tools.parallel"
+protocol   = "responses"
+tags       = ["dataset", "tools"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "A multi-item prompt yields multiple function_call items in one response."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 256
+tools             = [ { type = "function", name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+input             = "Get the weather for Paris and Tokyo, one call each."
+
+[[probe]]
+id         = "resp.tools.choice_allowed_tools"
+protocol   = "responses"
+tags       = ["explore", "tools"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "tool_choice with an allowed_tools subset constrains the model to that subset."
+expect     = "any"
+notes      = "allowed_tools is a newer Responses tool_choice mode; documents acceptance."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+tool_choice       = { type = "allowed_tools", mode = "auto", tools = [ { type = "function", name = "get_weather" } ] }
+tools             = [ { type = "function", name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } }, { type = "function", name = "get_time", description = "Get time.", parameters = { type = "object", properties = { tz = { type = "string" } }, required = ["tz"], additionalProperties = false } } ]
+input             = "Weather in Paris?"
+
+[[probe]]
+id         = "resp.tools.function_reasoning_capture"
+protocol   = "responses"
+tags       = ["explore", "dataset", "tools", "reasoning", "state"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "On a reasoning model with tools + encrypted reasoning, the output is [reasoning, function_call]; the reasoning item precedes and is paired with the function_call (plan §2 pairing claim)."
+expect     = "any"
+notes      = "Base capture for resp.state.replay_reasoning_without_pair; output[0] reasoning, output[1] function_call."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 256
+store             = false
+include           = ["reasoning.encrypted_content"]
+reasoning         = { effort = "medium" }
+tools             = [ { type = "function", name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+input             = "Weather in Paris? Use the tool."
+
+[[probe]]
+id         = "resp.tools.function_output_roundtrip"
+protocol   = "responses"
+tags       = ["dataset", "tools"]
+models     = "openai_responses"
+stream     = false
+after      = ["resp.tools.function_call"]
+hypothesis = "Replaying a function_call item followed by a function_call_output item (matching call_id) is accepted and yields a final answer."
+expect     = "any"
+notes      = "call_id comes from the captured function_call item (output[0])."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+tools             = [ { type = "function", name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+input             = [ { role = "user", content = "Weather in Paris? Use the tool." }, "${ref:resp.tools.function_call:/output/0}", { type = "function_call_output", call_id = "${ref:resp.tools.function_call:/output/0/call_id}", output = "18C and sunny" } ]
+
+[[probe]]
+id         = "resp.tools.function_output_array_content"
+protocol   = "responses"
+tags       = ["explore", "tools", "media"]
+models     = "openai_responses"
+stream     = false
+after      = ["resp.tools.function_call"]
+hypothesis = "A function_call_output whose output is an array of content parts (image/file) is accepted — tool outputs may carry media."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+tools             = [ { type = "function", name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+input             = [ { role = "user", content = "Weather in Paris? Use the tool." }, "${ref:resp.tools.function_call:/output/0}", { type = "function_call_output", call_id = "${ref:resp.tools.function_call:/output/0/call_id}", output = [ { type = "input_text", text = "See attached chart." }, { type = "input_image", image_url = "$ASSET_DATA_URL:png_1px" } ] } ]
+
+[[probe]]
+id         = "resp.tools.web_search"
+protocol   = "responses"
+tags       = ["explore", "tools", "streaming"]
+models     = "openai_responses"
+stream     = true
+requires   = ["manual"]
+hypothesis = "The hosted web_search tool emits web_search_call output items and dedicated stream events."
+expect     = "any"
+notes      = "requires manual: billed hosted tool; operator confirms. Documents the hosted-tool item + event shapes."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 256
+tools             = [ { type = "web_search" } ]
+input             = "Search the web for today's date and report it."

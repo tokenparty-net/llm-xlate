@@ -1,0 +1,23 @@
+{
+  "label": "resp.output.verbosity/gpt-4o-mini",
+  "protocol": "responses",
+  "model": "gpt-4o-mini",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "3 path(s) differ (normalizations): ~/input, +/text/format, -/text/verbosity"
+    },
+    {
+      "name": "error_decode",
+      "pass": true,
+      "detail": "kind=invalid_request status=400"
+    }
+  ]
+}

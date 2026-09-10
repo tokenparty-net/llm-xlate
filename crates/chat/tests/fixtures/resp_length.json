@@ -1,0 +1,14 @@
+{
+  "id": "chatcmpl-len1",
+  "object": "chat.completion",
+  "created": 1700000004,
+  "model": "gpt-4o-2024-08-06",
+  "choices": [
+    {
+      "index": 0,
+      "message": { "role": "assistant", "content": "This answer was cut" },
+      "finish_reason": "length"
+    }
+  ],
+  "usage": { "prompt_tokens": 12, "completion_tokens": 256, "total_tokens": 268 }
+}

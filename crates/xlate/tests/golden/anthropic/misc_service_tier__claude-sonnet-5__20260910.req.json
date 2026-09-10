@@ -1,0 +1,11 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Say ok.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "service_tier": "auto"
+}

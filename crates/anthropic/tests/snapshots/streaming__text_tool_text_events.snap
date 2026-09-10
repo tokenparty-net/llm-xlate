@@ -1,0 +1,94 @@
+---
+source: crates/anthropic/tests/streaming.rs
+expression: events
+---
+[
+    Start {
+        response_id: ResponseId(
+            "msg_1",
+        ),
+        model: "claude-opus-5",
+        usage_prefill: Some(
+            Usage {
+                input: 10,
+                output: 1,
+                cache_read: None,
+                cache_write_5m: None,
+                cache_write_1h: None,
+                reasoning: None,
+                ext: Extensions(
+                    {},
+                ),
+            },
+        ),
+    },
+    ItemStart {
+        index: 0,
+        kind: Message,
+        id: None,
+        call: None,
+    },
+    Delta {
+        index: 0,
+        delta: Text(
+            "Let me check.",
+        ),
+    },
+    ItemStop {
+        index: 0,
+    },
+    ItemStart {
+        index: 1,
+        kind: ToolCall,
+        id: None,
+        call: Some(
+            (
+                CallId(
+                    "toolu_1",
+                ),
+                "get",
+            ),
+        ),
+    },
+    Delta {
+        index: 1,
+        delta: ToolArgs(
+            "{\"city\":\"NYC\"}",
+        ),
+    },
+    ItemStop {
+        index: 1,
+    },
+    ItemStart {
+        index: 2,
+        kind: Message,
+        id: None,
+        call: None,
+    },
+    Delta {
+        index: 2,
+        delta: Text(
+            "Done.",
+        ),
+    },
+    ItemStop {
+        index: 2,
+    },
+    Stop {
+        reason: ToolUse,
+        usage: Usage {
+            input: 10,
+            output: 25,
+            cache_read: None,
+            cache_write_5m: None,
+            cache_write_1h: None,
+            reasoning: None,
+            ext: Extensions(
+                {},
+            ),
+        },
+        ext: Extensions(
+            {},
+        ),
+    },
+]

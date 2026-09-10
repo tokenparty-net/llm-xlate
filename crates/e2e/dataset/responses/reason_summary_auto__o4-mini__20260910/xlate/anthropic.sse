@@ -1,0 +1,30 @@
+event: message_start
+data: {"type":"message_start","message":{"id":"resp_check","type":"message","role":"assistant","model":"check-model","content":[],"stop_reason":null,"stop_sequence":null,"usage":{"input_tokens":0,"output_tokens":0}}}
+
+event: content_block_start
+data: {"type":"content_block_start","index":0,"content_block":{"type":"thinking","thinking":""}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"thinking_delta","thinking":"**Calculating 17 times 23**\n\nThe user asks for 17 times 23 and suggests I think before answering. So, I could show some reasoning but keep it brief. I can break it down into parts: 17 times 20 equals 340, and 17 times 3 equals 51. Adding those gives me 391. So, I can confidently say that 17 times 23 is 391, including the succinct reasoning for clarity."}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"signature_delta","signature":"rtr1.eyJ2IjoxLCJwIjoib3BlbmFpIiwibSI6Im80LW1pbmktMjAyNS0wNC0xNiIsImsiOiJlbmNyeXB0ZWQiLCJkIjoiZ0FBQUFBQnFvbWlwZ3JfQmRBTmxvTXc1Ty1ZZk1WeV9nRnlsNEQ4N2ROV0FZZmNyNWZBSGVtYmZKVVhycTVZMXlhMkpwWXBHUnlvQ0V0dUNNRjZjRjk0ZXpaQUp2YnFXSHRDMjFJUW9pa3VEaC1TQ2ZPREhNcTMzU0Q0QXhvQzRiNFBNM0g5ajZTSW0zdm1ycU1oZTRpbzhsZkJjN3YzWnpvanBGa2tHQkptcXU4R1pvTHRxbjZYb0xBMkJDX3NWSzBvT2Z3aEdGaXdXTElVYms1a1FRSFE2M1RFWndvYmpTUUs2bjJpUm55Y3M2QmVjNmZ1am1zTVBEOFdLZ1kwX1A3YThHcXJTQm1IS2xDbFRKU1M3alBUbzQ0czdMSjFlV2dvZlY4T3FPLTZYY2VmR09kS3NuU0d1SHFtcXdVNjE3TDU3RTA1X1lTamxxSVpYeVJEa0hnOEtMU0ZMX2owbll2Ylp6aFZySlZrWTl6aGRCMUtvOXpSZUtvMmcxS2lra1JsRFhQTk4xU04zdGFLdU1pUDhlVGNnanQxTnJGa2lzTEtZS1pPd241SV9jMXZCQWd1cW9ISWVzRkZBakNFd2xmQlVlSUllTGYzTXR6WVpJT3A2RDNnN3Rsb3BZcS1EUGZFQ3RRRzdMUVJzeVdWb3dDanJITkQ3Mk5BY0NRT3JlNlM3M3h6cXRnSms3aDBsaHlXdW1VTkpBakl2Y1QwSm9RN2phNUFBLW50RDFQTjdVX2pDbWt1S0kwUzhCM1phTzNaa0V3aHB6QzJqaXAxSXZwcGNDYUdZTTZOdXd5UXo3QlA1aUI1a1d0R0llM3hVUjNtekU0azNXZlVIUGk4VzJXVE0tTk40czhNVU44dWlKWnJXSDFlRm92bjZCU01NNHNQM2ZEakZRdGcwTjdtUHNyNmpSTUFjbVRaVGc1b1ZVUm84Q0VSZTAyeFRKM25iTVdua0U2YzIzZllkLXdxSnBqaFlxZlpMd3NsODUyM2l0b3lzWElaMWxkemQ5YzlkT180enZFbFdCUE1sZVhNZXVtYjNad1NDWkZHM3VnMXFUTXd1WjR5NDNSZzYxMmFNYnVacU91d01NdU4zbkhPUWl5VldodW4wQ28ycTM2UXRnWWptWWo5VWwyUjdWOUprSER2cEVkaTRPaEtvVGJTcG9Pc0xDWjRaVmRlWFc5b0dpQ053Q2VCSDB3VTVibk05THhHREZtVU1ONnROVFlFMXQxZXlPVkRVVXJXYlRTX29yQjdmQW5DWHgyRXBUOC1McWhid1FjeTUxMDFIaWJJUTNTMDNjTTlNRkRDMzFkSF80MWJwOWlFbmwtSHJlMkJ6VFBlNmZ4RHFrTlEyNW54dW5kTk9LaVlBRWs0ek5DOTFwLVl3YU1OT0FzVjBkd01oeVNXQzNuUUt1Q2Z1UkRhWE1SaDBVRTJRMTRaWjVObTdtUW1la1dJUmpjalJ3MlMzSDRMRzREclNpWTdzLWhONzdmMEw1MDUtTVV5S2xrR0pvYTZkem9BSExTVGc3Q1Nhc2M1ck1fdUlFcmozLTVOVjF0dy02VnBncU1YUkVDZ2ltTnFzZlFxaGxPNjJhUWhqYzdzeEcta1ljM25Sa2U5ckJYaXR2bVdMdGk1czAyczJQc0JqTVptcmNFY1lPNE40c21ON0QybEdRQ1V6TXowdGZIU2JEdHlGT3dFdk16cm1OTXY3Q3dwT29FSThXWWhzSVNNWFNIOXJDbWpYY00yVUVFZEVxNmJXWUpEQ0RZUWpmZHFpXzM0SlpKNzVIV0xjR3BlUXJobFlMNlpkeC0teFg5WF9tYWpLOGpUN3ppa0FnVFBKSncySjlGU1hGV1JfY2ZodXBqSW9uQXpyNm1lMURwR3FtcU16VmhvcmdxQ2VjNmRFc0tPa2RGMEFmX21GQVA4V0RKQVdDMEp3WjRndjg2SmozcDlEb2NMc1lyN2hvTWNsWWotYy11TllhYXF2RkFUcDlOU1IyVllIVDEwdkJya0pBMW9PSENWSFpWYjZSdlhnSzB4OUwxX18wak53NHF5Mm1TR0JvZXJOYjBTZ3YyUEV5T0ZQbGhPNXEzdjJmNkViVFFDaGk5X19fVlJLdV9tR2VyWkM3Q0pGQjBWZFB0SHBXdlFQQ2xCX00xSUxTZlN1bGZYRS1HemRnYWhCMUt0U0JibzRvaG4zUzRaLUItdks5WUVTcWNhRk9zZXAyRWdWbDlNLXNsQmY3TW9iNS0ybndpZFNhQUFBbkhsdTN4TGZJMjhhSnRZWEFydUJpTEpYdEhhRHZ1Q2pSX1E4c3NaT2NrZW5oS2trWGl5X3hBcFRWamJVLWRsbC1lN09lbms3cUU1OTM4emtrakpoMGh2SjFNSUcyanpwRlh1RmpFWm8xREJ1Mm5oRDB3NUpVWEh2Z3FIdENUeFhCZGZadVlXU0E1NkFrbFQ2SktuZWpaTTZmZ044ejZyczFpYzVaS1pLVWFuVmpPTy02V3FCbFhQb2VSTGlTUjY1ZEZ2cWh0VXQyVklsUXJtWEs0dXZLN1UxcmhJZ1g0d1lzTHY3TmMwcF9uYkR0RjdTbkxXUlRrRGtjMDVnZ0lkYjZZQ0dqR0FiazlWbFZnNUFtZXF5WHlRMkVfUzNQUUR2TXByOXJ6V2xxdUNmVmxOOF82cWUwTFZtdWVINTFRU2ZVUVFaM1E9PSIsImgiOiJVMVNqa3Jvc3AyTXk4UWpOTk5zS3ZLRWpCSDh4RjBoUnc3bmlwQUhzOW1VIn0"}}
+
+event: content_block_stop
+data: {"type":"content_block_stop","index":0}
+
+event: content_block_start
+data: {"type":"content_block_start","index":1,"content_block":{"type":"text","text":""}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":1,"delta":{"type":"text_delta","text":"17 × 23 = (17 × 20) + (17 × 3) = 340 + 51 = 391."}}
+
+event: content_block_stop
+data: {"type":"content_block_stop","index":1}
+
+event: message_delta
+data: {"type":"message_delta","delta":{"stop_reason":"end_turn","stop_sequence":null},"usage":{"input_tokens":18,"cache_read_input_tokens":0,"output_tokens":212}}
+
+event: message_stop
+data: {"type":"message_stop"}
+

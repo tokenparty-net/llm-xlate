@@ -1,0 +1,23 @@
+{
+  "label": "ant.tools.result_missing/claude-sonnet-5",
+  "protocol": "anthropic",
+  "model": "claude-sonnet-5",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "5 path(s) differ (normalizations): ~/messages/0/content, -/messages/1/content/1/caller, -/messages/1/content/2/caller, ~/messages/2/content, +/tool_choice"
+    },
+    {
+      "name": "error_decode",
+      "pass": true,
+      "detail": "kind=invalid_request status=400"
+    }
+  ]
+}

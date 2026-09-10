@@ -1,0 +1,207 @@
+# Anthropic family 2 — in-array `role:"system"` messages (plan §5.2).
+# llm-xlate assumption: plan §2 row 1 — Ant accepts {role:"system"} inside messages[] on Opus 4.8 / 5-family;
+# constraints: NOT first, must follow a user turn; later system messages override earlier + top-level system;
+# older models -> 400; not on Bedrock/Vertex. data/caps mid_context_system capability gate + §7.1 lowering.
+#
+# LIVE FINDING (explore1, 2026-09-10): the real rule (verbatim from the 400 body) is
+#   "role 'system' must follow a 'user' message or an 'assistant' message ending in a server tool
+#    result; the directive-only form (content: [] with output_config) is accepted at any position".
+# The v1 bodies placed the in-array system after an ASSISTANT text turn, which is NOT a legal slot, so
+# every one 400'd regardless of model. Bodies below place the content-bearing system right after a USER
+# turn (the legal slot) so the probe measures the intended thing; `directly_after_assistant` is kept as
+# the explicit illegal-slot case (expect 400).
+
+[[probe]]
+id         = "ant.system.mid.after_user"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "instructions"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "A content-bearing system message placed DIRECTLY after a user turn (the legal slot) is accepted (200) on current Claude and steers the reply."
+expect     = { status = 200 }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." }, { role = "system", content = "From now on answer only in French." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "ant.system.mid.first_message"
+protocol   = "anthropic"
+tags       = ["explore", "instructions", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A system message as the FIRST message violates 'must follow a user turn' -> 400 invalid_request_error."
+expect     = { status = 400, error_type = "invalid_request_error" }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "system", content = "Answer in French." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "ant.system.mid.directly_after_assistant"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "instructions", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "FINDING: a content-bearing system message directly after an assistant TEXT turn is NOT a legal slot -> 400 (it must follow a user turn, or an assistant turn ending in a server tool result)."
+expect     = { status = 400, error_type = "invalid_request_error" }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." }, { role = "assistant", content = "Hi." }, { role = "system", content = "Be terse." }, { role = "user", content = "Explain gravity." } ]
+
+[[probe]]
+id         = "ant.system.mid.two_in_a_row"
+protocol   = "anthropic"
+tags       = ["explore", "instructions"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "First system follows a user (legal); a second system immediately after it — is system-after-system accepted? Observe status + which instruction wins."
+expect     = "any"
+notes      = "Override semantics + whether system may follow system. First system is legally placed (after user)."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." }, { role = "system", content = "Answer in French." }, { role = "system", content = "Answer in German." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "ant.system.mid.overrides_top_level"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "instructions"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A legally-placed (after-user) mid-array system message overrides the top-level `system` field. Observe reply language."
+expect     = { status = 200 }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+system     = "Answer only in English."
+messages   = [ { role = "user", content = "Say hi." }, { role = "system", content = "Ignore prior language rules; answer only in French." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "ant.system.mid.on_old_model"
+protocol   = "anthropic"
+tags       = ["explore", "instructions", "errors"]
+models     = "anthropic_old"
+stream     = false
+hypothesis = "Older models reject in-array system with 400 even in the legal slot. NOTE: this account offers no 3.x models, so the oldest offered (4.5 family) may in fact ACCEPT it; the probe captures the real boundary."
+expect     = "any"
+notes      = "Legally-placed (after-user) system, run across anthropic_old to find the boundary; verdict per-capture."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." }, { role = "system", content = "Answer in French." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "ant.system.mid.across_all_models"
+protocol   = "anthropic"
+tags       = ["explore", "instructions"]
+models     = "anthropic_all"
+stream     = false
+hypothesis = "The full sweep pins exactly which model ids accept a legally-placed in-array system (measuring the 4.5/4.6/4.7/4.8/5 boundary)."
+expect     = "any"
+notes      = "Legally-placed (after-user) system. One expansion per model under --all-models."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." }, { role = "system", content = "Answer in French." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "ant.system.mid.with_effort_field"
+protocol   = "anthropic"
+tags       = ["explore", "instructions"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A legally-placed system message object carrying an `effort` field (rumoured mid-conversation output-config) is accepted or ignored; documents whether the field is recognised."
+expect     = "any"
+notes      = "Speculative field; system is legally placed (after user) so any 400 is about the field, not the slot."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." }, { role = "system", content = [ { type = "text", text = "Think harder now." } ], effort = "high" }, { role = "user", content = "What is 17*23?" } ]
+
+[[probe]]
+id         = "ant.system.mid.beta_header"
+protocol   = "anthropic"
+tags       = ["explore", "instructions"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A legally-placed in-array system needs NO special beta header on current Claude; sending a mid-conversation beta header is harmless."
+expect     = "any"
+notes      = "Determines whether llm-xlate must emit a beta header for mid-context system. Compare against ant.system.mid.after_user (no header)."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." }, { role = "system", content = "Answer in French." }, { role = "user", content = "How are you?" } ]
+
+[probe.headers]
+"anthropic-beta" = "mid-conversation-output-config-2026-07-01"
+
+[[probe]]
+id         = "ant.system.mid.ends_array"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "instructions"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "FINDING: the real rule is 'system must precede an assistant message or END the array'. A system message as the LAST element (directive for the upcoming assistant turn) is accepted (200)."
+expect     = { status = 200 }
+notes      = "The legal slot A. Error text on the illegal cases: 'role system must precede an assistant message or end the array'."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." }, { role = "system", content = "Answer only in French." } ]
+
+[[probe]]
+id         = "ant.system.mid.precedes_assistant"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "instructions"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "FINDING: a system message that immediately PRECEDES an assistant message (its directive) is accepted (200)."
+expect     = { status = 200 }
+notes      = "The legal slot B: [user, system, assistant, user]. system at idx1 precedes the assistant at idx2."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." }, { role = "system", content = "Answer only in French." }, { role = "assistant", content = "D'accord." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "ant.system.mid.follows_plain_assistant_precedes_assistant"
+protocol   = "anthropic"
+tags       = ["explore", "instructions", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "AUDIT follow-up: the placement rule is a CONJUNCTION — system must FOLLOW a user (or a server-tool-result assistant) AND PRECEDE an assistant (or end the array). [user, assistant(plain), system, assistant, user] satisfies 'precedes an assistant' yet the system follows a PLAIN assistant, so it must still 400 with the 'must follow' message. This is the exact case where the old precedes_assistant_or_ends_array flag would wrongly ACCEPT."
+expect     = { status = 400, error_type = "invalid_request_error" }
+notes      = "Distinguishes precedes_assistant_or_ends_array (accepts) from the true conjunctive rule (rejects: system follows a plain assistant, not a user/server-tool assistant)."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Say hi." }, { role = "assistant", content = "Hi." }, { role = "system", content = "Be terse." }, { role = "assistant", content = "Understood." }, { role = "user", content = "Explain gravity." } ]
+
+[[probe]]
+id         = "ant.system.mid.directive_only_first"
+protocol   = "anthropic"
+tags       = ["explore", "instructions"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "FINDING follow-up: the directive-only form (system with content:[] + output_config) is accepted at ANY position, including first, per the 400 body text."
+expect     = "any"
+notes      = "Tests the escape hatch the error message named. output_config carries effort; content is empty."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "system", content = [], output_config = { effort = "high" } }, { role = "user", content = "What is 17*23?" } ]

@@ -1,0 +1,65 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/chat/completions",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "max_completion_tokens": 128,
+    "messages": [
+      {
+        "content": "What time is it in Tokyo?",
+        "role": "user"
+      }
+    ],
+    "model": "gpt-4o-mini",
+    "tool_choice": {
+      "function": {
+        "name": "get_time"
+      },
+      "type": "function"
+    },
+    "tools": [
+      {
+        "function": {
+          "description": "Get weather.",
+          "name": "get_weather",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "city": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "city"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Get time.",
+          "name": "get_time",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "tz": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "tz"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ]
+  }
+}

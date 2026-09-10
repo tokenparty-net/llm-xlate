@@ -1,0 +1,14 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "First question.",
+      "role": "user"
+    },
+    {
+      "content": "Second question. Answer both.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5"
+}

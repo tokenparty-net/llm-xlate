@@ -1,0 +1,36 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "input": [
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "I will help.",
+          "annotations": []
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Great, what is 2+2?"
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 64
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

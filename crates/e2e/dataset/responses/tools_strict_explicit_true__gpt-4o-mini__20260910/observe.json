@@ -1,0 +1,37 @@
+{
+  "protocol": "responses",
+  "stream": false,
+  "status": 200,
+  "verdict": "na",
+  "request_id": "req_f8d5c94eed574caa8c5d9440e6dbca2d",
+  "rate_limit": {
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9999",
+    "x-ratelimit-remaining-tokens": "199732",
+    "x-ratelimit-reset-requests": "8.64s",
+    "x-ratelimit-reset-tokens": "80ms"
+  },
+  "stop_reason": "completed",
+  "usage": {
+    "input_tokens": 51,
+    "input_tokens_details.cache_write_tokens": 0,
+    "input_tokens_details.cached_tokens": 0,
+    "output_tokens": 16,
+    "output_tokens_details.reasoning_tokens": 0,
+    "total_tokens": 67
+  },
+  "type_sequence": [
+    "function_call"
+  ],
+  "echoed_request_fields": [
+    "max_output_tokens"
+  ],
+  "tool_call_count": 1,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

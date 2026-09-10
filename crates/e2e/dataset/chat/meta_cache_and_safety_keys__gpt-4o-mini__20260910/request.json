@@ -1,0 +1,21 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/chat/completions",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "max_completion_tokens": 32,
+    "messages": [
+      {
+        "content": "Say ok.",
+        "role": "user"
+      }
+    ],
+    "model": "gpt-4o-mini",
+    "prompt_cache_key": "e2e-cache-20260910-042135",
+    "safety_identifier": "e2e-user-20260910-042135"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "max_completion_tokens": 64,
+  "messages": [
+    {
+      "content": [
+        {
+          "text": "How many pages?",
+          "type": "text"
+        },
+        {
+          "file": {
+            "file_data": "$ASSET_DATA_URL:pdf_1page"
+          },
+          "type": "file"
+        }
+      ],
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini"
+}

@@ -1,0 +1,5 @@
+---
+source: crates/chat/tests/request.rs
+expression: "encode_request_str(&ir, &gpt4o())"
+---
+{"model":"gpt-4o","messages":[{"role":"user","content":"Extract the person."}],"response_format":{"type":"json_schema","json_schema":{"name":"person","description":"A person record","schema":{"type":"object","properties":{"name":{"type":"string"},"age":{"type":"integer"}},"required":["name","age"],"additionalProperties":false},"strict":true}}}

@@ -1,0 +1,26 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-6-astra",
+  "instructions": "Padded system for caching: lorem ipsum dolor sit amet consectetur adipiscing elit, repeated for size, repeated for size, repeated for size.",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Reply with the single word: ok."
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 64
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

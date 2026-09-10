@@ -1,0 +1,65 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Get the weather for Paris and for Tokyo using the tool, one call per city."
+    },
+    {
+      "role": "assistant",
+      "content": "I'll get the weather for both cities now.",
+      "tool_calls": [
+        {
+          "id": "toolu_01NcBmmQLYPVEZabgndS6Esr",
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "arguments": "{\"city\":\"Paris\"}"
+          }
+        },
+        {
+          "id": "toolu_01SLub878vFZRjnD3YKHXYdK",
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "arguments": "{\"city\":\"Tokyo\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "user",
+      "content": "thanks"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get weather.",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "city": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "city"
+          ],
+          "type": "object"
+        }
+      }
+    }
+  ],
+  "max_completion_tokens": 128
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

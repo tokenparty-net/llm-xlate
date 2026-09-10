@@ -1,0 +1,140 @@
+{
+  "status": 200,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d06f5ad4eb295-EWR",
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:50 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "307",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-openai-proxy-wasm": "v0.1",
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9974",
+    "x-ratelimit-remaining-tokens": "199992",
+    "x-ratelimit-reset-requests": "3m40.769s",
+    "x-ratelimit-reset-tokens": "2ms",
+    "x-request-id": "req_9782a56053f94ac99e899ab5293a10f1"
+  },
+  "elapsed_ms": 382,
+  "body": {
+    "id": "chatcmpl-EMULS2pmNZTimreTNNowU4jtkUYeK",
+    "object": "chat.completion",
+    "created": 1789028570,
+    "model": "gpt-4o-mini-2024-07-18",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Yes.",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": {
+          "content": [
+            {
+              "token": "Yes",
+              "logprob": -3.128163257315464e-7,
+              "bytes": [
+                89,
+                101,
+                115
+              ],
+              "top_logprobs": [
+                {
+                  "token": "Yes",
+                  "logprob": -3.128163257315464e-7,
+                  "bytes": [
+                    89,
+                    101,
+                    115
+                  ]
+                },
+                {
+                  "token": " Yes",
+                  "logprob": -15.25,
+                  "bytes": [
+                    32,
+                    89,
+                    101,
+                    115
+                  ]
+                },
+                {
+                  "token": "yes",
+                  "logprob": -18.125,
+                  "bytes": [
+                    121,
+                    101,
+                    115
+                  ]
+                }
+              ]
+            },
+            {
+              "token": ".",
+              "logprob": -2.696889623621246e-6,
+              "bytes": [
+                46
+              ],
+              "top_logprobs": [
+                {
+                  "token": ".",
+                  "logprob": -2.696889623621246e-6,
+                  "bytes": [
+                    46
+                  ]
+                },
+                {
+                  "token": "!",
+                  "logprob": -13.12500286102295,
+                  "bytes": [
+                    33
+                  ]
+                },
+                {
+                  "token": ".\n",
+                  "logprob": -14.87500286102295,
+                  "bytes": [
+                    46,
+                    10
+                  ]
+                }
+              ]
+            }
+          ],
+          "refusal": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 13,
+      "completion_tokens": 2,
+      "total_tokens": 15,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_8c60972de7"
+  }
+}

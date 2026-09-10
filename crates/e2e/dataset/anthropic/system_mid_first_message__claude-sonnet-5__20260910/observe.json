@@ -1,0 +1,18 @@
+{
+  "protocol": "anthropic",
+  "stream": false,
+  "status": 400,
+  "verdict": "pass",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "messages.0: use the top-level 'system' parameter for the initial system prompt; the directive-only form (content: [] with output_config) is accepted at any position"
+  },
+  "request_id": "req_011CeuSJGiHdRmu3Dsd5dM3Y",
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

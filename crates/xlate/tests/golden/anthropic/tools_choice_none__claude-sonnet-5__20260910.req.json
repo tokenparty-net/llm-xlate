@@ -1,0 +1,31 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": "What is the weather in Paris?",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "tool_choice": {
+    "type": "none"
+  },
+  "tools": [
+    {
+      "description": "Get weather.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "type": "object"
+      },
+      "name": "get_weather"
+    }
+  ]
+}

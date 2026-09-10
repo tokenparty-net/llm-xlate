@@ -1,0 +1,331 @@
+# Anthropic Messages capability data. verified_at = 2026-09-10 (live-verified families 1-4,6,9; see FINDINGS).
+# Layers: [defaults] (family) -> [[model]] rules (first glob match wins, newest first).
+
+family = "anthropic"
+
+[defaults.transport]
+protocols = ["anthropic"]
+streaming = "both"
+usage_timing = "start_and_end"
+stream_usage_opt_in = false
+keepalive_interval_secs = 15
+api_version = "2023-06-01"
+max_output_tokens_required = true
+default_max_output_tokens = 32000
+
+[defaults.transport.beta_headers]
+mid_conversation_effort = "mid-conversation-output-config-2026-07-01"
+system_clear_at = "mid-conversation-system-clear-at-2026-08-21"
+
+[defaults.instructions]
+top_level_system = "text_blocks"
+mid_conversation_system = "none"
+developer_role = false
+system_clear_at = false
+system_effort_override = false
+
+[defaults.reasoning]
+exposure = "full_text"
+replay = "signature"
+required_on_last_tool_turn = true
+tools_with_reasoning = true
+forced_temperature_with_thinking = false
+
+[defaults.tools]
+function_tools = true
+tool_choice = ["auto", "none", "required", "named"]
+parallel_control = true
+result_content = ["text", "image", "document"]
+id_pattern = "^[A-Za-z0-9_-]{1,64}$"
+hosted = ["web_search_20260318", "web_fetch_20260318", "code_execution_20260521", "memory_20250818", "tool_search_bm25_20251119"]
+schema_unsupported_keywords = []
+max_tools = 512
+mid_conversation_tool_changes = true
+
+[defaults.tools.strict]
+supported = true
+default = "off"
+
+# LIVE FINDING (llm-xlate-e2e explore2, 2026-09-10): minLength / maxLength / pattern / format in an
+# output_config.format json_schema are ACCEPTED (200) on every current model in this account's
+# listing (haiku-4-5, sonnet-4-5, opus-4-5, sonnet-4-6, opus-4-6, opus-4-7, opus-4-8, sonnet-5,
+# opus-5) — probes ant.output.string_constraints / ant.output.format_keyword across anthropic_all.
+# So the current-model default no longer strips them (was ["minLength","maxLength","pattern",
+# "format"]); the legacy 3.x/3.7 blocks below re-pin the conservative blocklist since those models
+# were never live-verified here. `additionalProperties` must still be explicitly false (a missing
+# one 400s — ant.output.missing_additional_properties — but that is a required-field rule, not an
+# unsupported keyword, so it is not modelled here).
+[defaults.output]
+format = "json_schema"
+strict_supported = true
+schema_unsupported_keywords = []
+format_with_tools = true
+prefill_allowed = false
+verbosity = false
+
+[defaults.media]
+file_id_namespace = "anthropic"
+container_upload = true
+image_detail_param = false
+
+[defaults.media.image]
+sources = ["base64", "url", "file_id"]
+mime = ["image/png", "image/jpeg", "image/gif", "image/webp"]
+max_bytes = 5000000
+max_count = 100
+
+[defaults.media.pdf]
+sources = ["base64", "url", "file_id"]
+max_bytes = 32000000
+
+[defaults.media.text_doc]
+sources = ["text"]
+
+[defaults.media.audio]
+sources = []
+
+[defaults.sampling]
+stop_sequences = { max = 4 }
+service_tier = ["auto", "standard_only"]
+
+[defaults.state]
+store = false
+previous_response_id = false
+conversation_api = false
+background = false
+encrypted_reasoning_include = false
+compaction = "context_management"
+
+[defaults.cache]
+auto_request_level = true
+prompt_cache_key = false
+usage_fields = ["cache_read", "cache_write_5m", "cache_write_1h", "reasoning"]
+
+[defaults.cache.explicit_breakpoints]
+max = 4
+ttl = ["5m", "1h"]
+
+[defaults.limits]
+context_window = 1000000
+max_output_tokens = 128000
+max_messages = 100000
+max_request_bytes = 32000000
+
+[defaults.errors]
+context_length_patterns = ["prompt is too long"]
+retryable_status = [429, 500, 529]
+overloaded_status = 529
+stop_reasons = ["end_turn", "max_tokens", "stop_sequence", "tool_use", "pause_turn", "refusal"]
+
+# --- Opus 4.8 + the 5-family: adaptive, sampling rejected, NATIVE mid-conversation system.
+# LIVE-VERIFIED 2026-09-10 (llm-xlate-e2e explore2/explore3, model sweeps on sonnet-5/opus-5/opus-4-8):
+#  - sampling (temperature/top_p/top_k non-default) REJECTED ("`temperature` is deprecated for this
+#    model") — confirmed vs. 4.5/4.6 which ACCEPT.
+#  - legacy thinking:{type:"enabled",budget_tokens} REJECTED ("thinking.type.enabled is not supported
+#    for this model. Use thinking.type.adaptive and output_config.effort") — confirms budget=rejected.
+#  - adaptive + output_config.effort incl. "max" ACCEPTED (200) on 4.6+; 4.5 rejects ("adaptive
+#    thinking is not supported on this model").
+#  - in-array role:"system" (content-bearing) ACCEPTED, but the placement rule is a CONJUNCTION of
+#    two constraints the API reports with two distinct verbatim messages:
+#      (a) what PRECEDES it — "role 'system' must follow a 'user' message or an 'assistant' message
+#          ending in a server tool result" (400 when the system follows a plain assistant); and
+#      (b) what FOLLOWS it — "role 'system' must precede an 'assistant' message or end the array"
+#          (400 when the system is followed by a user and is not the last element).
+#    So a content-bearing in-array system is accepted iff it (follows a user OR a server-tool-result
+#    assistant) AND (precedes an assistant OR ends the array). Evidence: explore3 ends_array
+#    [user,system] and precedes_assistant [user,system,assistant,user] = 200; explore2 after_user
+#    [user,system,user] = 400 (b); explore1 after_user [user,assistant,system,user] = 400 (a); and
+#    placement_audit [user,assistant,system,assistant,user] = 400 (a) — the decisive case: the
+#    system PRECEDES an assistant yet is still rejected because it FOLLOWS a plain assistant, which
+#    is why the old "precedes_assistant_or_ends_array" flag (and the older "after_user_not_first"
+#    hint) were both insufficient — each captured only one half of the rule. The directive-only
+#    `output_config` message form is rejected ("output_config: Extra inputs are not permitted").
+[[model]]
+match = "claude-opus-4-8*|claude-opus-5*|claude-sonnet-5*|claude-fable-5*|claude-mythos-5*"
+verified_at = "2026-09-10"
+
+[model.reasoning]
+mode = "adaptive"
+effort_levels = ["low", "medium", "high", "xhigh", "max"]
+budget = { min = 1024, status = "rejected" }
+
+[model.instructions]
+mid_conversation_system = "native"
+mid_system_placement = "follows_user_or_server_tool_and_precedes_assistant_or_ends_array"
+system_clear_at = true
+system_effort_override = true
+
+[model.sampling]
+temperature = "rejected"
+top_p = "rejected"
+top_k = "rejected"
+seed = "ignored"
+frequency_penalty = "ignored"
+presence_penalty = "ignored"
+logit_bias = "ignored"
+logprobs = "ignored"
+n = { max = 1 }
+
+# --- Claude 4.7 / 4.8 (non-Opus): adaptive, sampling rejected, no native mid-conv system.
+[[model]]
+match = "claude-*-4-7*|claude-*-4-8*"
+verified_at = "2026-09-10"
+
+[model.reasoning]
+mode = "adaptive"
+effort_levels = ["low", "medium", "high", "xhigh", "max"]
+budget = { min = 1024, status = "rejected" }
+
+[model.instructions]
+mid_conversation_system = "none"
+
+[model.sampling]
+temperature = "rejected"
+top_p = "rejected"
+top_k = "rejected"
+seed = "ignored"
+frequency_penalty = "ignored"
+presence_penalty = "ignored"
+logit_bias = "ignored"
+logprobs = "ignored"
+n = { max = 1 }
+
+# --- Claude 4.6: adaptive, budget deprecated (ignored), sampling still accepted.
+[[model]]
+match = "claude-*-4-6*"
+verified_at = "2026-09-10"
+
+[model.reasoning]
+mode = "adaptive"
+effort_levels = ["low", "medium", "high", "xhigh", "max"]
+budget = { min = 1024, status = "ignored" }
+
+[model.instructions]
+mid_conversation_system = "none"
+
+[model.sampling]
+temperature = { range = [0.0, 1.0] }
+top_p = { range = [0.0, 1.0] }
+top_k = { range = [0.0, 500.0] }
+seed = "ignored"
+n = { max = 1 }
+
+# NOTE: the first matching [[model]] rule wins (the resolver stops at the first match), so each
+# era block below carries the *full* budget-era config, not just its limit overrides.
+
+# --- Claude 3.7 Sonnet: budget-mode thinking; 8192 default output, 64000 max (extended-output
+# beta). The family defaults (32000 default / 128000 max) exceed what these models accept, so an
+# omitted max_tokens would be filled with a value the real API 400s; pin the era's real limits.
+[[model]]
+match = "claude-*-3-7*|claude-3-7*"
+verified_at = "2026-09-01"
+
+[model.transport]
+default_max_output_tokens = 8192
+
+[model.limits]
+max_output_tokens = 64000
+
+[model.reasoning]
+mode = "budget"
+effort_levels = ["low", "medium", "high", "xhigh"]
+budget = { min = 1024, status = "accepted" }
+
+[model.instructions]
+mid_conversation_system = "none"
+
+[model.output]
+prefill_allowed = true
+schema_unsupported_keywords = ["minLength", "maxLength", "pattern", "format"]
+
+[model.sampling]
+temperature = { range = [0.0, 1.0] }
+top_p = { range = [0.0, 1.0] }
+top_k = { range = [0.0, 500.0] }
+seed = "ignored"
+n = { max = 1 }
+
+# --- Claude 3.5 (Sonnet / Haiku): NO extended thinking (introduced in 3.7); 8192 max output.
+# Extended thinking (`thinking:{budget_tokens}`) did not exist before Claude 3.7, so reasoning
+# mode is "none": a reasoning request is dropped + degraded rather than emitting a `thinking`
+# block the real API rejects. 3.5 raised max output to 8192 (vs 4096 on the original Claude 3).
+[[model]]
+match = "claude-*-3-5*|claude-3-5*"
+verified_at = "2026-09-01"
+
+[model.transport]
+default_max_output_tokens = 8192
+
+[model.limits]
+max_output_tokens = 8192
+
+[model.reasoning]
+mode = "none"
+
+[model.instructions]
+mid_conversation_system = "none"
+
+[model.output]
+prefill_allowed = true
+schema_unsupported_keywords = ["minLength", "maxLength", "pattern", "format"]
+
+[model.sampling]
+temperature = { range = [0.0, 1.0] }
+top_p = { range = [0.0, 1.0] }
+top_k = { range = [0.0, 500.0] }
+seed = "ignored"
+n = { max = 1 }
+
+# --- Claude 3.0 GA (Opus / Sonnet / Haiku): NO extended thinking; 4096 max output.
+# The original Claude 3 models cap output at 4096 (only 3.5 raised it to 8192) and have no
+# extended-thinking mode. Must sit *before* nothing narrower but *after* the 3.5 block (first
+# match wins, newest first); the 3.5 globs never match a `claude-3-opus/sonnet/haiku` name.
+[[model]]
+match = "claude-3-opus*|claude-3-sonnet*|claude-3-haiku*|claude-*-3-0*|claude-3-0*"
+verified_at = "2026-09-01"
+
+[model.transport]
+default_max_output_tokens = 4096
+
+[model.limits]
+max_output_tokens = 4096
+
+[model.reasoning]
+mode = "none"
+
+[model.instructions]
+mid_conversation_system = "none"
+
+[model.output]
+prefill_allowed = true
+schema_unsupported_keywords = ["minLength", "maxLength", "pattern", "format"]
+
+[model.sampling]
+temperature = { range = [0.0, 1.0] }
+top_p = { range = [0.0, 1.0] }
+top_k = { range = [0.0, 500.0] }
+seed = "ignored"
+n = { max = 1 }
+
+# --- Claude 4.0-4.5 (catch-all): budget-mode thinking, sampling accepted, prefill ok.
+[[model]]
+match = "claude-*"
+verified_at = "2026-09-10"
+
+[model.reasoning]
+mode = "budget"
+effort_levels = ["low", "medium", "high", "xhigh"]
+budget = { min = 1024, status = "accepted" }
+
+[model.instructions]
+mid_conversation_system = "none"
+
+[model.output]
+prefill_allowed = true
+
+[model.sampling]
+temperature = { range = [0.0, 1.0] }
+top_p = { range = [0.0, 1.0] }
+top_k = { range = [0.0, 500.0] }
+seed = "ignored"
+n = { max = 1 }

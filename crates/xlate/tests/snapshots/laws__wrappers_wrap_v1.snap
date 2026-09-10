@@ -1,0 +1,27 @@
+---
+source: crates/xlate/tests/laws.rs
+expression: rendered
+---
+WRAP_VERSION=wrap_v1
+
+[system_message]
+<system_message>
+BODY
+</system_message>
+
+[document titled]
+<document title="T&quot;itle">
+DOC
+</document>
+
+[document untitled]
+<document>
+DOC
+</document>
+
+[provider_tool_fold]
+[web_search result]
+RESULT
+
+[tool_result_attachment]
+[tool result attachment for call call_1]

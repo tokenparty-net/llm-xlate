@@ -1,0 +1,53 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "instructions": "You are a helpful assistant.",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Weather in NYC?"
+        }
+      ]
+    },
+    {
+      "type": "function_call",
+      "call_id": "toolu_1",
+      "name": "get_weather",
+      "arguments": "{\"city\":\"NYC\"}"
+    },
+    {
+      "type": "function_call_output",
+      "call_id": "toolu_1",
+      "output": "72F sunny"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "name": "get_weather",
+      "description": "Get weather",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "max_output_tokens": 2048
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---
+reasoning=dropped;reasoning=dropped

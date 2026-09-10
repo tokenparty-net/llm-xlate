@@ -1,0 +1,58 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Return a home address with a city."
+        }
+      ]
+    }
+  ],
+  "text": {
+    "format": {
+      "type": "json_schema",
+      "name": "response",
+      "schema": {
+        "$defs": {
+          "addr": {
+            "additionalProperties": false,
+            "properties": {
+              "city": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "city"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "home": {
+            "$ref": "#/$defs/addr"
+          }
+        },
+        "required": [
+          "home"
+        ],
+        "type": "object"
+      },
+      "strict": true
+    }
+  },
+  "max_output_tokens": 128
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

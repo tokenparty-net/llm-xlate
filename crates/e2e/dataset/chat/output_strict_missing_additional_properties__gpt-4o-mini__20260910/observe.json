@@ -1,0 +1,27 @@
+{
+  "protocol": "chat",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "param": "response_format",
+    "message": "Invalid schema for response_format 'open': In context=(), 'additionalProperties' is required to be supplied and to be false."
+  },
+  "request_id": "req_bad49e6d00e14e06a21a43237dfea1ea",
+  "rate_limit": {
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9984",
+    "x-ratelimit-remaining-tokens": "199995",
+    "x-ratelimit-reset-requests": "2m10.383s",
+    "x-ratelimit-reset-tokens": "1ms"
+  },
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

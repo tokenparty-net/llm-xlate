@@ -1,0 +1,134 @@
+{
+  "status": 200,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d05c1ac70b295-EWR",
+    "connection": "keep-alive",
+    "content-length": "4019",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:03 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "2128",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-ratelimit-limit-requests": "500",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "499",
+    "x-ratelimit-remaining-tokens": "199780",
+    "x-ratelimit-reset-requests": "120ms",
+    "x-ratelimit-reset-tokens": "66ms",
+    "x-request-id": "req_2ea3361652c64b49a1f15ed5449e5e3c"
+  },
+  "elapsed_ms": 2228,
+  "body": {
+    "id": "resp_0c070d390f53b6fe006aa268a94aa487d294002143f08b418a",
+    "object": "response",
+    "created_at": 1789028521,
+    "status": "completed",
+    "background": false,
+    "billing": {
+      "payer": "developer"
+    },
+    "completed_at": 1789028523,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": 256,
+    "max_tool_calls": null,
+    "model": "o4-mini-2025-04-16",
+    "moderation": null,
+    "output": [
+      {
+        "id": "rs_0c070d390f53b6fe006aa268aa34e087d29de7c169cd6aa7ba",
+        "type": "reasoning",
+        "content": [],
+        "encrypted_content": "gAAAAABqomiriVDoPotlnBIPY3Qu8ZAJuxSAkbBfbR8gJ3dmH3TGfXuYJc8vAlgnDU-wYzrrgZ8vYW5EnPRPTckgKnfZDk-1FfrYDbIEpSeTjF5vViM-TQ5E3mklPUtz88lcVETsvZxE6kA8xeg5e4L1KGWiirpJtOr0oGydQ2Mr4i3W_DL_g0NQRsxrSjdYRlaxp7RqZ3hp_g4h77-xaK33OMnQl5CX1DsVHqUS6LInzfhdCC_PJtfXUSB-bNL-tsfcVSUZ9je0q2cuLC9ItYCKVsrmNAWSpsMvAhWs-sfnVEyzUcL8qc-Sxt8E12XmG4EXyQW-gGyDbxgA0XH3hxoKuzpKs60pOnhrsBy-RXpa8jKIu_5XgR4vRe4IpUds6Y_BOH5eUvGsrvI10EPaNzqys8aQ4pIRnYiZIxMyo2TUgS4jV94J-nu2csQ2IyTCOXPEV9YriZE9s2Yqc5Lcl1p8SLYG9WytVVxmgltw-am7CFnQGOF220L8y8RAgfP9ADr_ZN3AHmHvck3TpWrP_km2NzbBFef2pHc7v1rLqf-B5Xq3ZH5d4cjsaAq7zMEJ6ByC0xQ2wb-Ah3Q3Qr2UEAQ6iNirbQFam3l1mDHosg4WRbEY2fNuKdEQG9wWeH6gxEJt4NOPKMPjk1PDOvqJiqbYlnFHtBKginUpGKVVhRtpZJK-WAK1aZ041UOwox2a_kqk2Y_68Spx7oWru6WE4L6PEoq2yxnj1dnGksWzSQmv_G4Sx5zNWQxvb_mybl0z_I4ir3UCHaKT0Y7MqAlv8G7hgSe-SDSTfmTorSB6hRq7qzFVXB_9GqyAdruPjv0fO5UrW7twKnHtY7wA_8mYjB5gELvaGMPuUkdpp6OLLGIyUcIj424H5cGZx6KqHDKZO9QzdNpp5DGxQ50Ihkf8NNNjO2Vayl7rFEiu02bYZGSkAgpJmd6B8JR5FUBYZH1O5a64IFzz_bdCUUwP05dIEjP9GIIeFjBBicn_niDeiUACdDjisJF8Fzw-z6KHbv_Tbog9lDgr2hob5w_wA2trx5JKnUNVReo1_nPsSkuY1C83hZrh6UID5ouEt_BsX4WQKEk3gP1DYLQM5L-M6adxlh8EzE2qbc7u5-JUNZo7WB4UCYLTqsq8dnySaJbaZh3qUdk0zceyXb9dsTEm-8vtlI25Nbdc0yFyWYXw0MBjhH4tudhybK4guhNtwIOvOOvavRzkD3ZwzQQj41b2_NBhg6EN887B5OL8TmF4ENp-1_9JnYXjLa47UTa6hNDvPKlZCtJ5mQSpSfLln76DnQoCCZp4xJD1zB-OdOcmgXEYgFt7Nxu4wEeZze_qYRPSaVbd1N0sFmdu_NEOwt_3Y27snoxVMNgRB20adg==",
+        "summary": [
+          {
+            "type": "summary_text",
+            "text": "**Calculating multiplication**\n\nOkay, the user wants to know what 9 times 9 is. The straightforward answer is just 81. I should keep it clear and simple for them. There's no need for any complicated explanation or formatting here. Just a plain answer will do. So, I’ll respond with 81 as the answer. That should satisfy their question perfectly!"
+          }
+        ]
+      },
+      {
+        "id": "msg_0c070d390f53b6fe006aa268ab2a0087d286783fd50acc6b89",
+        "type": "message",
+        "status": "completed",
+        "content": [
+          {
+            "type": "output_text",
+            "annotations": [],
+            "logprobs": [],
+            "text": "9 × 9 = 81"
+          }
+        ],
+        "role": "assistant"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "prompt_cache_retention": "in_memory",
+    "reasoning": {
+      "context": "current_turn",
+      "effort": "medium",
+      "mode": "standard",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "store": true,
+    "temperature": 1.0,
+    "text": {
+      "format": {
+        "type": "text"
+      },
+      "verbosity": "medium"
+    },
+    "tool_choice": "auto",
+    "tool_usage": {
+      "image_gen": {
+        "input_tokens": 0,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "output_tokens": 0,
+        "output_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "total_tokens": 0
+      },
+      "web_search": {
+        "num_requests": 0
+      }
+    },
+    "tools": [],
+    "top_logprobs": 0,
+    "top_p": 1.0,
+    "truncation": "disabled",
+    "usage": {
+      "input_tokens": 13,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 0
+      },
+      "output_tokens": 50,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 63
+    },
+    "user": null,
+    "metadata": {}
+  }
+}

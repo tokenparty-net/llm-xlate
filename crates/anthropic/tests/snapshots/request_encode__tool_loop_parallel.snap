@@ -1,0 +1,55 @@
+---
+source: crates/anthropic/tests/request_encode.rs
+expression: pretty(&out.body)
+---
+{
+  "model": "claude-opus-5",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "weather?"
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "toolu_1",
+          "name": "get",
+          "input": {
+            "city": "NYC"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_2",
+          "name": "get",
+          "input": {
+            "city": "LA"
+          }
+        }
+      ]
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "tool_result",
+          "tool_use_id": "toolu_1",
+          "content": "sunny"
+        },
+        {
+          "type": "tool_result",
+          "tool_use_id": "toolu_2",
+          "content": "smoggy"
+        }
+      ]
+    }
+  ],
+  "max_tokens": 1024
+}

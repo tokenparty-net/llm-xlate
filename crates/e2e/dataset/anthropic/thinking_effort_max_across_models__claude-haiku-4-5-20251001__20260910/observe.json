@@ -1,0 +1,18 @@
+{
+  "protocol": "anthropic",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "adaptive thinking is not supported on this model"
+  },
+  "request_id": "req_011CeuSHGAXKi9irC5XmgL9M",
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

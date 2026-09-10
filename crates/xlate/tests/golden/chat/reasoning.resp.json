@@ -1,0 +1,27 @@
+{
+  "id": "chatcmpl-reason1",
+  "object": "chat.completion",
+  "created": 1700000003,
+  "model": "gpt-5.4",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "The answer is 391.",
+        "reasoning_content": "17 times 23 is 391.",
+        "reasoning_details": [
+          { "type": "router.opaque", "data": "enc-native-blob-xyz" }
+        ]
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 25,
+    "completion_tokens": 40,
+    "total_tokens": 65,
+    "prompt_tokens_details": { "cached_tokens": 10 },
+    "completion_tokens_details": { "reasoning_tokens": 30 }
+  }
+}

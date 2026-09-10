@@ -1,0 +1,40 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "object": "chat.completion",
+  "created": 1700000000,
+  "model": "golden-model",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "The Eiffel Tower is 330 metres tall and was completed in 1889.",
+        "refusal": null,
+        "annotations": [
+          {
+            "type": "char_location",
+            "cited_text": "The Eiffel Tower is 330 metres tall and was completed in 1889.",
+            "document_index": 0,
+            "document_title": "facts.txt",
+            "start_char_index": 0,
+            "end_char_index": 62
+          }
+        ]
+      },
+      "finish_reason": "stop",
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 838,
+    "completion_tokens": 47,
+    "total_tokens": 885,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  }
+}

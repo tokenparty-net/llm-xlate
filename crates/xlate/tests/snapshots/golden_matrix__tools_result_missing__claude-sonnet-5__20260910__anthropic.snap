@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=invalid_request status=400 retryable=false param=- provider_type=invalid_request_error retry_after=- upstream_request_id=req_011CeuSGEexm4Tmr24DkRsC6
+message: messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_01NcBmmQLYPVEZabgndS6Esr, toolu_01SLub878vFZRjnD3YKHXYdK. Each `tool_use` block must have a corresponding `tool_result` block in the next message.
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_011CeuSGEexm4Tmr24DkRsC6
+body:
+{
+  "error": {
+    "message": "messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_01NcBmmQLYPVEZabgndS6Esr, toolu_01SLub878vFZRjnD3YKHXYdK. Each `tool_use` block must have a corresponding `tool_result` block in the next message.",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": null
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_01NcBmmQLYPVEZabgndS6Esr, toolu_01SLub878vFZRjnD3YKHXYdK. Each `tool_use` block must have a corresponding `tool_result` block in the next message.","type":"invalid_request_error","param":null,"code":null}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_011CeuSGEexm4Tmr24DkRsC6
+body:
+{
+  "error": {
+    "message": "messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_01NcBmmQLYPVEZabgndS6Esr, toolu_01SLub878vFZRjnD3YKHXYdK. Each `tool_use` block must have a corresponding `tool_result` block in the next message.",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": null
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":null,"message":"messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_01NcBmmQLYPVEZabgndS6Esr, toolu_01SLub878vFZRjnD3YKHXYdK. Each `tool_use` block must have a corresponding `tool_result` block in the next message.","param":null,"sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+  x-router-upstream-request-id: req_011CeuSGEexm4Tmr24DkRsC6
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_01NcBmmQLYPVEZabgndS6Esr, toolu_01SLub878vFZRjnD3YKHXYdK. Each `tool_use` block must have a corresponding `tool_result` block in the next message."
+  },
+  "request_id": "req_011CeuSGEexm4Tmr24DkRsC6"
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_01NcBmmQLYPVEZabgndS6Esr, toolu_01SLub878vFZRjnD3YKHXYdK. Each `tool_use` block must have a corresponding `tool_result` block in the next message."},"request_id":"req_011CeuSGEexm4Tmr24DkRsC6"}

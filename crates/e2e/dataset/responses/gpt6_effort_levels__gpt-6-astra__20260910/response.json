@@ -1,0 +1,126 @@
+{
+  "status": 200,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d0665b9c2b295-EWR",
+    "connection": "keep-alive",
+    "content-length": "4397",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:35 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "7624",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "req_280c2c0353214841899fff0a5e4c719f"
+  },
+  "elapsed_ms": 7717,
+  "body": {
+    "id": "resp_0f8e616b900fa662006aa268c3881487d2b57032b422b2050e",
+    "object": "response",
+    "created_at": 1789028547,
+    "status": "incomplete",
+    "background": false,
+    "billing": {
+      "payer": "developer"
+    },
+    "completed_at": null,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "incomplete_details": {
+      "reason": "max_output_tokens"
+    },
+    "instructions": null,
+    "max_output_tokens": 256,
+    "max_tool_calls": null,
+    "model": "gpt-6-astra",
+    "moderation": null,
+    "output": [
+      {
+        "id": "rs_0f8e616b900fa662006aa268c493cc87d29770a6ebdcb78031",
+        "type": "reasoning",
+        "content": [],
+        "encrypted_content": "gAAAAABqomjL8zeJwYY-K5frx5d7bg_i3StAM5R1SMh1zP39cOibNtTMA2LeVvrGErdpDyErmvs9EWYXBty14JS8P90L0aTV3Q1pMybslJdwOkYi1Mf6w8Av9IiUXik4UMCFRcBUXDHMfR8ZqBzfAmmaQs0IVSTFcvTNhh1JTa3lw20gyqDuGOUvraioe--wGD3mZv1sz-zCrYdQf-17QTHTYkuB18k3II2Sa49gJrdVn-_qY31JoXSGZUWWJ0i289kvnIS73kjISYXJlG1cxiuYmXU_I6AOjc8UVoxDe0yhsBzK9QPRXf7bVYKvyeOQuzNE8XzqBHE-bu6RNO7T3arHBS_ohmmIRFhhFUSqruoAGNd9S-oOcO7TWMIHcv5RjrMa1JaG26wapeehbg8A1w_zPAEGoo7B2licQrWEbSKlEZN0Z7sftLugTBtNIyKqmGa1jB_xLvwhXUoIlQKWUuhaT3RlmO-ZBGfgOAWU0qQn1BWo55VpZcleHc4ae0UMqgNed4O9n0KKYUe51Dhy6CWqdRK8WmhP3xwQrus073EQOiWh_DL_aJlaqPweQTj3Z-0uTsO2Bjin7xYljj9vN6AVjyxbVXEgco9wfeURpexCn1Hz3XBkoUPDROUCc_yGs2okudvWusYikhOc-33-Au6ek9qsOOfv8Lbcjc9WHoUlMYE4zxqeNC0X4jl9dIIGbdy7RwOEmh0vkeLtvRuPG6XdSwuD6_giM9egAHNiSKB8KSwXKvPgCM259X8tNsO3duJ6tPRSK1hFQUCZYpmOc8aUpK6yu74s2stJy5Hb9T9sraJnfFMOaMk-_CDhVj63NklkVCzZmGietYwalRd2MtEq4FITYt5tYiQoVySTWcvrcXYg_FYvdU_YLfPz4bA8DlLQg7COakGxnqQ_pTpL8zAQYxcv_WFTXNefo3JDpQ5eLjL42enGmF-fJ3Xi9QElh1UJfpThSlav1HWBuWEwoUDwtbXdXXWdfXlTWgmIpM-pe0jg6tuuxd7z0jbF3lKeFSPj8u9iIkMIr85GEt6hxIBmU0cp0x0zNpcxKQOXm8sNPhO5XNZCsRwftPAylMpN5KoaIdno4ddR5Zd2-Q4HDcHj0RhutVBPxLRRGxDH3wVpbJZltAiAcrLXSBac2IA6XrkUrU4ZOMHINdj_t8Ak2yWpTyQ1QUuF0j3ZT5_lYpA4E-Bpmt0pttR8zT2GQOkQnCw6mfbWPNI1ATdMfsI1tpVg6Pcr2GBjqRMSxojHJqu63_EjUD3rLHBYyNlhJNJUh3VjO3QV_u2da10g9AeLQu6dD_-pmBCvNr-PLFGEvLGkwSfGrpmKuauX2jfI1tAxIDkucQpPpoKc_pjzA0FzxNIvwwaCb8eY0x2NjDHWYT90wPtKUWCse_Rg9aNkK0JbNSmUQcuL8UNw75btPAREM02yFAhHAkA025FF54JBek4yGhHudHbPpvBdxM-GfBOcQKl1tIOsr4vn_VoCKIIJxD2ikW31hoFhO7s6q_LEr6b7aSrpK_iqiY107VANTt1vCa-gLI1haKCTom3zQ73TVzmVqjJeb5C-2S1desx-cm6KQJuU-5z_BTMhyhzjGo-t_ZKknAfneY0uaOCiJZYEDTJItu9c51DEfwv1bGLErXv6ceLHWThxPnsdPZFUh-9ApRUMjCFkvXeDExdQOEJDF0d6nuVv5QOaNGMoBJyWU92_TPxp7pzkS9iis9DiD15CXneT-TkQH4ai-PFhVSlCoU3zoJy78mbRrKrGFtP1KL_o8gfhHLo4mhYpoWMlYqhWbndmnjLC6nkPPOO6ofkG3ER5RTz32LZqajQBjPxr2dCdUZfGVvdTE7_hvXVTqVY6A_-1_sKjtYfb5pGCvQvzeOpnctkJXCgoUNTqe7soyeQo3npMDh55zIhfPz3qzEVjUQmfAMPkjBLFe1TrinEDTPDWvvfvJpv6Xw==",
+        "summary": []
+      },
+      {
+        "id": "msg_0f8e616b900fa662006aa268c952b487d2ac0fccdc24330c93",
+        "type": "message",
+        "status": "incomplete",
+        "content": [
+          {
+            "type": "output_text",
+            "annotations": [],
+            "logprobs": [],
+            "text": "Assume \\(\\sqrt2=a/b\\) for coprime positive integers \\(a,b\\); then \\(a^2=2b^2\\), so \\(a\\) is even.  \nWriting \\(a=2k\\) gives \\(b^2=2k^2\\), so \\(b\\) is also even, contradicting coprimality; hence"
+          }
+        ],
+        "phase": "final_answer",
+        "role": "assistant"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "prompt_cache_retention": "24h",
+    "reasoning": {
+      "context": "all_turns",
+      "effort": "high",
+      "mode": "standard",
+      "summary": null
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "store": true,
+    "temperature": 1.0,
+    "text": {
+      "format": {
+        "type": "text"
+      },
+      "verbosity": "medium"
+    },
+    "tool_choice": "auto",
+    "tool_usage": {
+      "image_gen": {
+        "input_tokens": 0,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "output_tokens": 0,
+        "output_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "total_tokens": 0
+      },
+      "web_search": {
+        "num_requests": 0
+      }
+    },
+    "tools": [],
+    "top_logprobs": 0,
+    "top_p": 0.98,
+    "truncation": "disabled",
+    "usage": {
+      "input_tokens": 18,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 0
+      },
+      "output_tokens": 256,
+      "output_tokens_details": {
+        "reasoning_tokens": 172
+      },
+      "total_tokens": 274
+    },
+    "user": null,
+    "metadata": {}
+  }
+}

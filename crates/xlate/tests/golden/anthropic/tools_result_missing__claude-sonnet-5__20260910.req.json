@@ -1,0 +1,63 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": "Get the weather for Paris and for Tokyo using the tool, one call per city.",
+      "role": "user"
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "I'll get the weather for both cities now."
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01NcBmmQLYPVEZabgndS6Esr",
+          "name": "get_weather",
+          "input": {
+            "city": "Paris"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01SLub878vFZRjnD3YKHXYdK",
+          "name": "get_weather",
+          "input": {
+            "city": "Tokyo"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ],
+      "role": "assistant"
+    },
+    {
+      "content": "thanks",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "tools": [
+    {
+      "description": "Get weather.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "type": "object"
+      },
+      "name": "get_weather"
+    }
+  ]
+}

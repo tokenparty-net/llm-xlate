@@ -1,0 +1,18 @@
+{
+  "protocol": "anthropic",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_01NcBmmQLYPVEZabgndS6Esr, toolu_01SLub878vFZRjnD3YKHXYdK. Each `tool_use` block must have a corresponding `tool_result` block in the next message."
+  },
+  "request_id": "req_011CeuSGEexm4Tmr24DkRsC6",
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

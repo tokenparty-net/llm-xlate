@@ -1,0 +1,35 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "type": "message",
+  "role": "assistant",
+  "model": "golden-model",
+  "content": [
+    {
+      "type": "thinking",
+      "thinking": "reason",
+      "signature": "SIG=="
+    },
+    {
+      "type": "text",
+      "text": "calling"
+    },
+    {
+      "type": "tool_use",
+      "id": "toolu_1",
+      "name": "get",
+      "input": {
+        "q": "x"
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 5,
+    "output_tokens": 10
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "label": "resp.gpt6.text/gpt-6-astra",
+  "protocol": "responses",
+  "model": "gpt-6-astra",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "1 path(s) differ (normalizations): ~/input"
+    },
+    {
+      "name": "response_decode_nonstream",
+      "pass": true,
+      "detail": "decoded 5 event(s)"
+    },
+    {
+      "name": "response_decode_stream",
+      "pass": true,
+      "detail": "decoded 13 event(s)"
+    },
+    {
+      "name": "twin_agreement",
+      "pass": true,
+      "detail": "live twins agree (stop + kinds [msg:Assistant])"
+    },
+    {
+      "name": "chunk_fuzz",
+      "pass": true,
+      "detail": "25 splits identical to baseline"
+    },
+    {
+      "name": "cross_client",
+      "pass": true,
+      "detail": "rendered 2 target dialect(s)"
+    }
+  ]
+}

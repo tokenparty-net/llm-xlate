@@ -1,0 +1,38 @@
+{
+  "label": "ant.system.mid.after_user/claude-sonnet-5",
+  "protocol": "anthropic",
+  "model": "claude-sonnet-5",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "5 path(s) differ (normalizations): ~/messages[len 4!=3], ~/messages/0/content, ~/messages/1/content, ~/messages/2/content, ~/messages/2/role"
+    },
+    {
+      "name": "response_decode_stream",
+      "pass": true,
+      "detail": "decoded 0 event(s)"
+    },
+    {
+      "name": "chunk_fuzz",
+      "pass": true,
+      "detail": "25 splits identical to baseline"
+    },
+    {
+      "name": "error_decode",
+      "pass": true,
+      "detail": "kind=invalid_request status=400"
+    },
+    {
+      "name": "cross_client",
+      "pass": true,
+      "detail": "rendered 2 target dialect(s)"
+    }
+  ]
+}

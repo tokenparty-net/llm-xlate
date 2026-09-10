@@ -1,0 +1,11 @@
+{
+  "max_completion_tokens": 32,
+  "messages": [
+    {
+      "content": "Give a random fruit.",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini",
+  "n": 2
+}

@@ -1,0 +1,6 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+ERROR kind=unsupported status=400 param=document.url
+message: Chat cannot fetch a document by URL

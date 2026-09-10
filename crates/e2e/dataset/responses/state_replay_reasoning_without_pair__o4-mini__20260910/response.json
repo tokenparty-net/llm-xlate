@@ -1,0 +1,149 @@
+{
+  "status": 200,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d054e3f0ab295-EWR",
+    "connection": "keep-alive",
+    "content-length": "4288",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:21:44 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "1352",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-ratelimit-limit-requests": "500",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "499",
+    "x-ratelimit-remaining-tokens": "199682",
+    "x-ratelimit-reset-requests": "120ms",
+    "x-ratelimit-reset-tokens": "95ms",
+    "x-request-id": "req_e6454d9270014ca1a11fa5e423a71a18"
+  },
+  "elapsed_ms": 1442,
+  "body": {
+    "id": "resp_0c67caaadd6ef05a016aa26896d18487d2a44d4776c8c4c3ad",
+    "object": "response",
+    "created_at": 1789028502,
+    "status": "completed",
+    "background": false,
+    "billing": {
+      "payer": "developer"
+    },
+    "completed_at": 1789028504,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": 128,
+    "max_tool_calls": null,
+    "model": "o4-mini-2025-04-16",
+    "moderation": null,
+    "output": [
+      {
+        "id": "rs_0c67caaadd6ef05a016aa268973dd887d29ed808acbcc77b42",
+        "type": "reasoning",
+        "content": [],
+        "encrypted_content": "gAAAAABqomiY8hEkwxI9ljlnIG6eOtQ__KiGFH6txt3dX-9s2juWvvhikta2dyDxQBViZn4yUQk_UxYqAgeXdN9dAMOjr6eAyeyv4ONHJxiFrbZuosR1OxfA_fsz65mK6T2EjqJn9C_QzH8jq7XLpJLedsyzHy8lDoDQ5mO6O-igXDygPCMwqaAwWEA_lMtDBNSY0bXb94GKQmEZ_p33Q_PFnyL0Gh4B_plofmBIqleam7se1wCl1LLAPEecPWoDOm7xpFlfAk0vTNvJ9x9mLrVJEqyYnsscB8xN-S52dwfJPSZvSDnofQAElLQKDCqINRa_q9F4_msiU5sKFIU_nr1KZ3yue_U9H7fps-Uc5HJo8TXz_eQPl7g4sQuS_70KmcO78iUof3r58JsQBvFvQfboRMnNHeJb7-9dkF9KrlqOz6_Ks5uJaKT0FRJt_T0nJlX_K12XX58-57VJEcdVbHeMBpuZ7M21hhVV0XXrpNQTYhwDDYbDsoT9lbBHbc7rqmZTXgDs5-31zSrqHIbOQRCW0Rpdkith6ehM_fiqyt_QlMjJ1JX0n568zoNW8g6P-kN3hyGnjTsDCszjtARX2RBbyFFd3wBAT1QTM3NOQ3ZV5foqk4-OQ1GQ802s6YIXSrIBGOtMYIm_Uvkqgu3IYQvOEArVEoG20i0TKzDBmf6Q4Fa-n_c37-PuCW5wYNtxVlg9NEpDyRanMRoTtGk7UHGpgOoY-OOwceXuKe4b1OPWwVFwkpdqek28D3WLJ7A3RVjIvRBLrouZZaALFl-SP4Yo4Ri40bl6hcCGUVRHpkLPp6RY5USBf6Cmd61sLuzGRT6gZaqNw133lsoiRec3d_4TOCQxCGnboSHxfjgpc-8R3ZRWLhTaJYJP7YJvhCFAqpcjGUYJd04cHfirf8ud4EdPLGfXryMhnW3U-ArvMT5BDw0DtZsrh2Kjf8pzb9dx7bHFl3tk3MRox3RV_yGjI18K1C2LJLYT_9R8j345iIgoiwuAdbAg7R_r4s6Xu9QjjMk0xocnL5jt0E-aYpDEfOlQUbZ3sr1QKnBn_z9dvCnT3WzXTVpeTU8nssL8m5VPguq2oPjIhoFKOBJSU_d73Eo6a1nte2bilz9lf-Vii16_A6Z7b6ZjyMA6UjHwpNVD0teEaBYobf9aCQGTY5z0q2Gm6yoGKfDxgAkERsxtKNC-_0Ckpksk0yc4mmvctUCT1rBUmsSgbepV4HGOqmif76QEPVo4mpKeIoECFB5Aq8uRO_VpKBWDdjQlAiGYOBGBWg1L4mpGlWjg9PEXzdUHtAFs1p3Rv5jwdfDJ5ue2KRBJOhEHSJinp0fNeU5I16blgFXk4bU7OO8WH0fICu08V1a2ASU3mY01KyPcoF-bvqU6Ej0nV8S5LjHpIXJb7kFTAq0921ITaCrWMZuy7fLlxpJxtzyKM8_8yoFtGoxVYFF5HBFzdkocnLk6__P1h-A7MKEiHbuWWxonIH-nBMG1FanGrotgcgdE_B40qDbrQZ92YKsAyYu-nfdH1FE8qah25EPuZCu2lH72IkjLGSztrbqOuE5GdbXRNdPAaRNwI56X49dmKDnTqCUzUxk4vjjfLmT0GgZVpOmzHR9XTrl-ranX2mI92hQCb-EDV8GLh9UIt5gq_bO79Hggx7vfOXQtLTF_jPlUVFIxoasLb454U1UwTsJJk4JgZQ==",
+        "summary": []
+      },
+      {
+        "id": "msg_0c67caaadd6ef05a016aa26897ee3087d294913179c3cf4df9",
+        "type": "message",
+        "status": "completed",
+        "content": [
+          {
+            "type": "output_text",
+            "annotations": [],
+            "logprobs": [],
+            "text": "Hi!"
+          }
+        ],
+        "role": "assistant"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "prompt_cache_retention": "in_memory",
+    "reasoning": {
+      "context": "current_turn",
+      "effort": "medium",
+      "mode": "standard",
+      "summary": null
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "store": false,
+    "temperature": 1.0,
+    "text": {
+      "format": {
+        "type": "text"
+      },
+      "verbosity": "medium"
+    },
+    "tool_choice": "auto",
+    "tool_usage": {
+      "image_gen": {
+        "input_tokens": 0,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "output_tokens": 0,
+        "output_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "total_tokens": 0
+      },
+      "web_search": {
+        "num_requests": 0
+      }
+    },
+    "tools": [
+      {
+        "type": "function",
+        "description": "Get weather.",
+        "name": "get_weather",
+        "output_schema": null,
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "city": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "city"
+          ],
+          "type": "object"
+        },
+        "strict": true
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 1.0,
+    "truncation": "disabled",
+    "usage": {
+      "input_tokens": 55,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 0
+      },
+      "output_tokens": 98,
+      "output_tokens_details": {
+        "reasoning_tokens": 64
+      },
+      "total_tokens": 153
+    },
+    "user": null,
+    "metadata": {}
+  }
+}

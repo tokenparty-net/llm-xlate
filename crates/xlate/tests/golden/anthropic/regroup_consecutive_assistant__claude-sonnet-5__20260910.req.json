@@ -1,0 +1,22 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Hi.",
+      "role": "user"
+    },
+    {
+      "content": "Hello.",
+      "role": "assistant"
+    },
+    {
+      "content": "Again hello.",
+      "role": "assistant"
+    },
+    {
+      "content": "How are you?",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5"
+}

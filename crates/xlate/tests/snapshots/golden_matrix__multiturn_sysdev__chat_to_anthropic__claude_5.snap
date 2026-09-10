@@ -1,0 +1,56 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "claude-opus-5",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "First question."
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "First answer."
+        }
+      ]
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "<system_message>\nMid-context developer instruction.\n</system_message>"
+        },
+        {
+          "type": "text",
+          "text": "Second question."
+        }
+      ]
+    }
+  ],
+  "max_tokens": 1024,
+  "system": [
+    {
+      "type": "text",
+      "text": "Global system prompt."
+    }
+  ],
+  "cache_control": {
+    "type": "ephemeral"
+  }
+}
+--- headers ---
+anthropic-version: 2023-06-01
+upstream_streams: false
+--- degraded ---
+instructions=wrapped

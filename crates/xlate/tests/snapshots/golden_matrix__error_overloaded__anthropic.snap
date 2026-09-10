@@ -1,0 +1,70 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+assertion_line: 381
+expression: out
+---
+--- decoded XlateError ---
+kind=overloaded status=529 retryable=true param=- provider_type=overloaded_error retry_after=- upstream_request_id=req_ovr_1
+message: Overloaded
+
+--- chat (non-streaming) ---
+status: 503
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_ovr_1
+body:
+{
+  "error": {
+    "message": "Overloaded",
+    "type": "overloaded_error",
+    "param": null,
+    "code": null
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 503
+frames:
+data: {"error":{"message":"Overloaded","type":"overloaded_error","param":null,"code":null}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 503
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_ovr_1
+body:
+{
+  "error": {
+    "message": "Overloaded",
+    "type": "overloaded_error",
+    "param": null,
+    "code": null
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 503
+frames:
+event: error
+data: {"type":"error","code":null,"message":"Overloaded","param":null,"sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 529
+headers:
+  x-router-upstream-request-id: req_ovr_1
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "overloaded_error",
+    "message": "Overloaded"
+  },
+  "request_id": "req_ovr_1"
+}
+--- anthropic (streaming, pre-start) ---
+status: 529
+frames:
+event: error
+data: {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_ovr_1"}

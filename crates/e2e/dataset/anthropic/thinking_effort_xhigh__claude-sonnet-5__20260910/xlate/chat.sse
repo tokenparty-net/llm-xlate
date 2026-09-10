@@ -1,0 +1,12 @@
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[{"index":0,"delta":{"reasoning_details":[{"type":"router.opaque","data":"rtr1.eyJ2IjoxLCJwIjoiYW50aHJvcGljIiwibSI6ImNsYXVkZS1zb25uZXQtNSIsImsiOiJzaWduYXR1cmUiLCJkIjoiRXQ4Q0NwQUJDQkVZQWlwQWlBS2NCN01oRW0wdGlBQzVxazlrVysxQTNvaTVhUFcrTG5NdGxETEFjbEdCNk80Vk9RblFnbjFydWFzcUdpMjJtSUtjV3BUSzZoblFhZmVBSFl2RXFESVBZMnhoZFdSbExYTnZibTVsZEMwMU9BQkNDSFJvYVc1cmFXNW5XaVJrWm1RME5USmtNQzAwTldFeUxUUTRZakF0T0RoaVpTMDVOV0V4TVdVM1lUUTFaakNvQWZyUmlkVUdFZ3lXaHFSQk5wVmZycGt1ZUZZYUROUllURmM2V0xPZ2szUStFU0l3bkd0RitVSEM4eVNlNVdTOTVFcThpUnZrYkx4Sk5XZGo2dmk5d3VXUG8rR0dHS2NyMlI1ZFU2Mi9tTVRJTGxlbktud3hxVklHblZGLy9XYXk5REdScnREVTFaVlllR1ltcXFYNXF6MXBYM3dJNzBWOTEwbGlZRlFmb09YK0FTclZIYmNZY3crNzBTVnZRV2t0ais5UVg3TWdiVlBKcFY1ak5BN0FqTll6eFdpUWxZYk1qNlo2ckY0a2ZDNWk0UFFKa1lPRkxLSWdvQStxZWc1cUlwQWRWZ1k0VFc3V0hFOVhiWWNWdlg3UUdBRT0iLCJoIjoidHQzaGlzS3ZMbTZCSk1zSjlGcDgyLWgzeVVhODRMdmhlY1ZZY1M4ZWNWZyJ9"}]},"finish_reason":null}]}
+
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[{"index":0,"delta":{"content":"The 7th prime number is **17**.\n\nHere's the sequence for reference:\n1st: 2\n2nd: 3\n3rd: 5\n4th: 7\n5th: 11\n6th: 13\n7th: **17**"},"finish_reason":null}]}
+
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"id":"resp_check","object":"chat.completion.chunk","created":1700000000,"model":"check-model","choices":[],"usage":{"prompt_tokens":15,"completion_tokens":150,"total_tokens":165,"prompt_tokens_details":{"cached_tokens":0}}}
+
+data: [DONE]
+

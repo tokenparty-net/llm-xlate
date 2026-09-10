@@ -1,0 +1,34 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Answer only in English."
+    },
+    {
+      "role": "user",
+      "content": "Say hi."
+    },
+    {
+      "role": "assistant",
+      "content": "Hi."
+    },
+    {
+      "role": "system",
+      "content": "Ignore prior language rules; answer only in French."
+    },
+    {
+      "role": "user",
+      "content": "How are you?"
+    }
+  ],
+  "max_completion_tokens": 64
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

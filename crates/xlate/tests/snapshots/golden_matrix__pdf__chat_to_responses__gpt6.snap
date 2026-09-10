@@ -1,0 +1,33 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-6-astra",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Summarize this document."
+        },
+        {
+          "type": "input_file",
+          "filename": "report.pdf",
+          "file_data": "data:application/pdf;base64,JVBERi0xLjQK"
+        },
+        {
+          "type": "input_file",
+          "file_id": "file-abc123"
+        }
+      ]
+    }
+  ]
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

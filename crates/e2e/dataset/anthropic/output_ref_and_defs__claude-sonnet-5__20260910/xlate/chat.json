@@ -1,0 +1,1 @@
+{"id":"resp_check","object":"chat.completion","created":1700000000,"model":"check-model","choices":[{"index":0,"message":{"role":"assistant","content":"{\"home\":{\"city\":\"Springfield\"}}","refusal":null},"finish_reason":"stop","logprobs":null}],"usage":{"prompt_tokens":292,"completion_tokens":18,"total_tokens":310,"prompt_tokens_details":{"cached_tokens":0}}}

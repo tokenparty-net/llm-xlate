@@ -1,0 +1,173 @@
+# OpenAI (Chat Completions + Responses) capability data. verified_at = 2026-09-01.
+
+family = "openai"
+
+[defaults.transport]
+protocols = ["chat", "responses"]
+streaming = "both"
+usage_timing = "end_only"
+stream_usage_opt_in = true
+keepalive_interval_secs = 15
+max_output_tokens_required = false
+
+[defaults.instructions]
+top_level_system = "string"
+mid_conversation_system = "native"
+developer_role = true
+system_clear_at = false
+system_effort_override = false
+
+[defaults.reasoning]
+mode = "none"
+exposure = "none"
+replay = "none"
+required_on_last_tool_turn = false
+tools_with_reasoning = true
+forced_temperature_with_thinking = false
+
+[defaults.tools]
+function_tools = true
+tool_choice = ["auto", "none", "required", "named"]
+parallel_control = true
+result_content = ["text"]
+id_pattern = "^[A-Za-z0-9_-]{1,64}$"
+hosted = ["web_search", "code_interpreter", "file_search", "computer_use_preview"]
+schema_unsupported_keywords = []
+max_tools = 128
+mid_conversation_tool_changes = true
+
+[defaults.tools.strict]
+supported = true
+default = "off"
+
+[defaults.output]
+format = "both"
+strict_supported = true
+schema_unsupported_keywords = ["minLength", "maxLength", "pattern", "format", "default"]
+format_with_tools = true
+prefill_allowed = false
+verbosity = false
+
+[defaults.media]
+file_id_namespace = "openai"
+container_upload = false
+image_detail_param = true
+
+[defaults.media.image]
+sources = ["base64", "url", "file_id"]
+mime = ["image/png", "image/jpeg", "image/gif", "image/webp"]
+max_bytes = 20000000
+max_count = 500
+
+[defaults.media.pdf]
+sources = ["base64", "url", "file_id"]
+max_bytes = 32000000
+
+[defaults.media.text_doc]
+sources = ["text"]
+
+[defaults.media.audio]
+sources = []
+
+[defaults.sampling]
+temperature = { range = [0.0, 2.0] }
+top_p = { range = [0.0, 1.0] }
+top_k = "rejected"
+seed = { range = [-9000000000000000000.0, 9000000000000000000.0] }
+frequency_penalty = { range = [-2.0, 2.0] }
+presence_penalty = { range = [-2.0, 2.0] }
+logit_bias = { range = [-100.0, 100.0] }
+logprobs = { range = [0.0, 20.0] }
+n = { max = 1 }
+stop_sequences = { max = 4 }
+service_tier = ["auto", "default", "flex", "priority"]
+
+[defaults.state]
+store = true
+previous_response_id = true
+conversation_api = true
+background = false
+encrypted_reasoning_include = true
+compaction = "none"
+
+[defaults.cache]
+auto_request_level = false
+prompt_cache_key = true
+usage_fields = ["cache_read", "reasoning"]
+
+[defaults.cache.explicit_breakpoints]
+max = 0
+ttl = []
+
+[defaults.limits]
+context_window = 400000
+max_output_tokens = 128000
+max_messages = 100000
+max_request_bytes = 52000000
+
+[defaults.errors]
+context_length_patterns = ["maximum context length", "reduce the length"]
+retryable_status = [429, 500, 503]
+overloaded_status = 503
+stop_reasons = ["stop", "length", "tool_calls", "content_filter", "function_call"]
+
+# --- GPT-6 (Astra): Responses only.
+[[model]]
+match = "gpt-6*"
+verified_at = "2026-09-01"
+
+[model.transport]
+protocols = ["responses"]
+
+[model.reasoning]
+mode = "effort_only"
+effort_levels = ["minimal", "low", "medium", "high", "xhigh"]
+exposure = "summary"
+replay = "encrypted_item"
+required_on_last_tool_turn = false
+tools_with_reasoning = true
+
+[model.output]
+verbosity = true
+
+[model.state]
+background = true
+
+# --- GPT-5.x and o-series: reasoning on both protocols.
+#
+# `tools_with_reasoning = true` reflects the native (Responses) access these models are reached
+# through — tool calling works alongside reasoning there. Plan §2/§6 notes that on the *Chat*
+# protocol, from GPT-5.4, tool calling is unsupported when `reasoning_effort != "none"`. That is
+# a per-protocol constraint, and `tools_with_reasoning` is a single per-model capability (the
+# schema has no per-protocol split), so the Chat-side `false` is DELIBERATELY delegated to a
+# router-supplied Chat backend overlay (see the `gpt5_chat()` preset in crates/core/src/caps)
+# rather than encoded here — encoding `false` on this block would wrongly degrade the Responses
+# path too. In practice OpenAI Chat-in is lowered to Responses-out for these backends anyway.
+[[model]]
+match = "gpt-5*|o1*|o3*|o4*|o5*"
+verified_at = "2026-09-01"
+
+[model.reasoning]
+mode = "effort_only"
+effort_levels = ["minimal", "low", "medium", "high", "xhigh"]
+exposure = "summary"
+replay = "encrypted_item"
+required_on_last_tool_turn = false
+tools_with_reasoning = true
+
+[model.output]
+verbosity = true
+
+[model.state]
+background = true
+
+# --- GPT-4.x / 4o: chat + responses, no reasoning.
+[[model]]
+match = "gpt-4*|chatgpt-4*"
+verified_at = "2026-09-01"
+
+[model.reasoning]
+mode = "none"
+
+[model.output]
+verbosity = false

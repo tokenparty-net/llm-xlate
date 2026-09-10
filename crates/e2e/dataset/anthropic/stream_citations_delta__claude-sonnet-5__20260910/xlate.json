@@ -1,0 +1,33 @@
+{
+  "label": "ant.stream.citations_delta/claude-sonnet-5",
+  "protocol": "anthropic",
+  "model": "claude-sonnet-5",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "1 path(s) differ (normalizations): -/messages/0/content/0/citations"
+    },
+    {
+      "name": "response_decode_stream",
+      "pass": true,
+      "detail": "decoded 10 event(s)"
+    },
+    {
+      "name": "chunk_fuzz",
+      "pass": true,
+      "detail": "25 splits identical to baseline"
+    },
+    {
+      "name": "cross_client",
+      "pass": true,
+      "detail": "rendered 2 target dialect(s)"
+    }
+  ]
+}

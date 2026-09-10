@@ -1,0 +1,170 @@
+# Anthropic family 4 — thinking / adaptive reasoning config (plan §5.4).
+# llm-xlate assumption: plan §2 row 2 + §7.2 — thinking is {type:"adaptive"} + output_config.effort in
+# {low,medium,high,xhigh,max} (max = Opus 4.6+). budget_tokens deprecated on 4.6, rejected on 4.7+.
+# data/caps reasoning/effort gates.
+
+[[probe]]
+id         = "ant.thinking.adaptive_medium"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "reasoning"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "thinking:{type:adaptive} + output_config.effort=medium is accepted (200) and emits a thinking block before text (plan §2/§7.2)."
+expect     = { status = 200 }
+notes      = "Baseline dataset capture of a thinking+text turn (non-stream and stream)."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+thinking      = { type = "adaptive" }
+output_config = { effort = "medium" }
+messages      = [ { role = "user", content = "What is 17*23? Think step by step, then give the number." } ]
+
+[[probe]]
+id         = "ant.thinking.effort_low"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "effort=low is accepted on all current models."
+expect     = { status = 200 }
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+thinking      = { type = "adaptive" }
+output_config = { effort = "low" }
+messages      = [ { role = "user", content = "What is 12+30?" } ]
+
+[[probe]]
+id         = "ant.thinking.effort_high"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "effort=high is accepted on all current models."
+expect     = { status = 200 }
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+thinking      = { type = "adaptive" }
+output_config = { effort = "high" }
+messages      = [ { role = "user", content = "What is 144/12?" } ]
+
+[[probe]]
+id         = "ant.thinking.effort_xhigh"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "effort=xhigh is accepted on current models."
+expect     = { status = 200 }
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+thinking      = { type = "adaptive" }
+output_config = { effort = "xhigh" }
+messages      = [ { role = "user", content = "What is the 7th prime?" } ]
+
+[[probe]]
+id         = "ant.thinking.effort_max_across_models"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning"]
+models     = "anthropic_all"
+stream     = false
+hypothesis = "effort=max is accepted only on Opus 4.6+ (plan §2); on other/older models -> 400 or ignored. Swept to find the boundary."
+expect     = "any"
+notes      = "Per-model verdict; expected accept on opus-4-6/4-7/4-8/opus-5, reject on haiku/sonnet-4-5."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+thinking      = { type = "adaptive" }
+output_config = { effort = "max" }
+messages      = [ { role = "user", content = "Prove sqrt(2) is irrational in two lines." } ]
+
+[[probe]]
+id         = "ant.thinking.budget_tokens_on_46"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning"]
+models     = "anthropic_46"
+stream     = false
+hypothesis = "Legacy thinking:{type:enabled, budget_tokens:N} is DEPRECATED-but-accepted (200, possibly ignored) on the 4.6 family (plan §2)."
+expect     = "any"
+allow_long = true
+notes      = "Legacy budget shape; documents whether 4.6 still honours it. budget_tokens>=1024 (API min) and max_tokens>budget_tokens (allow_long lifts the 256 clamp) so the result reflects field acceptance, not a value-range 400."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 1536
+thinking   = { type = "enabled", budget_tokens = 1024 }
+messages   = [ { role = "user", content = "What is 17*23? Think first." } ]
+
+[[probe]]
+id         = "ant.thinking.budget_tokens_on_new"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "Legacy budget_tokens is REJECTED (400) on 4.7+/5 (plan §2 'rejected on 4.7+')."
+expect     = "any"
+allow_long = true
+notes      = "Boundary vs ant.thinking.budget_tokens_on_46. budget_tokens>=1024 (API min) with max_tokens>budget so the outcome reflects whether the 4.7+/5 models accept the legacy enabled/budget shape at all (vs a value-range 400)."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 1536
+thinking   = { type = "enabled", budget_tokens = 1024 }
+messages   = [ { role = "user", content = "What is 17*23? Think first." } ]
+
+[[probe]]
+id         = "ant.thinking.disabled"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "thinking:{type:disabled} is accepted and suppresses the thinking block (no thinking in the type sequence)."
+expect     = { status = 200 }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+thinking   = { type = "disabled" }
+messages   = [ { role = "user", content = "What is 2+2?" } ]
+
+[[probe]]
+id         = "ant.thinking.with_temperature"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning", "sampling", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "thinking + non-default temperature is rejected (400) on 4.7+ — thinking forces temperature=1 and any explicit non-default temperature conflicts."
+expect     = "any"
+notes      = "Interaction between the sampling rule and thinking; documents the exact error."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+temperature   = 0.5
+thinking      = { type = "adaptive" }
+output_config = { effort = "medium" }
+messages      = [ { role = "user", content = "What is 17*23?" } ]
+
+[[probe]]
+id         = "ant.thinking.effort_invalid_value"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "An out-of-enum effort value (e.g. 'ultra') -> 400 invalid_request_error listing the allowed set."
+expect     = { status = 400, error_type = "invalid_request_error" }
+notes      = "Captures the allowed-effort enumeration from the error text — direct evidence for data/caps."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 64
+thinking      = { type = "adaptive" }
+output_config = { effort = "ultra" }
+messages      = [ { role = "user", content = "Hi." } ]

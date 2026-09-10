@@ -1,0 +1,28 @@
+{
+  "label": "ant.tools.choice_any/claude-sonnet-5",
+  "protocol": "anthropic",
+  "model": "claude-sonnet-5",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "1 path(s) differ (normalizations): ~/messages/0/content"
+    },
+    {
+      "name": "response_decode_nonstream",
+      "pass": true,
+      "detail": "decoded 5 event(s)"
+    },
+    {
+      "name": "cross_client",
+      "pass": true,
+      "detail": "rendered 2 target dialect(s)"
+    }
+  ]
+}

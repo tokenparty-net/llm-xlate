@@ -1,0 +1,11 @@
+{
+  "frobnicate": true,
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Say hi.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5"
+}

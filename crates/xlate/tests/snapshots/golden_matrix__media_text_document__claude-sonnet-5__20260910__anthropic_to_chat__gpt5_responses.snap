@@ -1,0 +1,27 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "<document title=\"notes.txt\">\nThe capital of France is Paris.\n</document>"
+        },
+        {
+          "type": "text",
+          "text": "What is the capital of France?"
+        }
+      ]
+    }
+  ],
+  "max_completion_tokens": 64
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

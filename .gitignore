@@ -1,0 +1,17 @@
+# llm-xlate workspace. Secrets are covered by the repository-root .gitignore
+# (.xlate_e2e_*, .token*, .env); this file covers build output and local run data.
+
+# build output (each agent/CI job uses its own target/<name> subdir)
+/target/
+/target-*/
+
+# insta snapshot review leftovers (accepted *.snap files are committed)
+*.snap.new
+*.pending-snap
+
+# llm-xlate-e2e: local live-run captures and the spend ledger. The curated
+# dataset (crates/e2e/dataset/) and the promoted goldens ARE committed.
+/crates/e2e/runs/
+
+# xlate-testrouter: local traces, Responses store, and reasoning sidecar
+/crates/testrouter/data/

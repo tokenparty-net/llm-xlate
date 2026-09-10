@@ -1,0 +1,9 @@
+{
+  "input": "Explain why the sky is blue, step by step.",
+  "max_output_tokens": 256,
+  "model": "o4-mini",
+  "reasoning": {
+    "effort": "high",
+    "summary": "detailed"
+  }
+}

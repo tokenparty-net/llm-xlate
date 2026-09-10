@@ -1,0 +1,22 @@
+{
+  "input": [
+    {
+      "content": "Say hi.",
+      "role": "user"
+    },
+    {
+      "content": "Hi.",
+      "role": "assistant"
+    },
+    {
+      "content": "From now on answer in French.",
+      "role": "developer"
+    },
+    {
+      "content": "How are you?",
+      "role": "user"
+    }
+  ],
+  "max_output_tokens": 64,
+  "model": "gpt-4o-mini"
+}

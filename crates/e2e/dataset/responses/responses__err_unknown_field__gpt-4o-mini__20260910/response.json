@@ -1,0 +1,31 @@
+{
+  "status": 400,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d0695fcb7b295-EWR",
+    "connection": "keep-alive",
+    "content-length": "167",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:35 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "20",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "req_140eeab825584d9492a2b7dce2577f7f"
+  },
+  "elapsed_ms": 88,
+  "body": {
+    "error": {
+      "message": "Unknown parameter: 'frobnicate'.",
+      "type": "invalid_request_error",
+      "param": "frobnicate",
+      "code": "unknown_parameter"
+    }
+  }
+}

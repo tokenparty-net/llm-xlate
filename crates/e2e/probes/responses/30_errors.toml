@@ -1,0 +1,113 @@
+# Responses family 30 — error variants (plan §5.30).
+# llm-xlate assumption: §10 error mapping. 400 variants, 404 unknown previous_response_id, encrypted content
+# from another org, error stream event, response.failed.
+
+[[probe]]
+id         = "resp.err.bad_param"
+protocol   = "responses"
+tags       = ["dataset", "errors"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "A wrong-typed param (max_output_tokens as a string) -> 400 invalid_request_error with param populated."
+expect     = { status = 400, error_type = "invalid_request_error" }
+notes      = "Body sets max_output_tokens to a string; the clamp only touches numeric values so it is left intact."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = "lots"
+input             = "Say ok."
+
+[[probe]]
+id         = "resp.err.unknown_field"
+protocol   = "responses"
+tags       = ["explore", "errors"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "An unknown top-level field -> 400 unknown_parameter (or ignored?)."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 32
+frobnicate        = true
+input             = "Say ok."
+
+[[probe]]
+id         = "resp.err.empty_input"
+protocol   = "responses"
+tags       = ["explore", "errors"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "An empty input array -> 400 invalid_request_error."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 32
+input             = []
+
+[[probe]]
+id         = "resp.err.unknown_previous_response_id"
+protocol   = "responses"
+tags       = ["dataset", "errors"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "An unknown previous_response_id -> 404 (or 400) naming the missing response."
+expect     = "any"
+notes      = "The id is a deliberately invalid literal (not a ref)."
+
+[probe.body]
+model                = "$MODEL"
+max_output_tokens    = 32
+previous_response_id = "resp_does_not_exist_000000"
+input                = "continue"
+
+[[probe]]
+id         = "resp.err.encrypted_from_another_org"
+protocol   = "responses"
+tags       = ["errors", "state", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+requires   = ["manual"]
+hypothesis = "Replaying encrypted reasoning content produced by another org/key -> 400 with org-binding text (plan §2 row 7)."
+expect     = "any"
+notes      = "requires manual: needs a second org's encrypted blob; operator supplies it. Same claim as resp.state.replay_second_key, isolated as an error probe."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+store             = false
+reasoning         = { effort = "low" }
+input             = [ { role = "user", content = "hi" }, { type = "reasoning", encrypted_content = "FOREIGN_ORG_BLOB_PLACEHOLDER", summary = [] }, { role = "user", content = "continue" } ]
+
+[[probe]]
+id         = "resp.err.bad_key"
+protocol   = "responses"
+tags       = ["dataset", "errors"]
+models     = "openai_responses"
+stream     = false
+requires   = ["manual"]
+hypothesis = "A bad key -> 401 invalid_api_key."
+expect     = { status = 401 }
+notes      = "requires manual: operator runs with a deliberately invalid key."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 32
+input             = "Say ok."
+
+[[probe]]
+id         = "resp.err.stream_error_event"
+protocol   = "responses"
+tags       = ["errors", "streaming"]
+models     = "openai_responses"
+stream     = true
+requires   = ["manual"]
+hypothesis = "A mid-stream failure emits an `error` stream event and/or response.failed (the streamed-error shape llm-xlate must decode)."
+expect     = "any"
+notes      = "requires manual: mid-stream failures cannot be triggered on demand; captured opportunistically."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+input             = "Say ok."

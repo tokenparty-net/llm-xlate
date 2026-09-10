@@ -1,0 +1,28 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Say hi.",
+      "role": "user"
+    },
+    {
+      "content": "Hi.",
+      "role": "assistant"
+    },
+    {
+      "content": [
+        {
+          "text": "Think harder now.",
+          "type": "text"
+        }
+      ],
+      "effort": "high",
+      "role": "system"
+    },
+    {
+      "content": "What is 17*23?",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5"
+}

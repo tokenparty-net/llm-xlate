@@ -1,0 +1,19 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Reply with the single word: ok.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "system": [
+    {
+      "cache_control": {
+        "type": "ephemeral"
+      },
+      "text": "You are a precise assistant. This system block is a cache breakpoint carrier and is padded to be large enough to cache: alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi omicron pi rho sigma tau upsilon phi chi psi omega, repeated context to raise the token count above the minimum cacheable threshold for the target model during a live run.",
+      "type": "text"
+    }
+  ]
+}

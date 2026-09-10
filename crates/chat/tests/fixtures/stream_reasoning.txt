@@ -1,0 +1,16 @@
+data: {"id":"chatcmpl-s4","object":"chat.completion.chunk","created":1700000000,"model":"gpt-5.4","choices":[{"index":0,"delta":{"role":"assistant"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-s4","object":"chat.completion.chunk","created":1700000000,"model":"gpt-5.4","choices":[{"index":0,"delta":{"reasoning_content":"Let me think. "},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-s4","object":"chat.completion.chunk","created":1700000000,"model":"gpt-5.4","choices":[{"index":0,"delta":{"reasoning_content":"17*23=391."},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-s4","object":"chat.completion.chunk","created":1700000000,"model":"gpt-5.4","choices":[{"index":0,"delta":{"reasoning_details":[{"type":"router.opaque","data":"enc-stream-blob"}]},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-s4","object":"chat.completion.chunk","created":1700000000,"model":"gpt-5.4","choices":[{"index":0,"delta":{"content":"The answer is 391."},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-s4","object":"chat.completion.chunk","created":1700000000,"model":"gpt-5.4","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"id":"chatcmpl-s4","object":"chat.completion.chunk","created":1700000000,"model":"gpt-5.4","choices":[],"usage":{"prompt_tokens":25,"completion_tokens":40,"total_tokens":65,"completion_tokens_details":{"reasoning_tokens":30}}}
+
+data: [DONE]
+

@@ -1,0 +1,10 @@
+{
+  "model": "gpt-4o",
+  "messages": [
+    { "role": "system", "content": "You are a helpful assistant." },
+    { "role": "user", "content": "Hello, who won the world cup in 2018?" }
+  ],
+  "temperature": 0.7,
+  "top_p": 1,
+  "max_completion_tokens": 256
+}

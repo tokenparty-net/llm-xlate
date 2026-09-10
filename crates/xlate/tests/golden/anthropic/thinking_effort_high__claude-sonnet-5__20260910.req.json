@@ -1,0 +1,16 @@
+{
+  "max_tokens": 256,
+  "messages": [
+    {
+      "content": "What is 144/12?",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "output_config": {
+    "effort": "high"
+  },
+  "thinking": {
+    "type": "adaptive"
+  }
+}

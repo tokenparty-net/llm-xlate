@@ -1,0 +1,31 @@
+{
+  "status": 400,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d061d2d94b295-EWR",
+    "connection": "keep-alive",
+    "content-length": "180",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:16 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "129",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "req_98d84a97914e41e1ac7038566648060f"
+  },
+  "elapsed_ms": 226,
+  "body": {
+    "error": {
+      "message": "Error while downloading file. Upstream status code: 400.",
+      "type": "invalid_request_error",
+      "param": "url",
+      "code": "invalid_value"
+    }
+  }
+}

@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=invalid_request status=400 retryable=false param=- provider_type=invalid_request_error retry_after=- upstream_request_id=req_4aade1e0f8954fe6a98cdc9a6d2da07b
+message: One of "input" or "previous_response_id" or 'prompt' or 'conversation' must be provided.
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_4aade1e0f8954fe6a98cdc9a6d2da07b
+body:
+{
+  "error": {
+    "message": "One of \"input\" or \"previous_response_id\" or 'prompt' or 'conversation' must be provided.",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": "missing_required_parameter"
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"One of \"input\" or \"previous_response_id\" or 'prompt' or 'conversation' must be provided.","type":"invalid_request_error","param":null,"code":"missing_required_parameter"}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_4aade1e0f8954fe6a98cdc9a6d2da07b
+body:
+{
+  "error": {
+    "message": "One of \"input\" or \"previous_response_id\" or 'prompt' or 'conversation' must be provided.",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": "missing_required_parameter"
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":"missing_required_parameter","message":"One of \"input\" or \"previous_response_id\" or 'prompt' or 'conversation' must be provided.","param":null,"sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+  x-router-upstream-request-id: req_4aade1e0f8954fe6a98cdc9a6d2da07b
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "One of \"input\" or \"previous_response_id\" or 'prompt' or 'conversation' must be provided."
+  },
+  "request_id": "req_4aade1e0f8954fe6a98cdc9a6d2da07b"
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"One of \"input\" or \"previous_response_id\" or 'prompt' or 'conversation' must be provided."},"request_id":"req_4aade1e0f8954fe6a98cdc9a6d2da07b"}

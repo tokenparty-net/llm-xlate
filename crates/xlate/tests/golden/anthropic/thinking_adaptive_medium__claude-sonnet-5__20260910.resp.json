@@ -1,0 +1,36 @@
+{
+  "model": "claude-sonnet-5",
+  "id": "msg_011CeuSHxccKAEAgwi2rr3Vd",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "EqgCCpABCBEYAipAcFYgePFDTjSY1mAc1dLHhn9kUswkcRjpxJ0mkm9ODSmEQ28huNpLA7PHbeBHmnE0XU7vWoUBnOpWb+njgRk7vDIPY2xhdWRlLXNvbm5ldC01OABCCHRoaW5raW5nWiRkZmQ0NTJkMC00NWEyLTQ4YjAtODhiZS05NWExMWU3YTQ1ZjCoAYTSidUGEgwS2w/TKmpfeWpDoogaDA/SWfBhr4s5qH5UpSIwkWG2qcIB9sx1WzNI44l4MrVarA8cNpu5r/0sQz+i+Jlk3LVrio9SvZVwKEMJepjAKkV7xMPAOvOBnP7QG+cDonF6kLvqnqoe9JhvQHJ5bs+OSPyCrECmIB8w3Q7w9tPrqLVuf9y2YdDp8KpmEb+3REeUaLoBMBMYAQ=="
+    },
+    {
+      "type": "text",
+      "text": "**Step-by-step:**\n\n17 × 23 = 17 × (20 + 3) = (17 × 20) + (17 × 3) = 340 + 51 = 391\n\n**Answer: 391**"
+    }
+  ],
+  "container": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 24,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 104,
+    "output_tokens_details": {
+      "thinking_tokens": 38
+    },
+    "service_tier": "standard",
+    "inference_geo": "global"
+  }
+}

@@ -1,0 +1,22 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a precise assistant. This system block is a cache breakpoint carrier and is padded to be large enough to cache: alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi omicron pi rho sigma tau upsilon phi chi psi omega, repeated context to raise the token count above the minimum cacheable threshold for the target model during a live run."
+    },
+    {
+      "role": "user",
+      "content": "Reply with the single word: ok."
+    }
+  ],
+  "max_completion_tokens": 64
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

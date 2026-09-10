@@ -1,0 +1,30 @@
+{
+  "status": 400,
+  "headers": {
+    "anthropic-organization-id": "<redacted>",
+    "anthropic-workspace-id": "<redacted>",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d08c98b4b7327-EWR",
+    "connection": "keep-alive",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:24:05 GMT",
+    "request-id": "req_011CeuSLR68Vosem7D789T9L",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "traceresponse": "00-c877179efaf4a16a689cae8c69600560-7b3b0fe31667557a-01",
+    "transfer-encoding": "chunked",
+    "vary": "Accept-Encoding",
+    "x-robots-tag": "none",
+    "x-should-retry": "false"
+  },
+  "elapsed_ms": 240,
+  "body": {
+    "type": "error",
+    "error": {
+      "type": "invalid_request_error",
+      "message": "output_config.format.schema: For 'object' type, 'additionalProperties' must be explicitly set to false"
+    },
+    "request_id": "req_011CeuSLR68Vosem7D789T9L"
+  }
+}

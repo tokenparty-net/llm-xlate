@@ -1,0 +1,8 @@
+{
+  "input": "What is 12+30?",
+  "max_output_tokens": 256,
+  "model": "o4-mini",
+  "reasoning": {
+    "effort": "low"
+  }
+}

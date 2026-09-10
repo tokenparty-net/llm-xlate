@@ -1,0 +1,28 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/responses",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "input": [
+      {
+        "content": [
+          {
+            "text": "Summarise.",
+            "type": "input_text"
+          },
+          {
+            "file_url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            "type": "input_file"
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "max_output_tokens": 64,
+    "model": "gpt-4o-mini"
+  }
+}

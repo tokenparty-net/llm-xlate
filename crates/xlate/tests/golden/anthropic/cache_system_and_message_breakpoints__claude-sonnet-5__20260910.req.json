@@ -1,0 +1,31 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": [
+        {
+          "cache_control": {
+            "type": "ephemeral"
+          },
+          "text": "A reference document that is padded for caching: one two three four five six seven eight nine ten, repeated to exceed the minimum cacheable size during a live run.",
+          "type": "text"
+        },
+        {
+          "text": "Reply with the single word: ok.",
+          "type": "text"
+        }
+      ],
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "system": [
+    {
+      "cache_control": {
+        "type": "ephemeral"
+      },
+      "text": "System policy block padded for caching: aaaa bbbb cccc dddd eeee ffff gggg hhhh iiii jjjj kkkk llll mmmm nnnn oooo pppp qqqq rrrr ssss tttt uuuu vvvv wwww xxxx yyyy zzzz repeated to exceed the minimum cacheable size during a live run.",
+      "type": "text"
+    }
+  ]
+}

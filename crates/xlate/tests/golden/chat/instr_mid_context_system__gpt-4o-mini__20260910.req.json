@@ -1,0 +1,22 @@
+{
+  "max_completion_tokens": 64,
+  "messages": [
+    {
+      "content": "Say hi.",
+      "role": "user"
+    },
+    {
+      "content": "Hi.",
+      "role": "assistant"
+    },
+    {
+      "content": "From now on answer in French.",
+      "role": "system"
+    },
+    {
+      "content": "How are you?",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini"
+}

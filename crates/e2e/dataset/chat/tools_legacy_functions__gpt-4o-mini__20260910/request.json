@@ -1,0 +1,37 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/chat/completions",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "function_call": "auto",
+    "functions": [
+      {
+        "description": "Get weather.",
+        "name": "get_weather",
+        "parameters": {
+          "properties": {
+            "city": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "city"
+          ],
+          "type": "object"
+        }
+      }
+    ],
+    "max_completion_tokens": 128,
+    "messages": [
+      {
+        "content": "Weather in Paris?",
+        "role": "user"
+      }
+    ],
+    "model": "gpt-4o-mini"
+  }
+}

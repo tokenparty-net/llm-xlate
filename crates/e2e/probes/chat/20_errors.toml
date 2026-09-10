@@ -1,0 +1,112 @@
+# Chat family 20 — error variants (plan §5.20).
+# llm-xlate assumption: §10 error mapping (status + error.type + code + param). Each probe pins one shape;
+# the `param` field population is itself under study.
+
+[[probe]]
+id         = "chat.err.bad_param_type"
+protocol   = "chat"
+tags       = ["dataset", "errors"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "A wrong-typed param (temperature as a string) -> 400 invalid_request_error with param=\"temperature\" populated."
+expect     = { status = 400, error_type = "invalid_request_error" }
+notes      = "Tests whether the `param` field is populated (drives error-detail mapping)."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+temperature           = "hot"
+messages              = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "chat.err.unknown_field"
+protocol   = "chat"
+tags       = ["explore", "errors"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "An unknown top-level field -> 400 unrecognized/unknown parameter (or silently ignored?)."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+frobnicate            = true
+messages              = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "chat.err.empty_messages"
+protocol   = "chat"
+tags       = ["dataset", "errors"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "An empty messages array -> 400 invalid_request_error."
+expect     = { status = 400, error_type = "invalid_request_error" }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+messages              = []
+
+[[probe]]
+id         = "chat.err.context_length"
+protocol   = "chat"
+tags       = ["explore", "errors", "expensive"]
+models     = "openai_chat"
+stream     = false
+allow_long = true
+requires   = ["manual"]
+hypothesis = "A prompt exceeding the context window -> 400 code=context_length_exceeded (the code llm-xlate maps to ContextLengthExceeded per §10)."
+expect     = { status = 400, error_type = "invalid_request_error" }
+notes      = "Schema gap: no repeat helper; operator supplies a body_file with a huge prompt. Kept on the cheap model. Tagged expensive+manual."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+messages              = [ { role = "user", content = "Placeholder; replace with a body_file large enough to exceed the context window. Repeat this sentence many thousands of times." } ]
+
+[[probe]]
+id         = "chat.err.bad_key"
+protocol   = "chat"
+tags       = ["dataset", "errors"]
+models     = "openai_chat"
+stream     = false
+requires   = ["manual"]
+hypothesis = "A bad key -> 401 invalid_api_key (the 401 shape llm-xlate maps per §10)."
+expect     = { status = 401 }
+notes      = "requires manual: operator runs with a deliberately invalid key. Never checked in."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+messages              = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "chat.err.insufficient_quota"
+protocol   = "chat"
+tags       = ["errors"]
+models     = "openai_chat"
+stream     = false
+requires   = ["manual"]
+hypothesis = "429 insufficient_quota / rate limit carries a retry-after header."
+expect     = { status = 429 }
+notes      = "Cannot be triggered on demand; captured opportunistically."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+messages              = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "chat.err.temperature_out_of_range"
+protocol   = "chat"
+tags       = ["explore", "errors"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "temperature=3.0 (above the max of 2) -> 400 with param=temperature and a range message."
+expect     = { status = 400, error_type = "invalid_request_error" }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+temperature           = 3.0
+messages              = [ { role = "user", content = "Say ok." } ]

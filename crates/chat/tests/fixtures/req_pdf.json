@@ -1,0 +1,13 @@
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        { "type": "text", "text": "Summarize this document." },
+        { "type": "file", "file": { "filename": "report.pdf", "file_data": "data:application/pdf;base64,JVBERi0xLjQK" } },
+        { "type": "file", "file": { "filename": "prior.pdf", "file_id": "file-abc123" } }
+      ]
+    }
+  ]
+}

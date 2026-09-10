@@ -1,0 +1,26 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Padded cacheable system: alpha beta gamma delta epsilon zeta eta theta iota kappa, repeated for size, repeated for size, repeated for size, repeated for size."
+    },
+    {
+      "role": "user",
+      "content": "Say ok."
+    }
+  ],
+  "max_completion_tokens": 64,
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  }
+}
+--- headers ---
+upstream_streams: true
+--- degraded ---

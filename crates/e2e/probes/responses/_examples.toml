@@ -1,0 +1,30 @@
+# Example OpenAI Responses probes. Tagged `example` only.
+
+[[probe]]
+id         = "resp.example.text"
+protocol   = "responses"
+tags       = ["example"]
+models     = "openai_responses"
+stream     = "both"
+hypothesis = "A plain text request via `input` returns 200 with status completed and a message item."
+expect     = { status = 200 }
+notes      = "Smoke test: the cheapest Responses model answers a trivial prompt."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+input             = "Say hello in one short sentence."
+
+[[probe]]
+id         = "resp.example.unknown_model"
+protocol   = "responses"
+tags       = ["example"]
+models     = ["gpt-nonexistent-model-xyz"]
+stream     = false
+hypothesis = "An unknown model id is rejected 404 with error.type invalid_request_error."
+expect     = { status = 404, error_type = "invalid_request_error" }
+notes      = "Error smoke test; the model id is deliberately invalid."
+
+[probe.body]
+model = "$MODEL"
+input = "This should fail."

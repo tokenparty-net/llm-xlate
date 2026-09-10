@@ -1,0 +1,28 @@
+{
+  "protocol": "chat",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "code": "unsupported_parameter",
+    "param": "max_tokens",
+    "message": "Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead."
+  },
+  "request_id": "req_a2674c50a4dd4019bd2695fae627b215",
+  "rate_limit": {
+    "x-ratelimit-limit-requests": "500",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "499",
+    "x-ratelimit-remaining-tokens": "199995",
+    "x-ratelimit-reset-requests": "120ms",
+    "x-ratelimit-reset-tokens": "1ms"
+  },
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

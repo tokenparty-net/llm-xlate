@@ -1,0 +1,1 @@
+{"id":"resp_check","type":"message","role":"assistant","model":"check-model","content":[{"type":"tool_use","id":"call_U3MzmXsoT1RQ7adsU5g30APd","name":"get_weather","input":{"city":"Paris"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":46,"cache_read_input_tokens":0,"output_tokens":14}}

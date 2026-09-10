@@ -1,0 +1,23 @@
+{
+  "label": "chat.gpt6.tools_rejected/gpt-6-astra",
+  "protocol": "chat",
+  "model": "gpt-6-astra",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "byte/structure identical"
+    },
+    {
+      "name": "error_decode",
+      "pass": true,
+      "detail": "kind=invalid_request status=400"
+    }
+  ]
+}

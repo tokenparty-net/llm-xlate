@@ -1,0 +1,37 @@
+{
+  "protocol": "chat",
+  "stream": false,
+  "status": 200,
+  "verdict": "pass",
+  "request_id": "req_8cd6eda487bd48ef9c3035a434b2ddd6",
+  "rate_limit": {
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9990",
+    "x-ratelimit-remaining-tokens": "199991",
+    "x-ratelimit-reset-requests": "1m18.688s",
+    "x-ratelimit-reset-tokens": "2ms"
+  },
+  "stop_reason": "tool_calls",
+  "usage": {
+    "completion_tokens": 14,
+    "completion_tokens_details.accepted_prediction_tokens": 0,
+    "completion_tokens_details.audio_tokens": 0,
+    "completion_tokens_details.reasoning_tokens": 0,
+    "completion_tokens_details.rejected_prediction_tokens": 0,
+    "prompt_tokens": 46,
+    "prompt_tokens_details.audio_tokens": 0,
+    "prompt_tokens_details.cached_tokens": 0,
+    "total_tokens": 60
+  },
+  "type_sequence": [
+    "tool_call"
+  ],
+  "tool_call_count": 1,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

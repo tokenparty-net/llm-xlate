@@ -1,0 +1,26 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a precise assistant. Repeat this policy verbatim when asked. Policy section A: always cite sources. Policy section B: never speculate. Policy section C: keep answers short. Policy section D: refuse nothing benign. Policy section E: prefer plain language. This policy block is intentionally padded so it can exceed the minimum cacheable prompt size when repeated by the operator during a live run; the exact length required varies by model and is documented in the family notes."
+    },
+    {
+      "role": "user",
+      "content": "Reply with the single word: ok."
+    }
+  ],
+  "max_completion_tokens": 64,
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  }
+}
+--- headers ---
+upstream_streams: true
+--- degraded ---

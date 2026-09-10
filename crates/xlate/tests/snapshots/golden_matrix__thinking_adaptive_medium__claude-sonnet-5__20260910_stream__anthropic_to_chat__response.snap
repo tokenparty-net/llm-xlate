@@ -1,0 +1,36 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "object": "chat.completion",
+  "created": 1700000000,
+  "model": "golden-model",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "**Step-by-step:**\n\n17 × 23 = 17 × (20 + 3)\n= 17 × 20 + 17 × 3\n= 340 + 51\n= 391\n\n**Answer: 391**",
+        "refusal": null,
+        "reasoning_details": [
+          {
+            "type": "router.opaque",
+            "data": "rtr1.eyJ2IjoxLCJwIjoiYW50aHJvcGljIiwibSI6ImNsYXVkZS1zb25uZXQtNSIsImsiOiJzaWduYXR1cmUiLCJkIjoiRXFnQ0NwQUJDQkVZQWlwQWNGWWdlUEZEVGpTWTFtQWMxZExIaG45a1Vzd2tjUmpweEowbWttOU9EU21FUTI4aHVOcExBN1BIYmVCSG1uRTBYVTd2V29VQm5PcFdiK25qZ1JrN3ZESVBZMnhoZFdSbExYTnZibTVsZEMwMU9BQkNDSFJvYVc1cmFXNW5XaVJrWm1RME5USmtNQzAwTldFeUxUUTRZakF0T0RoaVpTMDVOV0V4TVdVM1lUUTFaakNvQVliU2lkVUdFZ3g4TGJBVkVOMi80bmtqd1BBYURMUHh1Z3pQaTJ6NHVJUkdTQ0l3RDFMc21INmt6ZElyUlpZZ1poTXRrV0NoQnRoNmJWMURDcXludWZlU3A0V2R2QlE4czVLcVhZMjI1aU12WXdsZ0trVm1WYTdsNGZXc3lKd2p2SFlqclAxQnVFZWM4L0FrTVFtOFZqNTNYV1FGWjVGajd0dWQvalI5TXZ6QmlsVVF2RnBqY1lRdzAwbmV2ZFBBbXppd2M5RUhEVHdzV2hnWUFRPT0iLCJoIjoiZU1OSnBvckdyOWk5R0JvNkMtbXF1TEs3WVVKWGtKSFBjUFY5M2dqOVdtayJ9"
+          }
+        ]
+      },
+      "finish_reason": "stop",
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 24,
+    "completion_tokens": 105,
+    "total_tokens": 129,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  }
+}

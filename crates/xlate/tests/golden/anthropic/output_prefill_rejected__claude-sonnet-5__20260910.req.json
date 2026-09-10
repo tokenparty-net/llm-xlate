@@ -1,0 +1,31 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": "What is 2+2?",
+      "role": "user"
+    },
+    {
+      "content": "{",
+      "role": "assistant"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "output_config": {
+    "format": {
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "answer"
+        ],
+        "type": "object"
+      },
+      "type": "json_schema"
+    }
+  }
+}

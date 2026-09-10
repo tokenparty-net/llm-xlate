@@ -1,0 +1,18 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/responses",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "input": "Explain why the sky is blue, step by step.",
+    "max_output_tokens": 256,
+    "model": "o4-mini",
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    }
+  }
+}

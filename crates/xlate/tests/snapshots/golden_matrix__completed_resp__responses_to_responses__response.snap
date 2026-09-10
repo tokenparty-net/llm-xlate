@@ -1,0 +1,61 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "object": "response",
+  "created_at": 1700000000,
+  "status": "completed",
+  "background": null,
+  "error": null,
+  "incomplete_details": null,
+  "instructions": null,
+  "max_output_tokens": null,
+  "metadata": {},
+  "model": "golden-model",
+  "output": [
+    {
+      "type": "reasoning",
+      "id": "rs_1",
+      "summary": [
+        {
+          "type": "summary_text",
+          "text": "Consider the tool."
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "fc_1",
+      "type": "function_call",
+      "status": "completed",
+      "call_id": "call_abc",
+      "name": "get_weather",
+      "arguments": "{\"city\":\"NYC\"}"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "previous_response_id": null,
+  "reasoning": null,
+  "service_tier": null,
+  "store": null,
+  "temperature": null,
+  "text": null,
+  "tool_choice": "auto",
+  "tools": [],
+  "top_p": null,
+  "truncation": "disabled",
+  "usage": {
+    "input_tokens": 50,
+    "input_tokens_details": {
+      "cached_tokens": 10
+    },
+    "output_tokens": 20,
+    "output_tokens_details": {
+      "reasoning_tokens": 12
+    },
+    "total_tokens": 70
+  },
+  "user": null
+}

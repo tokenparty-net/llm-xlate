@@ -1,0 +1,26 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-6-astra",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Say ok."
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 64,
+  "temperature": 0.5
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

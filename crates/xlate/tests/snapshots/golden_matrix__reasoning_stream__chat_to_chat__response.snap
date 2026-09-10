@@ -1,0 +1,37 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "object": "chat.completion",
+  "created": 1700000000,
+  "model": "golden-model",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "The answer is 391.",
+        "refusal": null,
+        "reasoning_content": "Let me think. 17*23=391.",
+        "reasoning_details": [
+          {
+            "type": "router.opaque",
+            "data": "rtr1.eyJ2IjoxLCJwIjoib3BlbmFpIiwibSI6ImdwdC01LjQiLCJrIjoiZW5jcnlwdGVkIiwiZCI6ImVuYy1zdHJlYW0tYmxvYiIsImgiOiJONm8yNHdSWXhsYWVYMW9QUjJIUUl6dGxVT2JPQ05jeHBLZHdEWmdVYjJRIn0"
+          }
+        ]
+      },
+      "finish_reason": "stop",
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 25,
+    "completion_tokens": 40,
+    "total_tokens": 65,
+    "completion_tokens_details": {
+      "reasoning_tokens": 30
+    }
+  }
+}

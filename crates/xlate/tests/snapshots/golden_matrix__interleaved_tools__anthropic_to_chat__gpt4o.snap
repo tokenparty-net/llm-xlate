@@ -1,0 +1,91 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Weather and time in NYC?"
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "Let me check the weather"
+        },
+        {
+          "type": "text",
+          "text": "and the time."
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "toolu_1",
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "arguments": "{\"city\":\"NYC\"}"
+          }
+        },
+        {
+          "id": "toolu_2",
+          "type": "function",
+          "function": {
+            "name": "get_time",
+            "arguments": "{\"tz\":\"ET\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "toolu_1",
+      "content": "72F sunny"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "toolu_2",
+      "content": "3pm ET"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get weather",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_time",
+        "description": "Get time",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "tz": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "max_completion_tokens": 1024
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

@@ -1,0 +1,14 @@
+{
+  "id": "resp_ws",
+  "object": "response",
+  "created_at": 1726000000,
+  "status": "completed",
+  "model": "gpt-5.4",
+  "output": [
+    {"id": "ws_1", "type": "web_search_call", "status": "completed", "action": {"type": "search", "query": "weather in NYC"}},
+    {"id": "msg_1", "type": "message", "role": "assistant", "status": "completed", "content": [
+      {"type": "output_text", "text": "It is sunny.", "annotations": []}
+    ]}
+  ],
+  "usage": {"input_tokens": 22, "output_tokens": 6, "total_tokens": 28}
+}

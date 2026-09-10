@@ -1,0 +1,38 @@
+{
+  "method": "POST",
+  "url": "https://api.anthropic.com/v1/messages",
+  "stream": true,
+  "headers": {
+    "anthropic-version": "2023-06-01",
+    "content-type": "application/json",
+    "x-api-key": "<redacted>"
+  },
+  "body": {
+    "max_tokens": 128,
+    "messages": [
+      {
+        "content": [
+          {
+            "citations": {
+              "enabled": true
+            },
+            "source": {
+              "data": "The Eiffel Tower is 330 metres tall and was completed in 1889.",
+              "media_type": "text/plain",
+              "type": "text"
+            },
+            "title": "facts.txt",
+            "type": "document"
+          },
+          {
+            "text": "How tall is the tower? Cite.",
+            "type": "text"
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model": "claude-sonnet-5",
+    "stream": true
+  }
+}

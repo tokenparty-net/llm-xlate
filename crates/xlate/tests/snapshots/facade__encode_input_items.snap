@@ -1,0 +1,23 @@
+---
+source: crates/xlate/tests/facade.rs
+expression: "serde_json::to_string_pretty(&v).unwrap()"
+---
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "msg_resp_stored_1_0",
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Q1"
+        }
+      ]
+    }
+  ],
+  "first_id": "msg_resp_stored_1_0",
+  "last_id": "msg_resp_stored_1_0",
+  "has_more": false
+}

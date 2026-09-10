@@ -1,0 +1,9 @@
+{
+  "input": "Prove there are infinitely many primes in two lines.",
+  "max_output_tokens": 256,
+  "model": "o4-mini",
+  "reasoning": {
+    "effort": "high"
+  },
+  "stream": true
+}

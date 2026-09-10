@@ -1,0 +1,29 @@
+{
+  "status": 400,
+  "headers": {
+    "anthropic-organization-id": "<redacted>",
+    "anthropic-workspace-id": "<redacted>",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d080efa0e7327-EWR",
+    "connection": "keep-alive",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:23:35 GMT",
+    "request-id": "req_011CeuSJDRrBQ7zD7FvRqeFa",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "traceresponse": "00-6212d5545eee69b16a32ef64a7c19563-b918c0e1b9cfc6d0-01",
+    "transfer-encoding": "chunked",
+    "vary": "Accept-Encoding",
+    "x-robots-tag": "none",
+    "x-should-retry": "false"
+  },
+  "body": {
+    "type": "error",
+    "error": {
+      "type": "invalid_request_error",
+      "message": "messages.2: role 'system' must follow a 'user' message or an 'assistant' message ending in a server tool result; the directive-only form (content: [] with output_config) is accepted at any position"
+    },
+    "request_id": "req_011CeuSJDRrBQ7zD7FvRqeFa"
+  }
+}

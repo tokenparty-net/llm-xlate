@@ -1,0 +1,14 @@
+{
+  "max_completion_tokens": 128,
+  "messages": [
+    {
+      "content": "Count one to five.",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini",
+  "stream_options": {
+    "include_usage": true
+  },
+  "stream": true
+}

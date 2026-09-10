@@ -1,0 +1,128 @@
+# Anthropic family 6 — structured output via output_config.format json_schema (plan §5.6).
+# llm-xlate assumption: plan §2 row 3 + §7.3 — output_config.format={type:json_schema,schema:...}; trailing
+# assistant prefill rejected on 4.6+. Which JSON-schema keywords are rejected drives the schema-sanitiser in
+# lowering. data/caps structured_output.
+
+[[probe]]
+id         = "ant.output.basic_object"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "output"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "A basic object schema with additionalProperties:false is accepted (200) and the reply is a single JSON text block matching it (plan §2 row 3)."
+expect     = { status = 200 }
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 128
+output_config = { format = { type = "json_schema", schema = { type = "object", properties = { city = { type = "string" }, population = { type = "integer" } }, required = ["city", "population"], additionalProperties = false } } }
+messages      = [ { role = "user", content = "Give the city Paris and a rough population." } ]
+
+[[probe]]
+id         = "ant.output.missing_additional_properties"
+protocol   = "anthropic"
+tags       = ["explore", "output", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "An object schema WITHOUT additionalProperties:false is rejected (400) — the API requires it to be closed."
+expect     = "any"
+notes      = "If accepted, the sanitiser need not inject additionalProperties:false. Record the exact requirement text."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 128
+output_config = { format = { type = "json_schema", schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"] } } }
+messages      = [ { role = "user", content = "Give a city." } ]
+
+[[probe]]
+id         = "ant.output.string_constraints"
+protocol   = "anthropic"
+tags       = ["explore", "output", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "minLength/maxLength/pattern on a string property are either honoured or rejected with named-keyword error text; documents which string constraints survive."
+expect     = "any"
+notes      = "Direct evidence for which keywords the schema-sanitiser must strip."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 128
+output_config = { format = { type = "json_schema", schema = { type = "object", properties = { code = { type = "string", minLength = 2, maxLength = 4, pattern = "^[A-Z]+$" } }, required = ["code"], additionalProperties = false } } }
+messages      = [ { role = "user", content = "Give a 3-letter uppercase country code." } ]
+
+[[probe]]
+id         = "ant.output.format_keyword"
+protocol   = "anthropic"
+tags       = ["explore", "output", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "The `format` keyword (e.g. format:\"email\"/\"date-time\") is either ignored or rejected; documents support."
+expect     = "any"
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 128
+output_config = { format = { type = "json_schema", schema = { type = "object", properties = { when = { type = "string", format = "date-time" }, who = { type = "string", format = "email" } }, required = ["when", "who"], additionalProperties = false } } }
+messages      = [ { role = "user", content = "Give a timestamp and an email." } ]
+
+[[probe]]
+id         = "ant.output.enum_and_nested"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "output"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "enum values and one level of nested object are accepted."
+expect     = { status = 200 }
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 128
+output_config = { format = { type = "json_schema", schema = { type = "object", properties = { status = { type = "string", enum = ["ok", "error"] }, meta = { type = "object", properties = { code = { type = "integer" } }, required = ["code"], additionalProperties = false } }, required = ["status", "meta"], additionalProperties = false } } }
+messages      = [ { role = "user", content = "Return status ok and meta.code 200." } ]
+
+[[probe]]
+id         = "ant.output.ref_and_defs"
+protocol   = "anthropic"
+tags       = ["explore", "output", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "$ref / $defs (schema references) are either resolved or rejected; documents whether the sanitiser must inline refs."
+expect     = "any"
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 128
+output_config = { format = { type = "json_schema", schema = { type = "object", properties = { home = { "$ref" = "#/$defs/addr" } }, required = ["home"], additionalProperties = false, "$defs" = { addr = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } } }
+messages      = [ { role = "user", content = "Return a home address with a city." } ]
+
+[[probe]]
+id         = "ant.output.with_tools"
+protocol   = "anthropic"
+tags       = ["explore", "output", "tools", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "output_config.format alongside tools is accepted; documents interaction (does forced JSON output coexist with tool_choice?)."
+expect     = "any"
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 128
+output_config = { format = { type = "json_schema", schema = { type = "object", properties = { answer = { type = "string" } }, required = ["answer"], additionalProperties = false } } }
+tools         = [ { name = "noop", description = "does nothing", input_schema = { type = "object", properties = {}, additionalProperties = false } } ]
+messages      = [ { role = "user", content = "Answer in JSON: what is 2+2?" } ]
+
+[[probe]]
+id         = "ant.output.prefill_rejected"
+protocol   = "anthropic"
+tags       = ["explore", "output", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A trailing assistant prefill message together with output_config.format is REJECTED (400) on 4.6+ (plan §2 row 3: no prefill-based fallbacks)."
+expect     = "any"
+notes      = "Confirms llm-xlate must not use prefill to force JSON on new Claude."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 128
+output_config = { format = { type = "json_schema", schema = { type = "object", properties = { answer = { type = "string" } }, required = ["answer"], additionalProperties = false } } }
+messages      = [ { role = "user", content = "What is 2+2?" }, { role = "assistant", content = "{" } ]

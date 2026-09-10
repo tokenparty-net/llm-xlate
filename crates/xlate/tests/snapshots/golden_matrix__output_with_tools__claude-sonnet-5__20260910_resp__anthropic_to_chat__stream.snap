@@ -1,0 +1,15 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: render_frames(&frames)
+---
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"reasoning_details":[{"type":"router.opaque","data":"rtr1.eyJ2IjoxLCJwIjoiYW50aHJvcGljIiwibSI6ImNsYXVkZS1zb25uZXQtNSIsImsiOiJzaWduYXR1cmUiLCJkIjoiRW8wQ0NwQUJDQkVZQWlwQUp5TDNmaVJxY2pSSTFPeHk5SzNCTUVIOG5vUmhtWU9MQ1MzUkIwMk9uWUJIcmtjTjRFOTdIbncrcE1ySVZxRUhjUDFkWkNkcHprMGNsV3NWN1pFSUdESVBZMnhoZFdSbExYTnZibTVsZEMwMU9BQkNDSFJvYVc1cmFXNW5XaVJrWm1RME5USmtNQzAwTldFeUxUUTRZakF0T0RoaVpTMDVOV0V4TVdVM1lUUTFaakNvQVovU2lkVUdFZ3dqL0VSYkh0UnJXYjhxWE04YURMelVjSjh3MXNGY3FCcWVkeUl3WFJRa1IwdWJxK3R0TEI4VWgyM0MvRHZaZ1g3MnM3cjBkbHI0YU1JaVhmeVJEaW1CbDNFd05wSjhGdHFSbHY5a0tpcUp1VndabFlvQ1d6U0h0aEJ3MElWaGZZM1VXditkS21haDFyeXhzSEU2NGtXMVJmTGJVdDIvK1ZVWUFRPT0iLCJoIjoiblUzdzZ4djkyRkxDRXZGU0xVMnVhRUxfYnlJUl9HSENmLTRfTjEzdGktSSJ9"}]},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"content":"{\"answer\": \"4\"}"},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[],"usage":{"prompt_tokens":617,"completion_tokens":23,"total_tokens":640,"prompt_tokens_details":{"cached_tokens":0}}}
+
+data: [DONE]

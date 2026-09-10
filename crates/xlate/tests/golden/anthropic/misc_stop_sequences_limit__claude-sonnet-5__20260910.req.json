@@ -1,0 +1,22 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Say ok.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "stop_sequences": [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j"
+  ]
+}

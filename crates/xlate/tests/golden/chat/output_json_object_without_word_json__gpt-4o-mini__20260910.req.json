@@ -1,0 +1,13 @@
+{
+  "max_completion_tokens": 64,
+  "messages": [
+    {
+      "content": "Give the capital of France as an object with a city field.",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini",
+  "response_format": {
+    "type": "json_object"
+  }
+}

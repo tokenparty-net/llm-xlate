@@ -1,0 +1,26 @@
+{
+  "protocol": "chat",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "Unrecognized request argument supplied: frobnicate"
+  },
+  "request_id": "req_11d6eb9e22a64108810ec2d3096ae909",
+  "rate_limit": {
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9966",
+    "x-ratelimit-remaining-tokens": "199996",
+    "x-ratelimit-reset-requests": "4m50.58s",
+    "x-ratelimit-reset-tokens": "1ms"
+  },
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

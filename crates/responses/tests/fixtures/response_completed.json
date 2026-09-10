@@ -1,0 +1,12 @@
+{
+  "id": "resp_abc123",
+  "object": "response",
+  "created_at": 1726000000,
+  "status": "completed",
+  "model": "gpt-5.4",
+  "output": [
+    {"id": "rs_1", "type": "reasoning", "summary": [{"type": "summary_text", "text": "Consider the tool."}], "encrypted_content": "ENCBLOB", "status": "completed"},
+    {"id": "fc_1", "type": "function_call", "call_id": "call_abc", "name": "get_weather", "arguments": "{\"city\":\"NYC\"}", "status": "completed"}
+  ],
+  "usage": {"input_tokens": 50, "input_tokens_details": {"cached_tokens": 10}, "output_tokens": 20, "output_tokens_details": {"reasoning_tokens": 12}, "total_tokens": 70}
+}

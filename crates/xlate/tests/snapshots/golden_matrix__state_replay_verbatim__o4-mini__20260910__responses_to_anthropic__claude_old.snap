@@ -1,0 +1,32 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "claude-3-5-sonnet-latest",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "What is 17*23? Think, then answer with just the number."
+        },
+        {
+          "type": "text",
+          "text": "Now multiply that result by 2."
+        }
+      ]
+    }
+  ],
+  "max_tokens": 256,
+  "cache_control": {
+    "type": "ephemeral"
+  }
+}
+--- headers ---
+anthropic-version: 2023-06-01
+upstream_streams: false
+--- degraded ---
+reasoning=dropped;reasoning=dropped;store=dropped;include=dropped

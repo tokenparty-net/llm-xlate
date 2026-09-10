@@ -1,0 +1,80 @@
+[server]
+listen = "127.0.0.1:8787"
+token = ""
+max_body_bytes = 33554432
+keepalive_secs = 15
+data_dir = "crates/testrouter/data"
+
+[trace]
+enabled = true
+file = "traces/{date}.jsonl"
+redact_media_over_bytes = 65536
+include_raw_sse = true
+
+[providers.anthropic]
+base_url = "https://api.anthropic.com"
+key_file = ".xlate_e2e_claude"
+
+[providers.openai]
+base_url = "https://api.openai.com"
+key_file = ".xlate_e2e_oai"
+
+# Local vLLM server exposing the Chat Completions surface (base URL without `/v1`; the router
+# appends `/v1/chat/completions`). Token in `.token_tf_api` at the repo root.
+[providers.compat]
+base_url = "http://127.0.0.1:3301"
+key_file = ".token_tf_api"
+models = ["deepseek-v4-flash", "kimi-k3"]
+
+# Models served by the vLLM instance are passed through by exact name.
+[[route]]
+match = "^(deepseek-v4-flash|kimi-k3)$"
+provider = "compat"
+upstream = "chat"
+
+[[route]]
+match = "^claude-"
+provider = "anthropic"
+upstream = "anthropic"
+
+[[route]]
+match = "^(gpt-6|o[0-9])"
+provider = "openai"
+upstream = "responses"
+
+[[route]]
+match = "^gpt-"
+provider = "openai"
+upstream = "responses"
+
+[[route]]
+match = "^chatgpt-|^compat/"
+provider = "openai"
+upstream = "chat"
+
+[aliases]
+"claude" = "claude-sonnet-5"
+"gpt" = "gpt-5.4"
+"default" = "claude-sonnet-5"
+
+# Capability overrides for the local vLLM backend (the generic `openai-compatible` registry
+# profile is deliberately conservative). vLLM serves DeepSeek/Kimi with tool calling, JSON
+# schema guided decoding, and `reasoning_content` on reasoning models.
+[backend_overrides."compat".tools]
+function_tools = true
+tool_choice = ["auto", "none", "required", "named"]
+parallel_control = true
+result_content = ["text"]
+
+[backend_overrides."compat".reasoning]
+mode = "none"
+exposure = "full_text"
+replay = "text_field"
+
+[backend_overrides."compat".output]
+format = "both"
+format_with_tools = true
+
+[backend_overrides."compat".sampling]
+top_k = { range = [0.0, 2147483647.0] }
+seed = { range = [0.0, 9007199254740991.0] }

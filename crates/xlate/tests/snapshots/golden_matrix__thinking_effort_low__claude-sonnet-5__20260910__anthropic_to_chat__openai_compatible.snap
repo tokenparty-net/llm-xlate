@@ -1,0 +1,19 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "llama-x",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is 12+30?"
+    }
+  ],
+  "max_tokens": 256
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---
+reasoning=dropped

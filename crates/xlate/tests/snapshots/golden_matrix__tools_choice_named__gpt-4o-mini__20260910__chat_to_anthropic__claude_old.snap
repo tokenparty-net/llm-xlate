@@ -1,0 +1,65 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "claude-3-5-sonnet-latest",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "What time is it in Tokyo?"
+        }
+      ]
+    }
+  ],
+  "max_tokens": 128,
+  "tools": [
+    {
+      "name": "get_weather",
+      "description": "Get weather.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_time",
+      "description": "Get time.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "tz": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tz"
+        ],
+        "type": "object"
+      }
+    }
+  ],
+  "tool_choice": {
+    "type": "tool",
+    "name": "get_time"
+  },
+  "cache_control": {
+    "type": "ephemeral"
+  }
+}
+--- headers ---
+anthropic-version: 2023-06-01
+upstream_streams: false
+--- degraded ---

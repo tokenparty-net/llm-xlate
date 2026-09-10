@@ -1,0 +1,23 @@
+{
+  "label": "ant.thinking.effort_max_across_models/claude-haiku-4-5-20251001",
+  "protocol": "anthropic",
+  "model": "claude-haiku-4-5-20251001",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "4 path(s) differ (normalizations): ~/messages/0/content, -/output_config, +/thinking/budget_tokens, ~/thinking/type"
+    },
+    {
+      "name": "error_decode",
+      "pass": true,
+      "detail": "kind=invalid_request status=400"
+    }
+  ]
+}

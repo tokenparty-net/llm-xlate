@@ -1,0 +1,23 @@
+{
+  "model": "claude-opus-5",
+  "max_tokens": 2048,
+  "system": [
+    {"type": "text", "text": "You are a helpful assistant.", "cache_control": {"type": "ephemeral"}}
+  ],
+  "thinking": {"type": "adaptive"},
+  "output_config": {"effort": "high"},
+  "tools": [
+    {"name": "get_weather", "description": "Get weather", "input_schema": {"type": "object", "properties": {"city": {"type": "string"}}}}
+  ],
+  "tool_choice": {"type": "auto"},
+  "messages": [
+    {"role": "user", "content": "Weather in NYC?"},
+    {"role": "assistant", "content": [
+      {"type": "thinking", "thinking": "The user wants weather.", "signature": "SIG-ABC=="},
+      {"type": "tool_use", "id": "toolu_1", "name": "get_weather", "input": {"city": "NYC"}}
+    ]},
+    {"role": "user", "content": [
+      {"type": "tool_result", "tool_use_id": "toolu_1", "content": "72F sunny"}
+    ]}
+  ]
+}

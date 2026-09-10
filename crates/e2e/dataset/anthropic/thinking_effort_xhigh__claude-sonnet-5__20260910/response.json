@@ -1,0 +1,69 @@
+{
+  "status": 200,
+  "headers": {
+    "anthropic-organization-id": "<redacted>",
+    "anthropic-ratelimit-input-tokens-limit": "5000000",
+    "anthropic-ratelimit-input-tokens-remaining": "5000000",
+    "anthropic-ratelimit-input-tokens-reset": "2026-09-10T08:23:21Z",
+    "anthropic-ratelimit-output-tokens-limit": "1000000",
+    "anthropic-ratelimit-output-tokens-remaining": "1000000",
+    "anthropic-ratelimit-output-tokens-reset": "2026-09-10T08:23:22Z",
+    "anthropic-ratelimit-requests-limit": "5000",
+    "anthropic-ratelimit-requests-remaining": "4999",
+    "anthropic-ratelimit-requests-reset": "2026-09-10T08:23:20Z",
+    "anthropic-ratelimit-tokens-limit": "6000000",
+    "anthropic-ratelimit-tokens-remaining": "6000000",
+    "anthropic-ratelimit-tokens-reset": "2026-09-10T08:23:21Z",
+    "anthropic-workspace-id": "<redacted>",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d07b2b9dc7327-EWR",
+    "connection": "keep-alive",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:23:22 GMT",
+    "request-id": "req_011CeuSH8JVw9f5sAXsn7svB",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "traceresponse": "00-54d17060712c1352b63f783248c3cdf3-cf3d9fce44b34b34-01",
+    "transfer-encoding": "chunked",
+    "vary": "Accept-Encoding",
+    "x-robots-tag": "none"
+  },
+  "elapsed_ms": 1754,
+  "body": {
+    "model": "claude-sonnet-5",
+    "id": "msg_011CeuSH8sE738KLnkV4WKsH",
+    "type": "message",
+    "role": "assistant",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "",
+        "signature": "Et8CCpABCBEYAipAiAKcB7MhEm0tiAC5qk9kW+1A3oi5aPW+LnMtlDLAclGB6O4VOQnQgn1ruasqGi22mIKcWpTK6hnQafeAHYvEqDIPY2xhdWRlLXNvbm5ldC01OABCCHRoaW5raW5nWiRkZmQ0NTJkMC00NWEyLTQ4YjAtODhiZS05NWExMWU3YTQ1ZjCoAfrRidUGEgyWhqRBNpVfrpkueFYaDNRYTFc6WLOgk3Q+ESIwnGtF+UHC8ySe5WS95Eq8iRvkbLxJNWdj6vi9wuWPo+GGGKcr2R5dU62/mMTILlenKnwxqVIGnVF//Way9DGRrtDU1ZVYeGYmqqX5qz1pX3wI70V910liYFQfoOX+ASrVHbcYcw+70SVvQWktj+9QX7MgbVPJpV5jNA7AjNYzxWiQlYbMj6Z6rF4kfC5i4PQJkYOFLKIgoA+qeg5qIpAdVgY4TW7WHE9XbYcVvX7QGAE="
+      },
+      {
+        "type": "text",
+        "text": "The 7th prime number is **17**.\n\nHere's the sequence for reference:\n1st: 2\n2nd: 3\n3rd: 5\n4th: 7\n5th: 11\n6th: 13\n7th: **17**"
+      }
+    ],
+    "container": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "stop_details": null,
+    "usage": {
+      "input_tokens": 15,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 150,
+      "output_tokens_details": {
+        "thinking_tokens": 78
+      },
+      "service_tier": "standard",
+      "inference_geo": "global"
+    }
+  }
+}

@@ -1,0 +1,127 @@
+# Chat family 19 — sampling & metadata fields (plan §5.19).
+# n, logprobs/top_logprobs, seed + system_fingerprint, service_tier, prompt_cache_key, safety_identifier,
+# store, metadata, user. llm-xlate assumption: §7.6 sampling passthrough on OpenAI; these are echo/observe.
+
+[[probe]]
+id         = "chat.meta.n_two"
+protocol   = "chat"
+tags       = ["explore", "dataset", "sampling"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "n:2 returns two choices (indices 0 and 1); the aggregator/decoder must handle multiple choices."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+n                     = 2
+messages              = [ { role = "user", content = "Give a random fruit." } ]
+
+[[probe]]
+id         = "chat.meta.logprobs"
+protocol   = "chat"
+tags       = ["explore", "dataset", "sampling"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "logprobs:true + top_logprobs:3 populates choices[].logprobs.content[].top_logprobs."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 16
+logprobs              = true
+top_logprobs          = 3
+messages              = [ { role = "user", content = "Say the single word yes." } ]
+
+[[probe]]
+id         = "chat.meta.seed_fingerprint"
+protocol   = "chat"
+tags       = ["explore", "sampling"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "seed is accepted and the response carries system_fingerprint (determinism handle)."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+seed                  = 42
+messages              = [ { role = "user", content = "Give a random color." } ]
+
+[[probe]]
+id         = "chat.meta.service_tier"
+protocol   = "chat"
+tags       = ["explore", "sampling"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "service_tier values (auto/default/flex) are accepted and echoed in the response."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+service_tier          = "auto"
+messages              = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "chat.meta.cache_and_safety_keys"
+protocol   = "chat"
+tags       = ["explore", "sampling"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "prompt_cache_key and safety_identifier are accepted (newer routing/cache fields)."
+expect     = "any"
+notes      = "safety_identifier replaces the deprecated per-user field on some accounts; documents acceptance."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+prompt_cache_key      = "e2e-cache-$RUN_ID"
+safety_identifier     = "e2e-user-$RUN_ID"
+messages              = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "chat.meta.store_and_metadata"
+protocol   = "chat"
+tags       = ["explore", "sampling"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "store:true + metadata{} are accepted (chat completions storage)."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+store                 = true
+metadata              = { run = "$RUN_ID" }
+messages              = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "chat.meta.user_field"
+protocol   = "chat"
+tags       = ["explore", "sampling"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "The legacy `user` field is accepted (possibly with a deprecation notice vs safety_identifier)."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 32
+user                  = "e2e-$RUN_ID"
+messages              = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "chat.meta.logit_bias"
+protocol   = "chat"
+tags       = ["explore", "sampling"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "logit_bias is accepted on chat models and biases generation."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 16
+logit_bias            = { "1734" = -100 }
+messages              = [ { role = "user", content = "Say the word yes." } ]

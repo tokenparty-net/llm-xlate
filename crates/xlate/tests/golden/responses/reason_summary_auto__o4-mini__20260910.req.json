@@ -1,0 +1,9 @@
+{
+  "input": "What is 17*23? Think, then answer.",
+  "max_output_tokens": 256,
+  "model": "o4-mini",
+  "reasoning": {
+    "effort": "medium",
+    "summary": "auto"
+  }
+}

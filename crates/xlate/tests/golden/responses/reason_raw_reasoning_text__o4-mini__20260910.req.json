@@ -1,0 +1,12 @@
+{
+  "include": [
+    "reasoning.encrypted_content"
+  ],
+  "input": "What is 9*9?",
+  "max_output_tokens": 256,
+  "model": "o4-mini",
+  "reasoning": {
+    "effort": "medium",
+    "summary": "auto"
+  }
+}

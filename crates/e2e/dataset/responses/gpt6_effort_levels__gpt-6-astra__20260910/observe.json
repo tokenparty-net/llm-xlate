@@ -1,0 +1,31 @@
+{
+  "protocol": "responses",
+  "stream": false,
+  "status": 200,
+  "verdict": "na",
+  "request_id": "req_280c2c0353214841899fff0a5e4c719f",
+  "stop_reason": "incomplete:max_output_tokens",
+  "usage": {
+    "input_tokens": 18,
+    "input_tokens_details.cache_write_tokens": 0,
+    "input_tokens_details.cached_tokens": 0,
+    "output_tokens": 256,
+    "output_tokens_details.reasoning_tokens": 172,
+    "total_tokens": 274
+  },
+  "type_sequence": [
+    "reasoning",
+    "message"
+  ],
+  "echoed_request_fields": [
+    "max_output_tokens",
+    "model"
+  ],
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": true,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

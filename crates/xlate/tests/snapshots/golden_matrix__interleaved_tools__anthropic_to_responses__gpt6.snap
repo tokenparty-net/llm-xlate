@@ -1,0 +1,97 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-6-astra",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Weather and time in NYC?"
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "Let me check the weather",
+          "annotations": []
+        }
+      ]
+    },
+    {
+      "type": "function_call",
+      "call_id": "toolu_1",
+      "name": "get_weather",
+      "arguments": "{\"city\":\"NYC\"}"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "and the time.",
+          "annotations": []
+        }
+      ]
+    },
+    {
+      "type": "function_call",
+      "call_id": "toolu_2",
+      "name": "get_time",
+      "arguments": "{\"tz\":\"ET\"}"
+    },
+    {
+      "type": "function_call_output",
+      "call_id": "toolu_1",
+      "output": "72F sunny"
+    },
+    {
+      "type": "function_call_output",
+      "call_id": "toolu_2",
+      "output": "3pm ET"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "name": "get_weather",
+      "description": "Get weather",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "name": "get_time",
+      "description": "Get time",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tz": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "max_output_tokens": 1024
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---

@@ -1,0 +1,33 @@
+[package]
+name = "llm-xlate-e2e"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "llm-xlate: live-API exploration and capture utility (operator-driven, not part of cargo test --workspace)"
+
+[[bin]]
+name = "llm-xlate-e2e"
+path = "src/main.rs"
+
+[dependencies]
+llm-xlate-core = { workspace = true }
+llm-xlate = { workspace = true }
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+bytes = { workspace = true }
+base64 = { workspace = true }
+sha2 = { workspace = true }
+glob = { workspace = true }
+
+tokio = { workspace = true }
+reqwest = { workspace = true }
+clap = { workspace = true }
+anyhow = { workspace = true }
+chrono = { workspace = true }
+futures = { workspace = true }
+
+[dev-dependencies]
+pretty_assertions = { workspace = true }

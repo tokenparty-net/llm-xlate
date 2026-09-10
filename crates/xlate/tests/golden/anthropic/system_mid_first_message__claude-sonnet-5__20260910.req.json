@@ -1,0 +1,14 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Answer in French.",
+      "role": "system"
+    },
+    {
+      "content": "How are you?",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5"
+}

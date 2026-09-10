@@ -1,0 +1,180 @@
+# Anthropic family 7 — tools: tool_choice, parallel, tool_result ordering (plan §5.7).
+# llm-xlate assumption: §7.4 tool lowering + regroup rules for tool_result blocks + invariants (tool_use ids
+# preserved). data/caps tools capability.
+
+[[probe]]
+id         = "ant.tools.choice_auto"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "tools"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "tool_choice:{type:auto} lets the model choose; a clearly tool-shaped prompt yields a tool_use block, stop_reason=tool_use."
+expect     = { status = 200 }
+
+[probe.body]
+model       = "$MODEL"
+max_tokens  = 128
+tool_choice = { type = "auto" }
+tools       = [ { name = "get_weather", description = "Get weather for a city.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages    = [ { role = "user", content = "What is the weather in Paris? Use the tool." } ]
+
+[[probe]]
+id         = "ant.tools.choice_any"
+protocol   = "anthropic"
+tags       = ["explore", "tools"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "tool_choice:{type:any} forces some tool call (never plain text)."
+expect     = { status = 200 }
+
+[probe.body]
+model       = "$MODEL"
+max_tokens  = 128
+tool_choice = { type = "any" }
+tools       = [ { name = "get_weather", description = "Get weather for a city.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages    = [ { role = "user", content = "Hello there." } ]
+
+[[probe]]
+id         = "ant.tools.choice_specific"
+protocol   = "anthropic"
+tags       = ["explore", "tools"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "tool_choice:{type:tool,name:X} forces exactly tool X."
+expect     = { status = 200 }
+
+[probe.body]
+model       = "$MODEL"
+max_tokens  = 128
+tool_choice = { type = "tool", name = "get_weather" }
+tools       = [ { name = "get_weather", description = "Get weather.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } }, { name = "get_time", description = "Get time.", input_schema = { type = "object", properties = { tz = { type = "string" } }, required = ["tz"], additionalProperties = false } } ]
+messages    = [ { role = "user", content = "What time is it in Tokyo?" } ]
+
+[[probe]]
+id         = "ant.tools.choice_none"
+protocol   = "anthropic"
+tags       = ["explore", "tools"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "tool_choice:{type:none} forbids tool calls even when tools are present (plain text only)."
+expect     = { status = 200 }
+
+[probe.body]
+model       = "$MODEL"
+max_tokens  = 128
+tool_choice = { type = "none" }
+tools       = [ { name = "get_weather", description = "Get weather.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages    = [ { role = "user", content = "What is the weather in Paris?" } ]
+
+[[probe]]
+id         = "ant.tools.disable_parallel"
+protocol   = "anthropic"
+tags       = ["explore", "tools"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "tool_choice with disable_parallel_tool_use:true yields at most one tool_use even when the prompt invites several."
+expect     = { status = 200 }
+
+[probe.body]
+model       = "$MODEL"
+max_tokens  = 128
+tool_choice = { type = "any", disable_parallel_tool_use = true }
+tools       = [ { name = "get_weather", description = "Get weather.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages    = [ { role = "user", content = "Weather in Paris, London and Rome please." } ]
+
+[[probe]]
+id         = "ant.tools.parallel_capture"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "tools"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "A multi-city prompt with parallel enabled yields multiple tool_use blocks in one turn (dataset for parallel-tool aggregation)."
+expect     = { status = 200 }
+notes      = "Capture of the parallel-tool shape (stream + non-stream)."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 256
+tools      = [ { name = "get_weather", description = "Get weather.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages   = [ { role = "user", content = "Get the weather for Paris and for Tokyo using the tool, one call per city." } ]
+
+[[probe]]
+id         = "ant.tools.result_not_first"
+protocol   = "anthropic"
+tags       = ["explore", "tools", "regroup", "errors"]
+models     = "anthropic_new"
+stream     = false
+after      = ["ant.tools.parallel_capture"]
+hypothesis = "A tool_result that is NOT the first block of the user message (text precedes it) — accepted or 400? Documents the ordering rule for tool_result placement."
+expect     = "any"
+notes      = "References a real tool_use id from ant.tools.parallel_capture (content[0] assumed tool_use)."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 128
+tools      = [ { name = "get_weather", description = "Get weather.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages   = [ { role = "user", content = "Get the weather for Paris and for Tokyo using the tool, one call per city." }, { role = "assistant", content = [ "${ref:ant.tools.parallel_capture:/content/0}" ] }, { role = "user", content = [ { type = "text", text = "Here is the result:" }, { type = "tool_result", tool_use_id = "${ref:ant.tools.parallel_capture:/content/0/id}", content = "18C" } ] } ]
+
+[[probe]]
+id         = "ant.tools.result_missing"
+protocol   = "anthropic"
+tags       = ["explore", "tools", "errors"]
+models     = "anthropic_new"
+stream     = false
+after      = ["ant.tools.parallel_capture"]
+hypothesis = "Replaying an assistant turn with a tool_use but providing NO tool_result in the following user turn is a 400 (every tool_use needs a result)."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 128
+tools      = [ { name = "get_weather", description = "Get weather.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages   = [ { role = "user", content = "Get the weather for Paris and for Tokyo using the tool, one call per city." }, { role = "assistant", content = "${ref:ant.tools.parallel_capture:/content}" }, { role = "user", content = "thanks" } ]
+
+[[probe]]
+id         = "ant.tools.result_image"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "tools", "media"]
+models     = "anthropic_new"
+stream     = false
+after      = ["ant.tools.parallel_capture"]
+hypothesis = "A tool_result whose content is an image block (base64 png) is accepted — tool results may carry media."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 128
+tools      = [ { name = "get_weather", description = "Get weather.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages   = [ { role = "user", content = "Get the weather for Paris and for Tokyo using the tool, one call per city." }, { role = "assistant", content = [ "${ref:ant.tools.parallel_capture:/content/0}" ] }, { role = "user", content = [ { type = "tool_result", tool_use_id = "${ref:ant.tools.parallel_capture:/content/0/id}", content = [ { type = "image", source = { type = "base64", media_type = "image/png", data = "$ASSET:png_1px" } } ] } ] } ]
+
+[[probe]]
+id         = "ant.tools.result_is_error"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "tools"]
+models     = "anthropic_new"
+stream     = false
+after      = ["ant.tools.parallel_capture"]
+hypothesis = "A tool_result with is_error:true is accepted and the model treats it as a failed call."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 128
+tools      = [ { name = "get_weather", description = "Get weather.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages   = [ { role = "user", content = "Get the weather for Paris and for Tokyo using the tool, one call per city." }, { role = "assistant", content = [ "${ref:ant.tools.parallel_capture:/content/0}" ] }, { role = "user", content = [ { type = "tool_result", tool_use_id = "${ref:ant.tools.parallel_capture:/content/0/id}", is_error = true, content = "weather service unavailable" } ] } ]
+
+[[probe]]
+id         = "ant.tools.strict_field"
+protocol   = "anthropic"
+tags       = ["explore", "tools"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A `strict` field on an Anthropic tool definition is accepted or ignored (Anthropic has no documented strict flag); documents whether the field leaks through."
+expect     = "any"
+notes      = "Cross-protocol carry: OAI tools carry strict; this checks whether Anthropic tolerates the field."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 128
+tools      = [ { name = "get_weather", description = "Get weather.", strict = true, input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages   = [ { role = "user", content = "Weather in Paris? Use the tool." } ]

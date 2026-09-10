@@ -1,0 +1,38 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": "Answer in JSON: what is 2+2?",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "output_config": {
+    "format": {
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "answer"
+        ],
+        "type": "object"
+      },
+      "type": "json_schema"
+    }
+  },
+  "tools": [
+    {
+      "description": "does nothing",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "noop"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "llama-x",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Padded system for caching: lorem ipsum dolor sit amet consectetur adipiscing elit, repeated for size, repeated for size, repeated for size."
+    },
+    {
+      "role": "user",
+      "content": "Reply with the single word: ok."
+    }
+  ],
+  "max_tokens": 64
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

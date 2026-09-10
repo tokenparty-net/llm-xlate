@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=invalid_request status=400 retryable=false param=temperature provider_type=invalid_request_error retry_after=- upstream_request_id=req_edc6fffb67054cf48b6f42e2665dbcea
+message: Invalid 'temperature': decimal above maximum value. Expected a value <= 2, but got 3.0 instead.
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_edc6fffb67054cf48b6f42e2665dbcea
+body:
+{
+  "error": {
+    "message": "Invalid 'temperature': decimal above maximum value. Expected a value <= 2, but got 3.0 instead.",
+    "type": "invalid_request_error",
+    "param": "temperature",
+    "code": "decimal_above_max_value"
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"Invalid 'temperature': decimal above maximum value. Expected a value <= 2, but got 3.0 instead.","type":"invalid_request_error","param":"temperature","code":"decimal_above_max_value"}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_edc6fffb67054cf48b6f42e2665dbcea
+body:
+{
+  "error": {
+    "message": "Invalid 'temperature': decimal above maximum value. Expected a value <= 2, but got 3.0 instead.",
+    "type": "invalid_request_error",
+    "param": "temperature",
+    "code": "decimal_above_max_value"
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":"decimal_above_max_value","message":"Invalid 'temperature': decimal above maximum value. Expected a value <= 2, but got 3.0 instead.","param":"temperature","sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+  x-router-upstream-request-id: req_edc6fffb67054cf48b6f42e2665dbcea
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "Invalid 'temperature': decimal above maximum value. Expected a value <= 2, but got 3.0 instead."
+  },
+  "request_id": "req_edc6fffb67054cf48b6f42e2665dbcea"
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"Invalid 'temperature': decimal above maximum value. Expected a value <= 2, but got 3.0 instead."},"request_id":"req_edc6fffb67054cf48b6f42e2665dbcea"}

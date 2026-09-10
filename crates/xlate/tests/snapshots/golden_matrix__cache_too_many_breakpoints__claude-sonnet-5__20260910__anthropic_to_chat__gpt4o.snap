@@ -1,0 +1,39 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "system",
+      "content": "sys breakpoint padded padded padded padded padded padded padded"
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "b1 padded padded padded padded"
+        },
+        {
+          "type": "text",
+          "text": "b2 padded padded padded padded"
+        },
+        {
+          "type": "text",
+          "text": "b3 padded padded padded padded"
+        },
+        {
+          "type": "text",
+          "text": "b4 padded padded padded padded"
+        }
+      ]
+    }
+  ],
+  "max_completion_tokens": 64
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

@@ -1,0 +1,75 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-6-astra",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "What is the weather in Paris and Tokyo?"
+        }
+      ]
+    },
+    {
+      "type": "function_call",
+      "call_id": "call_a",
+      "name": "get_weather",
+      "arguments": "{\"city\":\"Paris\"}"
+    },
+    {
+      "type": "function_call",
+      "call_id": "call_b",
+      "name": "get_weather",
+      "arguments": "{\"city\":\"Tokyo\"}"
+    },
+    {
+      "type": "function_call_output",
+      "call_id": "call_a",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Paris: sunny, 21C"
+        },
+        {
+          "type": "input_text",
+          "text": "[tool result attachment for call call_a]"
+        }
+      ]
+    },
+    {
+      "type": "function_call_output",
+      "call_id": "call_b",
+      "output": "Tokyo: rainy, 18C"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "name": "get_weather",
+      "description": "Get the weather for a city",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ]
+      }
+    }
+  ],
+  "parallel_tool_calls": true
+}
+--- headers ---
+content-type: application/json
+upstream_streams: false
+--- degraded ---
+tool_result.image=folded

@@ -1,0 +1,14 @@
+{
+  "cache_control": {
+    "type": "ephemeral"
+  },
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Reply with the single word: ok.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-haiku-4-5-20251001",
+  "system": "Padded system for caching: quick brown fox jumps over the lazy dog, repeated for size, repeated for size, repeated for size, repeated for size."
+}

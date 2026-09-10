@@ -1,0 +1,118 @@
+# Anthropic family 5 — thinking replay in tool loops (plan §5.5).
+# llm-xlate assumption: plan §2 row 5 + invariants — thinking blocks must be replayed VERBATIM
+# (signature-checked) in the last assistant turn during tool loops; redacted_thinking.data is opaque and
+# must be echoed back. These are "echo unchanged" carrier slots. §7.2 / §7.4.
+#
+# Chain: ant.thinking.tools_base captures a thinking+tool_use turn; the replay probes reference its blocks
+# via ${ref:...} and feed a tool_result, in four variants (verbatim, removed, tampered signature, disabled).
+
+[[probe]]
+id         = "ant.thinking.tools_base"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "reasoning", "tools"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "With thinking enabled and a tool available, the model emits [thinking, tool_use] and stop_reason=tool_use; the thinking block carries a signature (plan §2 row 5)."
+expect     = { status = 200 }
+notes      = "Base capture for the replay chain. content[0] expected to be the thinking block, content[1] the tool_use."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+thinking      = { type = "adaptive" }
+output_config = { effort = "medium" }
+tool_choice   = { type = "any" }
+tools         = [ { name = "get_weather", description = "Get the current weather for a city.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"] } } ]
+messages      = [ { role = "user", content = "Use the tool to get the weather in Paris." } ]
+
+[[probe]]
+id         = "ant.thinking.replay_verbatim"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "reasoning", "tools"]
+models     = "anthropic_new"
+stream     = false
+after      = ["ant.thinking.tools_base"]
+hypothesis = "Replaying the assistant turn VERBATIM (thinking block with its signature + tool_use) followed by a tool_result is accepted (200): the signature check passes."
+expect     = { status = 200 }
+notes      = "Whole-ref of content[0] and content[1] preserves the objects incl. signature; the tool_use_id is taken from the captured block."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+thinking      = { type = "adaptive" }
+output_config = { effort = "medium" }
+tools         = [ { name = "get_weather", description = "Get the current weather for a city.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"] } } ]
+messages      = [ { role = "user", content = "Use the tool to get the weather in Paris." }, { role = "assistant", content = [ "${ref:ant.thinking.tools_base:/content/0}", "${ref:ant.thinking.tools_base:/content/1}" ] }, { role = "user", content = [ { type = "tool_result", tool_use_id = "${ref:ant.thinking.tools_base:/content/1/id}", content = "18C and sunny" } ] } ]
+
+[[probe]]
+id         = "ant.thinking.replay_removed"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning", "tools", "errors"]
+models     = "anthropic_new"
+stream     = false
+after      = ["ant.thinking.tools_base"]
+hypothesis = "Replaying the tool_use WITHOUT the preceding thinking block is rejected (400) when thinking is enabled — the thinking block is mandatory in the last assistant turn during a tool loop (plan §2 row 5)."
+expect     = "any"
+notes      = "If it is accepted, that weakens the 'must replay verbatim' invariant; record either way."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+thinking      = { type = "adaptive" }
+output_config = { effort = "medium" }
+tools         = [ { name = "get_weather", description = "Get the current weather for a city.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"] } } ]
+messages      = [ { role = "user", content = "Use the tool to get the weather in Paris." }, { role = "assistant", content = [ "${ref:ant.thinking.tools_base:/content/1}" ] }, { role = "user", content = [ { type = "tool_result", tool_use_id = "${ref:ant.thinking.tools_base:/content/1/id}", content = "18C and sunny" } ] } ]
+
+[[probe]]
+id         = "ant.thinking.replay_tampered_signature"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning", "tools", "errors"]
+models     = "anthropic_new"
+stream     = false
+after      = ["ant.thinking.tools_base"]
+hypothesis = "A tampered signature on the replayed thinking block -> 400 invalid_request_error (signature check fails)."
+expect     = "any"
+notes      = "The signature is rebuilt textually with a corrupting prefix so it no longer verifies; thinking text is taken verbatim from the capture."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+thinking      = { type = "adaptive" }
+output_config = { effort = "medium" }
+tools         = [ { name = "get_weather", description = "Get the current weather for a city.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"] } } ]
+messages      = [ { role = "user", content = "Use the tool to get the weather in Paris." }, { role = "assistant", content = [ { type = "thinking", thinking = "${ref:ant.thinking.tools_base:/content/0/thinking}", signature = "TAMPERED${ref:ant.thinking.tools_base:/content/0/signature}" }, "${ref:ant.thinking.tools_base:/content/1}" ] }, { role = "user", content = [ { type = "tool_result", tool_use_id = "${ref:ant.thinking.tools_base:/content/1/id}", content = "18C and sunny" } ] } ]
+
+[[probe]]
+id         = "ant.thinking.replay_disabled_on_replay"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning", "tools"]
+models     = "anthropic_new"
+stream     = false
+after      = ["ant.thinking.tools_base"]
+hypothesis = "Replaying a thinking block while the replay request sets thinking:{type:disabled} — either accepted (block ignored) or 400. Documents whether disabling thinking waives the verbatim-replay requirement."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 256
+thinking   = { type = "disabled" }
+tools      = [ { name = "get_weather", description = "Get the current weather for a city.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"] } } ]
+messages   = [ { role = "user", content = "Use the tool to get the weather in Paris." }, { role = "assistant", content = [ "${ref:ant.thinking.tools_base:/content/0}", "${ref:ant.thinking.tools_base:/content/1}" ] }, { role = "user", content = [ { type = "tool_result", tool_use_id = "${ref:ant.thinking.tools_base:/content/1/id}", content = "18C and sunny" } ] } ]
+
+[[probe]]
+id         = "ant.thinking.redacted_trigger"
+protocol   = "anthropic"
+tags       = ["explore", "reasoning"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "The documented magic test string triggers a redacted_thinking block whose `.data` is opaque (plan §2 row 5)."
+expect     = { status = 200 }
+requires   = ["manual"]
+notes      = "Uses the official redacted-thinking test trigger phrase. Tagged manual because the trigger's availability is account/version dependent; the operator confirms before running."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+thinking      = { type = "adaptive" }
+output_config = { effort = "medium" }
+messages      = [ { role = "user", content = "ANTHROPIC_MAGIC_STRING_TRIGGER_REDACTED_THINKING_46C5C7AA-2D37-93ED-F7B4-A9D2AE1234567890 please think about this." } ]

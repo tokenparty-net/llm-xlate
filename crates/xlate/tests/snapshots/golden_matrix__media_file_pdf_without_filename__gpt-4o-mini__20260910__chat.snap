@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=invalid_request status=400 retryable=false param=messages[0].content[1].file.file_id provider_type=invalid_request_error retry_after=- upstream_request_id=req_6c24ad4a81c349cd9e7d0c0786acad77
+message: Missing required parameter: 'messages[0].content[1].file.file_id'.
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_6c24ad4a81c349cd9e7d0c0786acad77
+body:
+{
+  "error": {
+    "message": "Missing required parameter: 'messages[0].content[1].file.file_id'.",
+    "type": "invalid_request_error",
+    "param": "messages[0].content[1].file.file_id",
+    "code": "missing_required_parameter"
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"Missing required parameter: 'messages[0].content[1].file.file_id'.","type":"invalid_request_error","param":"messages[0].content[1].file.file_id","code":"missing_required_parameter"}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_6c24ad4a81c349cd9e7d0c0786acad77
+body:
+{
+  "error": {
+    "message": "Missing required parameter: 'messages[0].content[1].file.file_id'.",
+    "type": "invalid_request_error",
+    "param": "messages[0].content[1].file.file_id",
+    "code": "missing_required_parameter"
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":"missing_required_parameter","message":"Missing required parameter: 'messages[0].content[1].file.file_id'.","param":"messages[0].content[1].file.file_id","sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+  x-router-upstream-request-id: req_6c24ad4a81c349cd9e7d0c0786acad77
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "Missing required parameter: 'messages[0].content[1].file.file_id'."
+  },
+  "request_id": "req_6c24ad4a81c349cd9e7d0c0786acad77"
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"Missing required parameter: 'messages[0].content[1].file.file_id'."},"request_id":"req_6c24ad4a81c349cd9e7d0c0786acad77"}

@@ -1,0 +1,50 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "object": "chat.completion",
+  "created": 1700000000,
+  "model": "golden-model",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "refusal": null,
+        "tool_calls": [
+          {
+            "id": "call_abc",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": "{\"city\":\"NYC\"}"
+            }
+          }
+        ],
+        "reasoning_content": "Consider the tool.",
+        "reasoning_details": [
+          {
+            "type": "router.opaque",
+            "data": "rtr1.eyJ2IjoxLCJwIjoib3BlbmFpIiwibSI6ImdwdC01LjQiLCJrIjoiZW5jcnlwdGVkIiwiZCI6IkVOQ0JMT0IiLCJoIjoiT3lSWU13T0wxa3cxdHJfU2tRRTRoWk5ya05KeXAwaFNSUnR0Um1SRnBoOCJ9"
+          }
+        ]
+      },
+      "finish_reason": "tool_calls",
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 50,
+    "completion_tokens": 20,
+    "total_tokens": 70,
+    "prompt_tokens_details": {
+      "cached_tokens": 10
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 12
+    }
+  }
+}

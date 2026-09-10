@@ -1,0 +1,11 @@
+{
+  "frobnicate": true,
+  "max_completion_tokens": 32,
+  "messages": [
+    {
+      "content": "Say ok.",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini"
+}

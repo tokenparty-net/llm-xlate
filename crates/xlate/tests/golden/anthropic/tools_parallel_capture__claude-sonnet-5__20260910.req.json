@@ -1,0 +1,29 @@
+{
+  "max_tokens": 256,
+  "messages": [
+    {
+      "content": "Get the weather for Paris and for Tokyo using the tool, one call per city.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "tools": [
+    {
+      "description": "Get weather.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "type": "object"
+      },
+      "name": "get_weather"
+    }
+  ],
+  "stream": true
+}

@@ -1,0 +1,6 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+ERROR kind=unsupported status=400 param=response_format
+message: the backend does not support json_schema structured output

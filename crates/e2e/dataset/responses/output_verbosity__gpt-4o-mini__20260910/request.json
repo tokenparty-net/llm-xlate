@@ -1,0 +1,17 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/responses",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "input": "Explain photosynthesis.",
+    "max_output_tokens": 128,
+    "model": "gpt-4o-mini",
+    "text": {
+      "verbosity": "low"
+    }
+  }
+}

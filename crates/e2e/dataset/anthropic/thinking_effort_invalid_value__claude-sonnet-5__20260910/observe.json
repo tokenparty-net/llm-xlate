@@ -1,0 +1,18 @@
+{
+  "protocol": "anthropic",
+  "stream": false,
+  "status": 400,
+  "verdict": "pass",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "output_config.effort: Input should be 'low', 'medium', 'high', 'xhigh' or 'max'"
+  },
+  "request_id": "req_011CeuSHRnDijvV4XqpPnHDq",
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

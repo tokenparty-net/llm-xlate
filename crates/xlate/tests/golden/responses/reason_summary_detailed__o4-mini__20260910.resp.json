@@ -1,0 +1,93 @@
+{
+  "id": "resp_011b1331d8e660a1006aa2689e968087d2b55bc0fb97ce8dac",
+  "object": "response",
+  "created_at": 1789028510,
+  "status": "incomplete",
+  "background": false,
+  "billing": {
+    "payer": "developer"
+  },
+  "completed_at": null,
+  "error": null,
+  "frequency_penalty": 0.0,
+  "incomplete_details": {
+    "reason": "max_output_tokens"
+  },
+  "instructions": null,
+  "max_output_tokens": 256,
+  "max_tool_calls": null,
+  "model": "o4-mini-2025-04-16",
+  "moderation": null,
+  "output": [
+    {
+      "id": "rs_011b1331d8e660a1006aa2689f584c87d2bac87587feba6869",
+      "type": "reasoning",
+      "content": [],
+      "encrypted_content": "gAAAAABqomikNfA7eRhx_cFiz31lQB8z6AcDcsJh_BJb5E15hhyJVp1y143MGJ4Y4odYII2JCBXQKP8XtUqAEVsQAg_W23KmL_3R4gZSn6-N15d8Cc5LZj7Ht_1hFxw7uelBjyXHKVQHUWgJOKmEIQMvxsKE9klhE-bxB1FSNF05oG57tZ6vMosGJ6i-n55R07ISUzMub2iFPEDv6k0VwnHyfFnWAko9Ia-Gr_fkNs230-d-7wbXmtdxUcYa3OO373307R6jnt4-1ZpAF-LgN6CViAgdtKlTu9iTUxVxJIIR42YgVBE7-TtPM_jY3yKCqPt0S0Rb5l5ESjKCPlQ00v1uZv-R3aJ4TFVrlRYOS_nhOU5L4LpBhkuaOH3ZzHxWxkxp9Cse-WrQOHCv9GycxDWTMTbj-tDyIHm6jSoesIYFIpodaQri_mVzlg_TY0yhgDtU3r4qHtUftPam1PcQfTlAaW_GfTkqElxUPdsl_sdERsw2f3bQOqY_GXTT-5DAKe2NemFshqe1RNDS7FZgCe4GhiWIr-oeu1sXD3sboPvJsA49M0K1lv7PFovT3W2gW9MxTAmR8KXjYApG0t_WuVNLNs-4X6jYrGodENcZuMQcZzBUB_ulziWih0KmyCkp656sBSPHdSy_E6RmhOaqMAiHqy2WKPZsGP0LH5LeFJAS84yWxVBLlKR5R1cVfu_X5gojqeMYrnE4UJuIkX65V349AGb5s5ifHVU58eDEAsNGYqerPqY3CMJB6hno1iX0MzYW9eG8xmyXQT4h0WR1z47oFwFoTHx74n_Qfr-jXq92glmTmxByZQonZ6m5ugoqn8QdGCUyaGrzRtq7vxUeY5ejaoJ12XFLHcvmPu2IsyCnktNiUjcsYiZUQbt6fWBekO5I5A4mB9AEvN1OTieEj_bFjZ0e2c7EOSKZ2OmBUr7QFcpHLc9LkfwsSOEKSzJ9fwHcwDLD0nmInSzOuINDbzwshgw-815co_mWg2nKBnOd2sORP2-yrBJ_PLPtAxX9IOZLdLJGJCD6r0hZM9prb6-QiUnQztBi_TUN7-U1uIVws5RuK-spYj-KPSiAg3Tt1EsNN36Y4mmBIl4HrJwTZLuS1iJEP2Q__d9oVU9v1Iet4qvUz9QJFyugDWNs-av1lnXkA9q9hJpUN3B3sYfvXZsa3U3GinKn_EdqyXu3sDOXk_ZfTTEdjlCTksX4Fd95dLzL7pzcswKE5-otr9PbIbo-3ur-ensESaTQmmvgKvG58VwN4ld33AGeC2juQWNSYBLJOTI5L9RtvmfNOiaBoT4qJgwFuvahIcL7d_kFuO1QGfgNuvEpegMV2h5MlQDsCWgnApnQviybIqntXfEEhgjJjk-T83oS8sLdgqZjeYPFExqoH-iOGItR24E4f-XXj8eGz-LY8TiYpqSPG0Gindk3VjwPMFp0dJ38czFSBzhOW-Y2h5fdZcxiHzVr2N0aLBb7hjusNtNY4lFWZX-8eC0iQz-Ruwfng9OhS0B9pDy7xkiirKAiS-m8RMpKnZc4i0-kCcPrbRYke4oTyUjAwi0tmR64HLCCVWteoW9OryPdppfZHntQPWLkgbjBRGQlayO38dPoEWOpYsaXn1sG9ZHdd6OPdd9FuA-zs97ycpex-heOayvJZX5dveNkKG2WQVB8coavm873JL1DSj7TnJSieKL900OuhXdBr-qnoGZ5MRaJRg0BffAzjLDm41kKjcBSiXXrscVJmtHshSJTiNi-A3YUzXJnwhosevPnOccIaV-NKlrJGH5jAAkN1BSvMzLlgfLlhGZpIxot6Ma0aqyf-3rzBJbeLNGye5rAAYoKrjJwsFh2JdpfiOgDx_bBgx017PwqZicSSuIdYQl0kmjdXFNaeQn95PALxbLEMAoFxi2n_GqBcHWoXShfJHWE6Xtzvu-DY3XEHWqvv1J1S6ghfGpOpa0EstxquRUXRu4MTR0NLg8nwavyrY9gzsR6pMSyCfDNrQJOrL_okRxGjcmK8EYSkhLQcEk3UIP5TVAEblVQbzvRb8_yP9ezHW6hh_3QNUHjJYJW-k54hyf-xj3-Ia31i6pfLAko-0CTw-QWRyIIKsX8FxE6442KRnmA6ujIEx-2jLDnUvF8bKWF4aeOS3gqODfWLD4805qLPvcg47nF-hY1pgFH52g3S4IliqyLLzcDYtVmoSBvSA9AC8ThmBeaUx3Nhl9aFTdZLV7IHU3Eqt7P66S_kR5hm40QHrjhbMyj61d-SWQG32NmCSdtxGbOG_Futj4yLziDKVSBvmeODtfQPpg0emAgpPlpQD614zEdQIwMRpPYpMOzWILoAWwaXyy1l-uoYCZt4oofMEiU-erlqlKiWKBgIGq6RUTAGHxnXVeStR0lLiEnRv04SrglD23ahyhN3ofMN9ULNTXTRlAewFVu2TIBi0CSL5l5nexarDdQfXLGgQPMcscximLaz4Mf363naAUxHsT-bSZxLd1-ADDQoES0fVbXz359tA2nlZUC_3nWzj5XMgobTb3kkT6LFTcHcv9HrUWy0gUktAq4dYdbFhUDRSnTkGFksiaWlGT2Je-436sKVrGAOB3gjIxV5GmwihAFY3u4bBCEx6l5izxMXVNlhu1AIhcVy78MzA8PwSiu-mIwt_RKcSvqqI9849JIawoHdcz9gjLLww6GVOzXCdo4Ezn2bbuOgpmpmSREW9cZysNcu00RcHzHGkvWmrvREaiUunD5uCoFku-mT6jQg46VeW6KRfAu2aL3OctChKn5kKhlroz3XeCIVNrp1vFWIJWT-5UJb1nNZk6N20s=",
+      "summary": [
+        {
+          "type": "summary_text",
+          "text": "**Explaining the blue sky**\n\nThe user is asking for a step-by-step breakdown of why the sky is blue, focusing on Rayleigh scattering. \n\nFirst, sunlight appears white since it contains all visible wavelengths. \n\nNext, the atmosphere has nitrogen and oxygen molecules. \n\nLight scattering occurs as these particles scatter sunlight, with intensity inversely proportional to the fourth power of the wavelength.\n\nSince blue light has a shorter wavelength, it scatters more than red light. \n\nFinally, during sunrise and sunset, longer paths through the atmosphere remove blue light, giving the sky a red or orange appearance."
+        }
+      ]
+    }
+  ],
+  "parallel_tool_calls": true,
+  "presence_penalty": 0.0,
+  "previous_response_id": null,
+  "prompt_cache_key": null,
+  "prompt_cache_retention": "in_memory",
+  "reasoning": {
+    "context": "current_turn",
+    "effort": "high",
+    "mode": "standard",
+    "summary": "detailed"
+  },
+  "safety_identifier": null,
+  "service_tier": "default",
+  "store": true,
+  "temperature": 1.0,
+  "text": {
+    "format": {
+      "type": "text"
+    },
+    "verbosity": "medium"
+  },
+  "tool_choice": "auto",
+  "tool_usage": {
+    "image_gen": {
+      "input_tokens": 0,
+      "input_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 0
+      },
+      "output_tokens": 0,
+      "output_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 0
+      },
+      "total_tokens": 0
+    },
+    "web_search": {
+      "num_requests": 0
+    }
+  },
+  "tools": [],
+  "top_logprobs": 0,
+  "top_p": 1.0,
+  "truncation": "disabled",
+  "usage": {
+    "input_tokens": 17,
+    "input_tokens_details": {
+      "cache_write_tokens": 0,
+      "cached_tokens": 0
+    },
+    "output_tokens": 256,
+    "output_tokens_details": {
+      "reasoning_tokens": 256
+    },
+    "total_tokens": 273
+  },
+  "user": null,
+  "metadata": {}
+}

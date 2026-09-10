@@ -1,0 +1,30 @@
+{
+  "status": 400,
+  "headers": {
+    "anthropic-organization-id": "<redacted>",
+    "anthropic-workspace-id": "<redacted>",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d07cc3e7a7327-EWR",
+    "connection": "keep-alive",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:23:25 GMT",
+    "request-id": "req_011CeuSHRnDijvV4XqpPnHDq",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "traceresponse": "00-cd4f5302c9b515d1938c054484de71f0-409067f0cca58f27-01",
+    "transfer-encoding": "chunked",
+    "vary": "Accept-Encoding",
+    "x-robots-tag": "none",
+    "x-should-retry": "false"
+  },
+  "elapsed_ms": 216,
+  "body": {
+    "type": "error",
+    "error": {
+      "type": "invalid_request_error",
+      "message": "output_config.effort: Input should be 'low', 'medium', 'high', 'xhigh' or 'max'"
+    },
+    "request_id": "req_011CeuSHRnDijvV4XqpPnHDq"
+  }
+}

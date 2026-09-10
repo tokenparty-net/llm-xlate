@@ -1,0 +1,95 @@
+# Chat family 15 — response_format structured output (plan §5.15).
+# llm-xlate assumption: §7.3 — response_format json_schema strict/non-strict, json_object. Which keywords
+# a strict schema rejects drives the sanitiser. data/caps structured_output.
+
+[[probe]]
+id         = "chat.output.json_schema_strict"
+protocol   = "chat"
+tags       = ["explore", "dataset", "output"]
+models     = "openai_chat"
+stream     = "both"
+hypothesis = "response_format json_schema with strict:true and a closed schema is accepted (200) and the reply parses to the schema."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+response_format       = { type = "json_schema", json_schema = { name = "city_pop", strict = true, schema = { type = "object", properties = { city = { type = "string" }, population = { type = "integer" } }, required = ["city", "population"], additionalProperties = false } } }
+messages              = [ { role = "user", content = "Give the city Paris and a rough population." } ]
+
+[[probe]]
+id         = "chat.output.strict_unsupported_keywords"
+protocol   = "chat"
+tags       = ["explore", "output", "errors"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "Under strict:true, minLength/maxLength/pattern/format -> 400 naming the unsupported keyword (evidence for the strict-mode sanitiser)."
+expect     = "any"
+notes      = "Direct source of the keyword blocklist llm-xlate must strip for strict Chat schemas."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+response_format       = { type = "json_schema", json_schema = { name = "code", strict = true, schema = { type = "object", properties = { code = { type = "string", minLength = 2, maxLength = 4, pattern = "^[A-Z]+$" } }, required = ["code"], additionalProperties = false } } }
+messages              = [ { role = "user", content = "Give a 3-letter code." } ]
+
+[[probe]]
+id         = "chat.output.strict_missing_additional_properties"
+protocol   = "chat"
+tags       = ["explore", "output", "errors"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "Under strict:true, omitting additionalProperties:false -> 400 (strict requires closed objects)."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+response_format       = { type = "json_schema", json_schema = { name = "open", strict = true, schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"] } } }
+messages              = [ { role = "user", content = "Give a city." } ]
+
+[[probe]]
+id         = "chat.output.non_strict"
+protocol   = "chat"
+tags       = ["explore", "output"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "response_format json_schema with strict:false tolerates keywords that strict rejects (minLength etc. accepted, best-effort)."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+response_format       = { type = "json_schema", json_schema = { name = "code", strict = false, schema = { type = "object", properties = { code = { type = "string", minLength = 2, pattern = "^[A-Z]+$" } }, required = ["code"] } } }
+messages              = [ { role = "user", content = "Give a code." } ]
+
+[[probe]]
+id         = "chat.output.json_object_without_word_json"
+protocol   = "chat"
+tags       = ["explore", "output", "errors"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "response_format json_object WITHOUT the word 'JSON' anywhere in the prompt -> 400 (the API requires the prompt to mention JSON)."
+expect     = "any"
+notes      = "Documents the json_object prompt requirement — llm-xlate may need to inject the word JSON."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+response_format       = { type = "json_object" }
+messages              = [ { role = "user", content = "Give the capital of France as an object with a city field." } ]
+
+[[probe]]
+id         = "chat.output.json_object_with_word_json"
+protocol   = "chat"
+tags       = ["dataset", "output"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "response_format json_object WITH the word JSON in the prompt is accepted (200)."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+response_format       = { type = "json_object" }
+messages              = [ { role = "user", content = "Return JSON: an object with a city field set to Paris." } ]

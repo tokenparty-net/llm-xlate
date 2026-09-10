@@ -1,0 +1,22 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Say hi.",
+      "role": "user"
+    },
+    {
+      "content": "Hi.",
+      "role": "assistant"
+    },
+    {
+      "content": "Answer in French.",
+      "role": "system"
+    },
+    {
+      "content": "How are you?",
+      "role": "user"
+    }
+  ],
+  "model": "claude-haiku-4-5-20251001"
+}

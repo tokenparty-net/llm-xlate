@@ -1,0 +1,72 @@
+# Generic third-party OpenAI-compatible servers. verified_at = 2026-09-01.
+# Chat only; deliberately conservative — plan §6 "Unknown for most", plan §3/§6 global
+# principle "unknown ⇒ conservative + Unsupported, never silent". An arbitrary server gets NO
+# optimistic capability assertions: tools, mid-conversation system, and structured output are
+# all left UNSET (Unknown ⇒ treated as unsupported) until a concrete backend opts in via a
+# router-supplied BackendOverrides. Only genuinely safe values are asserted.
+
+family = "openai-compatible"
+
+[defaults.transport]
+protocols = ["chat"]
+streaming = "both"
+usage_timing = "end_only"
+stream_usage_opt_in = true
+
+[defaults.instructions]
+# `top_level_system = "string"` is the one universally-safe positive: the Chat Completions
+# format is defined around a leading `system` message, so every compatible server accepts one.
+# `mid_conversation_system` is deliberately left UNSET (resolves to None ⇒ inline-wrap
+# fallback, plan §7.1): an arbitrary server may not honor a native mid-array role:"system"
+# message, and emitting one would mis-place instructions instead of degrading safely.
+top_level_system = "string"
+developer_role = false
+
+[defaults.reasoning]
+mode = "none"
+exposure = "none"
+replay = "none"
+
+# Tools left Unknown: no `function_tools`, `tool_choice`, `parallel_control`, or
+# `result_content`. An arbitrary OpenAI-compatible endpoint may not support tool calling; a
+# concrete backend opts in via BackendOverrides. `strict = off/unsupported` is a safe negative.
+[defaults.tools.strict]
+supported = false
+default = "off"
+
+[defaults.output]
+# Structured output left Unknown: `format` unset (a bare server may silently ignore
+# `response_format` and return prose). Only safe negatives are asserted.
+strict_supported = false
+prefill_allowed = false
+verbosity = false
+
+[defaults.media]
+container_upload = false
+image_detail_param = false
+
+[defaults.media.image]
+sources = ["base64", "url"]
+
+[defaults.sampling]
+temperature = { range = [0.0, 2.0] }
+top_p = { range = [0.0, 1.0] }
+n = { max = 1 }
+stop_sequences = { max = 4 }
+
+[defaults.state]
+store = false
+previous_response_id = false
+conversation_api = false
+background = false
+encrypted_reasoning_include = false
+compaction = "none"
+
+[defaults.cache]
+auto_request_level = false
+prompt_cache_key = false
+
+# Everything matches; concrete backends refine via router-supplied BackendOverrides.
+[[model]]
+match = "*"
+verified_at = "2026-09-01"

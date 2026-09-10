@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=invalid_request status=400 retryable=false param=url provider_type=invalid_request_error retry_after=- upstream_request_id=req_98d84a97914e41e1ac7038566648060f
+message: Error while downloading file. Upstream status code: 400.
+
+--- chat (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_98d84a97914e41e1ac7038566648060f
+body:
+{
+  "error": {
+    "message": "Error while downloading file. Upstream status code: 400.",
+    "type": "invalid_request_error",
+    "param": "url",
+    "code": "invalid_value"
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 400
+frames:
+data: {"error":{"message":"Error while downloading file. Upstream status code: 400.","type":"invalid_request_error","param":"url","code":"invalid_value"}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 400
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_98d84a97914e41e1ac7038566648060f
+body:
+{
+  "error": {
+    "message": "Error while downloading file. Upstream status code: 400.",
+    "type": "invalid_request_error",
+    "param": "url",
+    "code": "invalid_value"
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","code":"invalid_value","message":"Error while downloading file. Upstream status code: 400.","param":"url","sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+  x-router-upstream-request-id: req_98d84a97914e41e1ac7038566648060f
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "Error while downloading file. Upstream status code: 400."
+  },
+  "request_id": "req_98d84a97914e41e1ac7038566648060f"
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"invalid_request_error","message":"Error while downloading file. Upstream status code: 400."},"request_id":"req_98d84a97914e41e1ac7038566648060f"}

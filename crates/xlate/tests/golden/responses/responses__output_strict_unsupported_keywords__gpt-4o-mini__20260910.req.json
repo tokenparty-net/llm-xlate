@@ -1,0 +1,26 @@
+{
+  "input": "Give a 3-letter code.",
+  "max_output_tokens": 128,
+  "model": "gpt-4o-mini",
+  "text": {
+    "format": {
+      "name": "code",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "minLength": 2,
+            "pattern": "^[A-Z]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "strict": true,
+      "type": "json_schema"
+    }
+  }
+}

@@ -1,0 +1,109 @@
+# Anthropic family 12 — misc fields (plan §5.12).
+# metadata.user_id; service_tier; stop_sequences echo; max_tokens cutoff; context_management echo.
+
+[[probe]]
+id         = "ant.misc.metadata_user"
+protocol   = "anthropic"
+tags       = ["dataset", "misc"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "metadata.user_id is accepted and not echoed in the body (tracking only)."
+expect     = { status = 200 }
+notes      = "user_id uses $RUN_ID so the capture is traceable without exposing anything sensitive."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+metadata   = { user_id = "e2e-$RUN_ID" }
+messages   = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "ant.misc.service_tier"
+protocol   = "anthropic"
+tags       = ["explore", "misc"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "service_tier values (auto / standard_only) are accepted; the response usage or headers echo the tier actually used."
+expect     = "any"
+
+[probe.body]
+model        = "$MODEL"
+max_tokens   = 64
+service_tier = "auto"
+messages     = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "ant.misc.stop_sequences_echo"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "misc"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "When generation halts on a stop sequence, stop_reason=stop_sequence and stop_sequence echoes the matched string."
+expect     = { status = 200 }
+
+[probe.body]
+model          = "$MODEL"
+max_tokens     = 128
+stop_sequences = ["END"]
+messages       = [ { role = "user", content = "Write the word START then the word END and nothing after." } ]
+
+[[probe]]
+id         = "ant.misc.stop_sequences_limit"
+protocol   = "anthropic"
+tags       = ["explore", "misc", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "Too many stop_sequences -> 400 naming the maximum (evidence for the stop-sequence cap)."
+expect     = "any"
+
+[probe.body]
+model          = "$MODEL"
+max_tokens     = 64
+stop_sequences = ["a","b","c","d","e","f","g","h","i","j"]
+messages       = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "ant.misc.max_tokens_cutoff"
+protocol   = "anthropic"
+tags       = ["dataset", "misc"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "A tiny max_tokens with a long-answer prompt yields stop_reason=max_tokens (the truncation shape)."
+expect     = { status = 200 }
+notes      = "max_tokens=16 is under the clamp so it is kept; forces a max_tokens stop."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 16
+messages   = [ { role = "user", content = "Write a 500-word essay about the ocean." } ]
+
+[[probe]]
+id         = "ant.misc.context_management_echo"
+protocol   = "anthropic"
+tags       = ["explore", "misc"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A context_management field is accepted and echoed/acted upon (opaque, provider-bound per plan §2 compaction row)."
+expect     = "any"
+notes      = "Speculative shape; may require a beta header. Documents whether the field is recognised."
+
+[probe.body]
+model              = "$MODEL"
+max_tokens         = 64
+context_management = { edits = [] }
+messages           = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "ant.misc.container_echo"
+protocol   = "anthropic"
+tags       = ["explore", "misc"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A `container` field (code-execution container reuse) is accepted or 400; documents recognition."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+container  = "container-PLACEHOLDER"
+messages   = [ { role = "user", content = "Say ok." } ]

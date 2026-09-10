@@ -1,0 +1,19 @@
+{
+  "protocol": "responses",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "code": "missing_required_parameter",
+    "message": "One of \"input\" or \"previous_response_id\" or 'prompt' or 'conversation' must be provided."
+  },
+  "request_id": "req_4aade1e0f8954fe6a98cdc9a6d2da07b",
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

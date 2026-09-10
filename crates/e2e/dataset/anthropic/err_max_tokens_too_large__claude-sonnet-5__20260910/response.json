@@ -1,0 +1,30 @@
+{
+  "status": 400,
+  "headers": {
+    "anthropic-organization-id": "<redacted>",
+    "anthropic-workspace-id": "<redacted>",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d095b5bce7327-EWR",
+    "connection": "keep-alive",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:24:28 GMT",
+    "request-id": "req_011CeuSN8sca3K29qNH34wVn",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "traceresponse": "00-dcb42fd548cb87211f23fdbe590bc210-b032346f036e8649-01",
+    "transfer-encoding": "chunked",
+    "vary": "Accept-Encoding",
+    "x-robots-tag": "none",
+    "x-should-retry": "false"
+  },
+  "elapsed_ms": 199,
+  "body": {
+    "type": "error",
+    "error": {
+      "type": "invalid_request_error",
+      "message": "max_tokens: 100000000 > 128000, which is the maximum allowed number of output tokens for claude-sonnet-5"
+    },
+    "request_id": "req_011CeuSN8sca3K29qNH34wVn"
+  }
+}

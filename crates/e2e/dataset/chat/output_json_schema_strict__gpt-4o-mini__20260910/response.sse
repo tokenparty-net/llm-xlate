@@ -1,0 +1,28 @@
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"role":"assistant","content":"","refusal":null},"logprobs":null,"finish_reason":null}],"obfuscation":"HyMyel"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"content":"{\""},"logprobs":null,"finish_reason":null}],"obfuscation":"d4KZY"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"content":"city"},"logprobs":null,"finish_reason":null}],"obfuscation":"FTpa"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"content":"\":\""},"logprobs":null,"finish_reason":null}],"obfuscation":"bnJ"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"content":"Paris"},"logprobs":null,"finish_reason":null}],"obfuscation":"Tjm"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"content":"\",\""},"logprobs":null,"finish_reason":null}],"obfuscation":"206"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"content":"population"},"logprobs":null,"finish_reason":null}],"obfuscation":"Y6WU2By6R1MApk"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"content":"\":"},"logprobs":null,"finish_reason":null}],"obfuscation":"qJXUg"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"content":"214"},"logprobs":null,"finish_reason":null}],"obfuscation":"JCmGM"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"content":"800"},"logprobs":null,"finish_reason":null}],"obfuscation":"QLgau"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"content":"0"},"logprobs":null,"finish_reason":null}],"obfuscation":"IONJA9Y"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{"content":"}"},"logprobs":null,"finish_reason":null}],"obfuscation":"yWOz8Ig"}
+
+data: {"id":"chatcmpl-EMULPOVUBgkWSTlQhfPfh2BUZW48h","object":"chat.completion.chunk","created":1789028567,"model":"gpt-4o-mini-2024-07-18","service_tier":"default","system_fingerprint":"fp_335dacabb2","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}],"obfuscation":"nC"}
+
+data: [DONE]
+

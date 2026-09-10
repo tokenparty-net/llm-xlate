@@ -1,0 +1,11 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Say ok.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-haiku-4-5-20251001",
+  "temperature": 0.5
+}

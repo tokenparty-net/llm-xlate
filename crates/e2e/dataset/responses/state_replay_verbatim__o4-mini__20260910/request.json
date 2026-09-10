@@ -1,0 +1,37 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/responses",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "include": [
+      "reasoning.encrypted_content"
+    ],
+    "input": [
+      {
+        "content": "What is 17*23? Think, then answer with just the number.",
+        "role": "user"
+      },
+      {
+        "id": "rs_0239c2be2c16353a016aa2689b0de487d29b97ed3490e23c92",
+        "type": "reasoning",
+        "content": [],
+        "encrypted_content": "gAAAAABqomib2sWJkstfgqvzQeQHEtSErQCtW-hMXYRatE6tE36qEH__1w20m5iTYCtidzFO1CLUOqWuYeuE0sSiNvYhADwSqcf3eno-MYoz6nhiDftcKPxR6k8TB00HRfsX2HGkJb9iYXM1uDKhMgHURaCQBAoYlK5RewypleJFNgyHLg_73tsouSfoqrhvbC6KE37rJYAfJJkwQfYCxg0KqWB2SShEPszZVnaP5mK8xkCOE2-61Y6IX988xHMZTvvaSpodW5W3qRXuxVrVl0URMLVJXCJZrmeCQiCt5qrUmA0POiJMDV7CkEUeFdXc5zbSg0tkkzy3RxazuRuHsQvliAhqMr8qnwUYASUrqRwxMsRpR-rGBL54UMdRzMKvV15nOogGY1CKVIFv9ev57aBfoyzV-psFDsCV8rO7UZh90KRbey1y2z5bF-0NjaKS7M9lT8gWb1zHcekt4x3ChMzsXyUa4KcTE733peEWmml_dPXCwe9RkT4DR9jj9xkt6lsJzDX0aieti3YIrA6NAhVb1dIdy5WskPPZ8aa-PyZ--UrCvmpaQdqJbsgXAprgOcAeEHktG-cwwDmAXZzW5-ib6Fx41kXp6LSsMRy36HozP-YZHkXzYDHx-k1ywtgICI4FODINwCu16XLgAvg0FSWVjyagjYevHDIOn8pUtXF_upxQbUvuh5eTk5liqn4jMO2ECvcdy0mF_QEaxCRq6rriFdKcTsuMeOeFCfa1-Uluc7tNW1i2Yk6mRRzUK44WeYleFFirxrl23uZvt8c58KfV3_S-WD7_tDbVNQk9f-LeeWVBVBbcQUtXR0kZ2MHgZzOrgS9b6HdDgppNKddtcSL8bDMYnA5TKTDdUUO8Ct5rC8CBTY0svG7NHY8LoOFDc56mY_sMxjSm6PInqe5IGLr8abQCKWE0hl5RWJYL42cPqCRdSxsKw_gFdonj1v40C2A1kidfpqzJgRCMJwtUaSOs8vE_hyqOaIt65bTTEkYxOYYLvzG1fakxQwYGvYXIxxR3QZmAKzVDCd-zEF_rZclCytzOrGZUrjTFGvXgA53Fqptop2gH-FzlmVYeO-QK9mmdIHOgwrzS58BFlluQos9NWTQ7W53V3ahfry8f4Mk053-mCK_P19B9EKinxNWTcvpYr83MkZU5Ru8yw4YMSxPYVlJg0y-jxwWyzU4oO_ttsRFokgGbeFrRiDVomtyZlfoSct369eKL7aDM-OqPzHlQ071CgY7Ld9GjxoS6GVWvKa7odQYiXbOGatZ7oEwsIiSPyhou_LAGgHK3vHUR8WP9en91hn5Whnguu6fFM8Y59MSVqy3csFfx-fNrPjsh1KOxUFB1nO8vQe2TAeLKlSeWpDZQT6XeKy5XtNo1IG8z3X1hyakpd20NRRJpMGQVRU9ABqvSVwA18LUE7I_deqwBYSwSxq3ET-Kwo2xZkKGmU_ey2Yi0wwY50iMLc8N7koTx3WGVkrgxZUJwYls8O_b70MaDoyV8HgHfXc0Uwxoet47R0liU16RbIBjaEf1xOTrqBoH4vC4d3BszkNoB3VhbLGaLONuterc37WA1qQq_0hEn8oJ5vSRdw1tA2kmHx7iEbyZY7J9U5Y51j47X5rb_z_vyiyyzskNoTL3hGtmGWh6NINMIk9U=",
+        "summary": []
+      },
+      {
+        "content": "Now multiply that result by 2.",
+        "role": "user"
+      }
+    ],
+    "max_output_tokens": 256,
+    "model": "o4-mini",
+    "reasoning": {
+      "effort": "medium"
+    },
+    "store": false
+  }
+}

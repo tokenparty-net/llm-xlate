@@ -1,0 +1,20 @@
+{
+  "protocol": "responses",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "code": "unsupported_parameter",
+    "param": "reasoning.effort",
+    "message": "Unsupported parameter: 'reasoning.effort' is not supported with this model."
+  },
+  "request_id": "req_ce7cd437a7cb476488170694a625ad56",
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

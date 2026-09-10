@@ -1,0 +1,15 @@
+{
+  "max_completion_tokens": 64,
+  "messages": [
+    {
+      "content": "hi",
+      "role": "user"
+    },
+    {
+      "content": "18C",
+      "role": "tool",
+      "tool_call_id": "call_does_not_exist"
+    }
+  ],
+  "model": "gpt-4o-mini"
+}

@@ -1,0 +1,14 @@
+{
+  "max_completion_tokens": 128,
+  "messages": [
+    {
+      "content": "Be terse.",
+      "role": "developer"
+    },
+    {
+      "content": "What is 2+2?",
+      "role": "user"
+    }
+  ],
+  "model": "o4-mini"
+}

@@ -1,0 +1,19 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/responses",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "input": "Return JSON: an object with a city field set to Paris.",
+    "max_output_tokens": 64,
+    "model": "gpt-4o-mini",
+    "text": {
+      "format": {
+        "type": "json_object"
+      }
+    }
+  }
+}

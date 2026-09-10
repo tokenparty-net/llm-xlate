@@ -1,0 +1,65 @@
+{
+  "status": 200,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d071c5a2cb295-EWR",
+    "connection": "keep-alive",
+    "content-length": "774",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:58 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "1355",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-openai-proxy-wasm": "v0.1",
+    "x-ratelimit-limit-requests": "500",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "499",
+    "x-ratelimit-remaining-tokens": "199984",
+    "x-ratelimit-reset-requests": "120ms",
+    "x-ratelimit-reset-tokens": "4ms",
+    "x-request-id": "req_96859cf8e12940c8832d106ccf98f751"
+  },
+  "elapsed_ms": 1492,
+  "body": {
+    "id": "chatcmpl-EMULZjqrf41gRknOPpJj3rbtN3CC3",
+    "object": "chat.completion",
+    "created": 1789028577,
+    "model": "o4-mini-2025-04-16",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "",
+          "refusal": null,
+          "annotations": []
+        },
+        "finish_reason": "length"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 26,
+      "completion_tokens": 128,
+      "total_tokens": 154,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 128,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+  }
+}

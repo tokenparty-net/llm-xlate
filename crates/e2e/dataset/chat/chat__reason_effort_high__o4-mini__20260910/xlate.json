@@ -1,0 +1,28 @@
+{
+  "label": "chat.reason.effort_high/o4-mini",
+  "protocol": "chat",
+  "model": "o4-mini",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "byte/structure identical"
+    },
+    {
+      "name": "response_decode_nonstream",
+      "pass": true,
+      "detail": "decoded 4 event(s)"
+    },
+    {
+      "name": "cross_client",
+      "pass": true,
+      "detail": "rendered 2 target dialect(s)"
+    }
+  ]
+}

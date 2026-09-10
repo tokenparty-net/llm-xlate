@@ -1,0 +1,23 @@
+{
+  "label": "chat.reason.tools_with_effort_gpt54/gpt-5.4",
+  "protocol": "chat",
+  "model": "gpt-5.4",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "byte/structure identical"
+    },
+    {
+      "name": "error_decode",
+      "pass": true,
+      "detail": "kind=invalid_request status=400"
+    }
+  ]
+}

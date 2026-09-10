@@ -1,0 +1,72 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=rate_limited status=429 retryable=true param=- provider_type=rate_limit_error retry_after=30000ms upstream_request_id=req_rl_1
+message: Rate limit reached for gpt-4o.
+
+--- chat (non-streaming) ---
+status: 429
+headers:
+  content-type: application/json
+  retry-after: 30
+  x-router-upstream-request-id: req_rl_1
+body:
+{
+  "error": {
+    "message": "Rate limit reached for gpt-4o.",
+    "type": "rate_limit_error",
+    "param": null,
+    "code": "rate_limit_exceeded"
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 429
+frames:
+data: {"error":{"message":"Rate limit reached for gpt-4o.","type":"rate_limit_error","param":null,"code":"rate_limit_exceeded"}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 429
+headers:
+  content-type: application/json
+  retry-after: 30
+  x-router-upstream-request-id: req_rl_1
+body:
+{
+  "error": {
+    "message": "Rate limit reached for gpt-4o.",
+    "type": "rate_limit_error",
+    "param": null,
+    "code": "rate_limit_exceeded"
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 429
+frames:
+event: error
+data: {"type":"error","code":"rate_limit_exceeded","message":"Rate limit reached for gpt-4o.","param":null,"sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 429
+headers:
+  retry-after: 30
+  x-router-upstream-request-id: req_rl_1
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "rate_limit_error",
+    "message": "Rate limit reached for gpt-4o."
+  },
+  "request_id": "req_rl_1"
+}
+--- anthropic (streaming, pre-start) ---
+status: 429
+frames:
+event: error
+data: {"type":"error","error":{"type":"rate_limit_error","message":"Rate limit reached for gpt-4o."},"request_id":"req_rl_1"}

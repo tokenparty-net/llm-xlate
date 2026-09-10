@@ -1,0 +1,88 @@
+# Anthropic family 9 — regrouping constraints (plan §5.9).
+# llm-xlate assumption: §7.7 regrouping (encode side) — consecutive same-role messages, empty/whitespace
+# blocks, leading assistant. These pin the constraints the encoder must satisfy.
+
+[[probe]]
+id         = "ant.regroup.consecutive_user"
+protocol   = "anthropic"
+tags       = ["explore", "regroup", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "Two consecutive user messages -> 400 (roles must alternate); this is why §7.7 merges consecutive same-role turns."
+expect     = "any"
+notes      = "If accepted, the encoder need not merge; record either way."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "First question." }, { role = "user", content = "Second question. Answer both." } ]
+
+[[probe]]
+id         = "ant.regroup.consecutive_assistant"
+protocol   = "anthropic"
+tags       = ["explore", "regroup", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "Two consecutive assistant messages -> 400 (roles must alternate)."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Hi." }, { role = "assistant", content = "Hello." }, { role = "assistant", content = "Again hello." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "ant.regroup.empty_text_block"
+protocol   = "anthropic"
+tags       = ["explore", "regroup", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "An empty text block (text:\"\") -> 400 (text blocks must be non-empty); the encoder must drop empties."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = [ { type = "text", text = "" }, { type = "text", text = "Say ok." } ] } ]
+
+[[probe]]
+id         = "ant.regroup.whitespace_trailing_assistant"
+protocol   = "anthropic"
+tags       = ["explore", "regroup", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A trailing assistant message that is whitespace-only -> 400 (final assistant turn cannot end with trailing whitespace); the encoder must trim."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "Complete: the sky is" }, { role = "assistant", content = "blue " } ]
+
+[[probe]]
+id         = "ant.regroup.first_message_assistant"
+protocol   = "anthropic"
+tags       = ["explore", "regroup", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "A conversation whose first message is assistant -> 400 (must start with user)."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "assistant", content = "I will help." }, { role = "user", content = "Great, what is 2+2?" } ]
+
+[[probe]]
+id         = "ant.regroup.empty_messages"
+protocol   = "anthropic"
+tags       = ["explore", "regroup", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "An empty messages array -> 400 invalid_request_error."
+expect     = { status = 400, error_type = "invalid_request_error" }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = []

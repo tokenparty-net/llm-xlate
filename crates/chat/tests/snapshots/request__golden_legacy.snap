@@ -1,0 +1,5 @@
+---
+source: crates/chat/tests/request.rs
+expression: "encode_request_str(&ir, &gpt4o())"
+---
+{"model":"gpt-4o","messages":[{"role":"user","content":"Call the lookup function."},{"role":"assistant","content":null,"function_call":{"name":"lookup","arguments":"{\"q\":\"cats\"}"}},{"role":"tool","tool_call_id":"lookup","content":"cats are great","name":"lookup"}],"functions":[{"name":"lookup","description":"Look something up","parameters":{"type":"object","properties":{"q":{"type":"string"}}}}],"function_call":{"name":"lookup"}}

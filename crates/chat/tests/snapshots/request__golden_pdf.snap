@@ -1,0 +1,5 @@
+---
+source: crates/chat/tests/request.rs
+expression: "encode_request_str(&ir, &gpt4o())"
+---
+{"model":"gpt-4o","messages":[{"role":"user","content":[{"type":"text","text":"Summarize this document."},{"type":"file","file":{"file_data":"data:application/pdf;base64,JVBERi0xLjQK","filename":"report.pdf"}},{"type":"file","file":{"file_id":"file-abc123","filename":"prior.pdf"}}]}]}

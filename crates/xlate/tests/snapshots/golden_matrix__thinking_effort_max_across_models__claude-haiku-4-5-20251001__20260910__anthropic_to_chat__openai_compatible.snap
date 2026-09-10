@@ -1,0 +1,19 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "llama-x",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Prove sqrt(2) is irrational in two lines."
+    }
+  ],
+  "max_tokens": 256
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---
+reasoning=dropped

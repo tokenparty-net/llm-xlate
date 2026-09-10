@@ -1,0 +1,11 @@
+{
+  "max_completion_tokens": 128,
+  "messages": [
+    {
+      "content": "Explain photosynthesis.",
+      "role": "user"
+    }
+  ],
+  "model": "o4-mini",
+  "verbosity": "low"
+}

@@ -1,0 +1,33 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": "Give a timestamp and an email.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "output_config": {
+    "format": {
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "when": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "who": {
+            "format": "email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "when",
+          "who"
+        ],
+        "type": "object"
+      },
+      "type": "json_schema"
+    }
+  }
+}

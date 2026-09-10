@@ -1,0 +1,75 @@
+# Named model sets for llm-xlate-e2e.
+#
+# Each set's FIRST member is the cheapest suitable model; `--cheap` (the default) uses only that
+# one. Ids are curated from the live `GET /v1/models` listings via `llm-xlate-e2e models --refresh`
+# (which writes models.listing.json); `refreshed_at` records when. A set filled from best-knowledge
+# because a listing call has not confirmed it is marked `unverified = true`. NEVER put keys here.
+#
+# Curated 2026-09-10 against the account's live listings (11 Anthropic, 131 OpenAI ids). Note: this
+# account's Anthropic listing offers no 3.x models, so `anthropic_old` uses the oldest models that
+# ARE offered (the 4.5 family) rather than 3.5/3.7.
+
+refreshed_at = "2026-09-10"
+
+# --- Anthropic ---------------------------------------------------------------------------------
+
+[sets.anthropic_new]
+# Current-generation Anthropic models (4.8 / 5 era). Cheapest first.
+#
+# The cheap (first) member MUST be a genuine new-generation model: plan §2 pins new-era features
+# (in-array `role:system`, adaptive-thinking/effort, output_config) to Opus 4.8 / 5-family, so a
+# 4.5 model as the --cheap default would 400 every `expect={status=200}` new-era probe and record a
+# rejection instead of the intended success shape. claude-sonnet-5 is the cheapest full new-gen id
+# in the listing; the 4.5 haiku belongs only in anthropic_old / anthropic_46 where old-gen is the
+# point.
+models = ["claude-sonnet-5", "claude-opus-5", "claude-opus-4-8"]
+
+[sets.anthropic_46]
+# The 4.6 family (accepts sampling params; budget-mode thinking per llm-xlate caps). No 4.6 haiku
+# is offered, so the cheap default is the 4.5 haiku.
+models = ["claude-haiku-4-5-20251001", "claude-sonnet-4-6", "claude-opus-4-6"]
+
+[sets.anthropic_old]
+# The oldest models this account offers (the 4.5 family + 4.7). Used to probe older-model error
+# text and capability differences; no 3.x models are listed for this account.
+models = ["claude-haiku-4-5-20251001", "claude-sonnet-4-5-20250929", "claude-opus-4-5-20251101", "claude-opus-4-7"]
+
+[sets.anthropic_all]
+# The full mainline sweep, cheapest first (never used under --cheap by accident).
+models = [
+    "claude-haiku-4-5-20251001",
+    "claude-sonnet-4-5-20250929",
+    "claude-opus-4-5-20251101",
+    "claude-sonnet-4-6",
+    "claude-opus-4-6",
+    "claude-opus-4-7",
+    "claude-opus-4-8",
+    "claude-sonnet-5",
+    "claude-opus-5",
+]
+
+# --- OpenAI Chat Completions -------------------------------------------------------------------
+
+[sets.openai_chat]
+# Chat-completions-capable models. gpt-4o-mini is the cheap default.
+models = ["gpt-4o-mini", "gpt-4.1-mini", "gpt-4o", "gpt-4.1"]
+
+# --- OpenAI Responses --------------------------------------------------------------------------
+
+[sets.openai_responses]
+# Responses-API models. gpt-4o-mini is the cheap default.
+models = ["gpt-4o-mini", "gpt-4.1-mini", "gpt-5.4-mini", "gpt-5.4"]
+
+[sets.openai_reasoning]
+# Reasoning (o-series / gpt-5 reasoning) models. o4-mini is the cheap default.
+models = ["o4-mini", "o3-mini", "o3", "gpt-5.4"]
+
+[sets.openai_gpt6]
+# GPT-6 family (Responses-only per llm_xlate_plan §2).
+models = ["gpt-6-astra"]
+
+# --- Third-party OpenAI-compatible server (only when E2E_OPENAI_COMPAT_* is set) ---------------
+
+[sets.openai_compat]
+models = []
+unverified = true

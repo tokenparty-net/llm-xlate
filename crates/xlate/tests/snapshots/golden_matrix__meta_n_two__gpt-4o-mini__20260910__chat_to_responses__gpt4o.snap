@@ -1,0 +1,6 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+ERROR kind=unsupported status=400 param=n
+message: multiple completions (n>1) are not supported

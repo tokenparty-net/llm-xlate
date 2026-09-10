@@ -1,0 +1,23 @@
+{
+  "label": "chat.media.file_pdf_without_filename/gpt-4o-mini",
+  "protocol": "chat",
+  "model": "gpt-4o-mini",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "2 path(s) differ (normalizations): ~/messages/0/content/1/file/file_data, +/messages/0/content/1/file/filename"
+    },
+    {
+      "name": "error_decode",
+      "pass": true,
+      "detail": "kind=invalid_request status=400"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "model": "gpt-5.4",
+  "instructions": "You are a helpful assistant.",
+  "input": [
+    {"role": "user", "content": [{"type": "input_text", "text": "What is the weather in NYC?"}]},
+    {"type": "function_call", "call_id": "call_abc", "name": "get_weather", "arguments": "{\"city\":\"NYC\"}", "id": "fc_1"},
+    {"type": "function_call_output", "call_id": "call_abc", "output": "Sunny, 72F"}
+  ],
+  "tools": [
+    {"type": "function", "name": "get_weather", "description": "Get weather", "parameters": {"type": "object", "properties": {"city": {"type": "string"}}}, "strict": true}
+  ],
+  "tool_choice": "auto",
+  "parallel_tool_calls": true,
+  "reasoning": {"effort": "high", "summary": "auto"},
+  "text": {"format": {"type": "text"}, "verbosity": "medium"},
+  "max_output_tokens": 1024,
+  "temperature": 0.7,
+  "store": false,
+  "include": ["reasoning.encrypted_content"],
+  "metadata": {"session": "s1"},
+  "truncation": "auto"
+}

@@ -1,0 +1,15 @@
+{
+  "cache_control": {
+    "type": "ephemeral"
+  },
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Say ok.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "system": "Padded cacheable system: alpha beta gamma delta epsilon zeta eta theta iota kappa, repeated for size, repeated for size, repeated for size, repeated for size.",
+  "stream": true
+}

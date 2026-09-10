@@ -1,0 +1,23 @@
+{
+  "label": "ant.regroup.whitespace_trailing_assistant/claude-sonnet-5",
+  "protocol": "anthropic",
+  "model": "claude-sonnet-5",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "n/a: upstream rejected this request (4xx); llm-xlate also refuses it ([Unsupported 400] trailing assistant message (prefill) is not allowed for this model)"
+    },
+    {
+      "name": "error_decode",
+      "pass": true,
+      "detail": "kind=invalid_request status=400"
+    }
+  ]
+}

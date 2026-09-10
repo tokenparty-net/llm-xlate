@@ -1,0 +1,11 @@
+{
+  "max_completion_tokens": 256,
+  "messages": [
+    {
+      "content": "Prove there are infinitely many primes in two lines.",
+      "role": "user"
+    }
+  ],
+  "model": "o4-mini",
+  "reasoning_effort": "high"
+}

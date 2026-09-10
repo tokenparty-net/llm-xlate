@@ -1,0 +1,23 @@
+---
+source: crates/anthropic/tests/request_encode.rs
+expression: pretty(&out.body)
+---
+{
+  "model": "claude-3-7-sonnet",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "hi"
+        }
+      ]
+    }
+  ],
+  "max_tokens": 1024,
+  "thinking": {
+    "type": "enabled",
+    "budget_tokens": 10000
+  }
+}

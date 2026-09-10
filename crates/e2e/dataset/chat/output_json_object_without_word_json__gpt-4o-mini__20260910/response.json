@@ -1,0 +1,38 @@
+{
+  "status": 400,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d06e6293cb295-EWR",
+    "connection": "keep-alive",
+    "content-length": "219",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:48 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "22",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-openai-proxy-wasm": "v0.1",
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9982",
+    "x-ratelimit-remaining-tokens": "199983",
+    "x-ratelimit-reset-requests": "2m34.129s",
+    "x-ratelimit-reset-tokens": "5ms",
+    "x-request-id": "req_a46b6f50d8bd4e1290ace3eedb1964f8"
+  },
+  "elapsed_ms": 85,
+  "body": {
+    "error": {
+      "message": "'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.",
+      "type": "invalid_request_error",
+      "param": "messages",
+      "code": null
+    }
+  }
+}

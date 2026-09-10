@@ -1,0 +1,8 @@
+{
+  "input": "Hi.",
+  "max_output_tokens": 64,
+  "model": "o4-mini",
+  "reasoning": {
+    "effort": "turbo"
+  }
+}

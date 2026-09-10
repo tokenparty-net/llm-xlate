@@ -1,0 +1,115 @@
+# Anthropic family 10 — streaming event shapes (plan §5.10).
+# llm-xlate assumption: §8 streaming codecs — event ordering, message_start vs message_delta usage,
+# cache_creation object, signature_delta, citations_delta, server_tool_use, pause_turn. These are the raw
+# SSE fixtures the stream decoder is tested against.
+
+[[probe]]
+id         = "ant.stream.text_basic"
+protocol   = "anthropic"
+tags       = ["dataset", "streaming"]
+models     = "anthropic_new"
+stream     = true
+hypothesis = "A plain text stream emits message_start (with input usage) -> content_block_start[text] -> deltas -> content_block_stop -> message_delta (with output usage + stop_reason) -> message_stop, plus periodic ping."
+expect     = { status = 200 }
+notes      = "Baseline SSE fixture; observe ping cadence and usage placement."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 128
+messages   = [ { role = "user", content = "Count from one to five in words." } ]
+
+[[probe]]
+id         = "ant.stream.tool_use"
+protocol   = "anthropic"
+tags       = ["dataset", "streaming", "tools"]
+models     = "anthropic_new"
+stream     = true
+hypothesis = "A tool call stream emits content_block_start[tool_use] with input_json_delta chunks that accumulate to the arguments; stop_reason=tool_use in message_delta."
+expect     = { status = 200 }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 128
+tool_choice = { type = "any" }
+tools      = [ { name = "get_weather", description = "Get weather.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages   = [ { role = "user", content = "Weather in Paris?" } ]
+
+[[probe]]
+id         = "ant.stream.thinking_signature_delta"
+protocol   = "anthropic"
+tags       = ["dataset", "streaming", "reasoning"]
+models     = "anthropic_new"
+stream     = true
+hypothesis = "A thinking stream emits content_block_start[thinking] with thinking_delta chunks and a terminal signature_delta before content_block_stop."
+expect     = { status = 200 }
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 256
+thinking      = { type = "adaptive" }
+output_config = { effort = "medium" }
+messages      = [ { role = "user", content = "What is 17*23? Think, then answer." } ]
+
+[[probe]]
+id         = "ant.stream.text_then_tool_then_text"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "streaming", "tools"]
+models     = "anthropic_new"
+stream     = true
+hypothesis = "The model can interleave text and tool_use in one stream: content blocks appear as [text, tool_use] with increasing indices."
+expect     = "any"
+notes      = "Ordering evidence for the aggregator's block-index handling."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 256
+tools      = [ { name = "get_weather", description = "Get weather.", input_schema = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+messages   = [ { role = "user", content = "Say 'checking now', then call the weather tool for Paris." } ]
+
+[[probe]]
+id         = "ant.stream.cache_usage"
+protocol   = "anthropic"
+tags       = ["explore", "streaming", "cache"]
+models     = "anthropic_new"
+stream     = true
+hypothesis = "With cache_control set, message_start usage carries a cache_creation object and cache_creation_input_tokens / cache_read_input_tokens fields."
+expect     = { status = 200 }
+notes      = "Streaming twin of the cache probes; padded system as in family 1."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 64
+cache_control = { type = "ephemeral" }
+system        = "Padded cacheable system: alpha beta gamma delta epsilon zeta eta theta iota kappa, repeated for size, repeated for size, repeated for size, repeated for size."
+messages      = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "ant.stream.citations_delta"
+protocol   = "anthropic"
+tags       = ["explore", "streaming", "media"]
+models     = "anthropic_new"
+stream     = true
+hypothesis = "A streamed answer over a text document with citations enabled emits citations_delta events inside the text block."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 128
+messages   = [ { role = "user", content = [ { type = "document", title = "facts.txt", source = { type = "text", media_type = "text/plain", data = "The Eiffel Tower is 330 metres tall and was completed in 1889." }, citations = { enabled = true } }, { type = "text", text = "How tall is the tower? Cite." } ] } ]
+
+[[probe]]
+id         = "ant.stream.web_search"
+protocol   = "anthropic"
+tags       = ["explore", "streaming", "tools"]
+models     = "anthropic_new"
+stream     = true
+requires   = ["manual"]
+hypothesis = "The server-side web_search tool emits server_tool_use + web_search_tool_result blocks and may emit pause_turn."
+expect     = "any"
+notes      = "requires manual: web search is billed and may need account enablement; operator confirms. Documents server_tool_use / pause_turn shapes."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 256
+tools      = [ { type = "web_search_20250305", name = "web_search", max_uses = 1 } ]
+messages   = [ { role = "user", content = "Search the web for today's date and report it." } ]

@@ -1,0 +1,56 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/responses",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "include": [
+      "reasoning.encrypted_content"
+    ],
+    "input": [
+      {
+        "content": "Weather in Paris? Use the tool.",
+        "role": "user"
+      },
+      {
+        "id": "rs_0c67caaadd6ef05a016aa26894e93c87d2a10f81f231eb78c1",
+        "type": "reasoning",
+        "content": [],
+        "encrypted_content": "gAAAAABqomiWk4t3DaRQjkh9H_fU_5gEPijjAa_6s7SRG_r9o46OeeAmJCkSmA-NEyNMYPdYGpIA7O0u1hay2uJ3IQxIq_JSUkJfnZLDV2PEnWkkFccD8tBjI5jOJIl-MIOw9ZBFDbP8TwiFnYOabE5V2J6R1abzXMV8jhdJWRpyuKxKAYCiVoSzXXxzcLVQunhdABRbU8RMbhnVbprwxnG3O2Nu-s1_wbB5RVDUAQi6rrrj4eBp1YcATvlnAIJEe0xGQGl8r2QWjKr77QqhUZ6wAxPGN3Xh0XF4XmDb3C5ZKMyyb1VGE7KCV47KS-efApMAR37lYItx09EGXQj3sWmd0hD7AejCXv_roPSSc-sKXOnaCGe2TMEyZj0z4tb08Dsrmgv5qLixmjg47WI06RDXFjJtrb2T0pZrUUTrIIW9ZXrC0cgjgafJnsofre5EEfXpnTVH3laqa6zlYagwcE9kVznIh7EpmpL5TFQ1pwgEjFyCkH5LwfoVSWsiSP7y0HIFaxGZJR4T9q7nzXnp1Fwjfq5Zq7UgbHeZu10wvtIsqkfi0pzEKxSGalecGwdGKmaiT23sJ5RcVrRCysjmz_VBHS2BH8uj7nNYa5Wrlzw2pSEC6iv46I92ob1FGFGS7hmspJI3s6SXdAUsr42-kgXCX5pItSWkwZ7zmlUcJHkAc7nIrAkSMbpNXcg9_2MjZCzz_nGw0GL5vjIY1qRpd3YcDnWij0M-uQbJaKsGR0DZyW-Y6J22pKlee8nf9VbjVHLMU6RSordfogtPQ9z6_NdfOjksCEgjt0VHNmkKrC5NJSZbejwogJ1vbMBRQ1mvExd8L5XHLPNrHGCUWWcd91Vl7dViXeceJzc1fOkqw9ipCCRA9Jz-n_0Nluznc0oWndh1D6HhgNe7mtDC_meMureduY0OwNAgin2Bhb7gpzJjQGVQp9AtO2V-z1IkIvwrdpmTMMJeEp24LGLfhdEaRRs87JWE37x-qJkw5ZCHog4WISU9yqik3nxHSU5TGFa0qzCI32HuDzjTTHFUezuF6VEKZjATtKLDDiVYf5F8H_LnLpdnrBKQCqpmoP2MrgYIwedxgtfo8-N1vvzhUpAaZC_7cRhz39y8tYS2bjt9axHH3N1gHuZn9wW-zFVzJCq8EaO3TRRWmrz2IsfcrAxUBpdw24uPKxTuTA5lAagQmeX9P_xNu1WCZMbPOTrZlH7pwLmVzeFQuCaMVZbM9Z7xJflY47RO5puiIi-dsN87qPGTMqABFOWInKe206Gv5fhEXE41wbQ4zMh2S3JOoZgG8Shgu9a7H6FOPR-fW5ZkYucSbO3wkZ5ibG6BvhJxDgQ7yOI8JNAsCiGNHJIgnRgmdKQgMBBCK_6TWReCSq0L9ujfc0yY9BeuKs8c-UHee_d4qTRbwWgE03was0wH0IE_KbIZDIQrVCKC7FzS9wY0lTKKTsMSCKbauNrg7hzprYJrUJZLPd7EZYB_pEhHW99TUxn-kq8EH-b2wOXt4-rzCxuixj9U5wqBLZHFEC3u61VFpNfYWlr_sJRGXE5fmLZsajaTMwVsj-_l1w5I9rqmq-ZvcPqwTWxu8VLYMf9q_Oo9AzJe3zxUediW8AYHuViI7TOD9ITf0C2I9UOvcFdfD69RVFYoawqqkfMHVSDE5P_KjGqs_pONOOO8JJtQzAyumS9pPZYdA3-K3M4AyA0vhHdzMtnEuRTvl5J-6FnDiXslxxz5uE6BUO561HKPrb64ZMinM2i4O-PWjrxEooOV2GON7GNUjxEZjIRxFT_ZXpt8GOJ6a6pv_TVlMcL1oT_Dp9aDEDMm2_EHdV7fNQVxT0ig09lnyMypTJ5NaXNV2ol0TdKOloI187oO9kJJEGk56k4hBA3JpqpcCjRfxZ3KoHvNlnch5XLf_nc6OLS-EcHYpLa8X942hBOIB4oAaw0-Rbae7ubUVE60uyBzPa-WhPcKvy2yOv1aE6zjQJ1pZ_M9DtOH7aPxbvGMfUEcPbipomof8OFik_QWexua3SuGMe7ggc51-KJrFHMBj89OCyQEJ38k3o0sBLhoayuQU5UaiplGjVao5b1kX39FgSKRGQL88nd3JFU7Oyk7EONWjFVJUanDQftR7HeK83FKcHDTmgVNAlJJFOds1crW8Vr2tGWWDMZjT8Mvc3eMdZhHM8dhUfwy01g3z8GGB1lK-M3vmKIB-mFx-8-ygsUov8ox3AjmJntXXJwcnuNWruVLeAZvGkx_1tyHRiKKgjCamu0jzB-TvkZ6ntefQgx0YreQnmMLF2lAT5Ld0VkRnCy7Ddmx-5LOGIK1sYrJLwnyN93vehGuqJNX0YB8S2-HbB13ZOltyW0s5myI_zlH3UM4PPXS8O_IIuVtphDDJpWpMh-XWNW0uOGFxpNQbhum9NYvGaVi3GcJxRB74gYGMPzeXWxuM_98GulGhndo4mCrMKQO6sMxu8OsaAwX0nswVuX70h_Qk9nNVqp1TMjNygP5Id7Du0JyD06IEFYFXJCaaXM7SIt-RXY4G54FCwC0gx2kezbpbqlniHooj7IhTmRksEkZgiNevQUuK-Yh6ejdKdSvgnAJmzmoqsqMgES73AZCPFta5t2VNSsV-cdYpJBiHs6npngHrzfH1uGxm7CEaTjVwEoLGq5op5CxdweQjcngYf7p6GHgGis145onvi0zniMNYrdodF9DRptyuiOFeG5t53ANkLDN7gtejQ==",
+        "summary": []
+      },
+      {
+        "content": "Never mind, just say hi.",
+        "role": "user"
+      }
+    ],
+    "max_output_tokens": 128,
+    "model": "o4-mini",
+    "reasoning": {
+      "effort": "medium"
+    },
+    "store": false,
+    "tools": [
+      {
+        "description": "Get weather.",
+        "name": "get_weather",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "city": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "city"
+          ],
+          "type": "object"
+        },
+        "type": "function"
+      }
+    ]
+  }
+}

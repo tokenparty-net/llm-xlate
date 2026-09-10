@@ -1,0 +1,50 @@
+{
+  "protocol": "anthropic",
+  "stream": true,
+  "status": 200,
+  "verdict": "pass",
+  "request_id": "req_011CeuSH2j8jsbBwYDe9wh6d",
+  "rate_limit": {
+    "anthropic-ratelimit-input-tokens-limit": "5000000",
+    "anthropic-ratelimit-input-tokens-remaining": "5000000",
+    "anthropic-ratelimit-input-tokens-reset": "2026-09-10T08:23:19Z",
+    "anthropic-ratelimit-output-tokens-limit": "1000000",
+    "anthropic-ratelimit-output-tokens-remaining": "1000000",
+    "anthropic-ratelimit-output-tokens-reset": "2026-09-10T08:23:19Z",
+    "anthropic-ratelimit-requests-limit": "5000",
+    "anthropic-ratelimit-requests-remaining": "4999",
+    "anthropic-ratelimit-requests-reset": "2026-09-10T08:23:19Z",
+    "anthropic-ratelimit-tokens-limit": "6000000",
+    "anthropic-ratelimit-tokens-remaining": "6000000",
+    "anthropic-ratelimit-tokens-reset": "2026-09-10T08:23:19Z"
+  },
+  "stop_reason": "tool_use",
+  "usage": {
+    "cache_creation.ephemeral_1h_input_tokens": 0,
+    "cache_creation.ephemeral_5m_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "input_tokens": 567,
+    "output_tokens": 40,
+    "output_tokens_details.thinking_tokens": 0
+  },
+  "tool_call_count": 1,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "event_sequence": [
+    "message_start",
+    "content_block_start[0]:tool_use",
+    "ping",
+    "content_block_delta[0]:input_json_delta",
+    "content_block_delta[0]:input_json_delta",
+    "content_block_delta[0]:input_json_delta",
+    "content_block_delta[0]:input_json_delta",
+    "content_block_stop",
+    "message_delta",
+    "message_stop"
+  ],
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 1
+}

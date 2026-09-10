@@ -1,0 +1,28 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is 17*23? Think, then answer with just the number."
+    },
+    {
+      "role": "assistant",
+      "content": null
+    },
+    {
+      "role": "user",
+      "content": "Now multiply that result by 2."
+    }
+  ],
+  "max_completion_tokens": 256,
+  "store": false
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---
+reasoning=dropped;reasoning.opaque=dropped

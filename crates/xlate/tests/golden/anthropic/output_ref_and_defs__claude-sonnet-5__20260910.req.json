@@ -1,0 +1,41 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": "Return a home address with a city.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "output_config": {
+    "format": {
+      "schema": {
+        "$defs": {
+          "addr": {
+            "additionalProperties": false,
+            "properties": {
+              "city": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "city"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "home": {
+            "$ref": "#/$defs/addr"
+          }
+        },
+        "required": [
+          "home"
+        ],
+        "type": "object"
+      },
+      "type": "json_schema"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "max_completion_tokens": 64,
+  "messages": [
+    {
+      "content": [
+        {
+          "text": "One word.",
+          "type": "text"
+        },
+        {
+          "image_url": {
+            "url": "data:image/tiff;base64,$ASSET:png_1px"
+          },
+          "type": "image_url"
+        }
+      ],
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini"
+}

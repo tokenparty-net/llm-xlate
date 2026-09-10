@@ -1,0 +1,126 @@
+# Chat family 14 — reasoning_effort / verbosity / token fields (plan §5.14).
+# llm-xlate assumption: plan §2 row 6 — from GPT-5.4, tool calling is unsupported when reasoning_effort != none,
+# so Chat-in should lower to Resp-out. §7.2 effort mapping; max_tokens vs max_completion_tokens on reasoning models.
+
+[[probe]]
+id         = "chat.reason.effort_none"
+protocol   = "chat"
+tags       = ["explore", "dataset", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "reasoning_effort=none is accepted and suppresses reasoning (fast path)."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+reasoning_effort      = "none"
+messages              = [ { role = "user", content = "What is 2+2?" } ]
+
+[[probe]]
+id         = "chat.reason.effort_minimal"
+protocol   = "chat"
+tags       = ["explore", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "reasoning_effort=minimal is accepted."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+reasoning_effort      = "minimal"
+messages              = [ { role = "user", content = "What is 12*12?" } ]
+
+[[probe]]
+id         = "chat.reason.effort_high"
+protocol   = "chat"
+tags       = ["explore", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "reasoning_effort=high is accepted."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 256
+reasoning_effort      = "high"
+messages              = [ { role = "user", content = "Prove there are infinitely many primes in two lines." } ]
+
+[[probe]]
+id         = "chat.reason.effort_xhigh"
+protocol   = "chat"
+tags       = ["explore", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "reasoning_effort=xhigh is accepted on the newest reasoning models; on older ones -> 400 naming the allowed set."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 256
+reasoning_effort      = "xhigh"
+messages              = [ { role = "user", content = "What is the 10th Fibonacci number?" } ]
+
+[[probe]]
+id         = "chat.reason.tools_with_effort_gpt54"
+protocol   = "chat"
+tags       = ["explore", "reasoning", "tools", "errors"]
+models     = ["gpt-5.4"]
+stream     = false
+hypothesis = "On gpt-5.4, tool calling with reasoning_effort != none is REJECTED (plan §2 row 6) — the reason Chat-in lowers to Resp-out for OpenAI backends."
+expect     = "any"
+notes      = "Central plan claim. Uses an explicit model list (gpt-5.4) rather than a set because the claim is model-specific. Verdict per capture."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+reasoning_effort      = "high"
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Weather in Paris? Use the tool." } ]
+
+[[probe]]
+id         = "chat.reason.tools_with_effort_none_gpt54"
+protocol   = "chat"
+tags       = ["explore", "reasoning", "tools"]
+models     = ["gpt-5.4"]
+stream     = false
+hypothesis = "On gpt-5.4, tool calling WITH reasoning_effort=none is accepted (the boundary that makes the §2 claim about non-none)."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+reasoning_effort      = "none"
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Weather in Paris? Use the tool." } ]
+
+[[probe]]
+id         = "chat.reason.max_tokens_on_reasoning"
+protocol   = "chat"
+tags       = ["explore", "reasoning", "errors"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "Legacy `max_tokens` (not max_completion_tokens) on a reasoning model -> 400 unsupported_parameter directing to max_completion_tokens."
+expect     = "any"
+notes      = "clamp only lowers over-cap values; max_tokens=64 stays. Documents the legacy-field rejection text."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+messages   = [ { role = "user", content = "What is 2+2?" } ]
+
+[[probe]]
+id         = "chat.reason.verbosity"
+protocol   = "chat"
+tags       = ["explore", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "A `verbosity` param (low/medium/high) is accepted on reasoning models and affects answer length."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+verbosity             = "low"
+messages              = [ { role = "user", content = "Explain photosynthesis." } ]

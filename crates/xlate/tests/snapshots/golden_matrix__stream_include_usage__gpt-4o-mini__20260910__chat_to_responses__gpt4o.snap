@@ -1,0 +1,26 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Count one to five."
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 128,
+  "stream": true
+}
+--- headers ---
+content-type: application/json
+upstream_streams: true
+--- degraded ---

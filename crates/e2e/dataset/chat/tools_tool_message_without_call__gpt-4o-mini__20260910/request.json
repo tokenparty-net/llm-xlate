@@ -1,0 +1,24 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/chat/completions",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "max_completion_tokens": 64,
+    "messages": [
+      {
+        "content": "hi",
+        "role": "user"
+      },
+      {
+        "content": "18C",
+        "role": "tool",
+        "tool_call_id": "call_does_not_exist"
+      }
+    ],
+    "model": "gpt-4o-mini"
+  }
+}

@@ -1,0 +1,90 @@
+# Chat family 17 — media: image_url, file (PDF), input_audio (plan §5.17).
+# llm-xlate assumption: §7.5 media lowering to Chat content parts (image_url data/https + detail; file
+# file_data + filename). data/caps media.
+
+[[probe]]
+id         = "chat.media.image_data_url"
+protocol   = "chat"
+tags       = ["dataset", "media"]
+models     = "openai_chat"
+stream     = "both"
+hypothesis = "An image_url content part with a data: URL (base64 png) is accepted (200)."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "user", content = [ { type = "text", text = "One word." }, { type = "image_url", image_url = { url = "$ASSET_DATA_URL:png_1px" } } ] } ]
+
+[[probe]]
+id         = "chat.media.image_https_detail"
+protocol   = "chat"
+tags       = ["explore", "media"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "An image_url with an https URL and detail:\"low\" is accepted; detail is honoured."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "user", content = [ { type = "text", text = "One word." }, { type = "image_url", image_url = { url = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png", detail = "low" } } ] } ]
+
+[[probe]]
+id         = "chat.media.file_pdf_with_filename"
+protocol   = "chat"
+tags       = ["dataset", "media"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "A `file` content part with file_data (base64 PDF) + filename is accepted on file-capable chat models (200)."
+expect     = "any"
+notes      = "PDF-in-chat is model-gated; if rejected the error text names the capability."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "user", content = [ { type = "text", text = "How many pages?" }, { type = "file", file = { filename = "doc.pdf", file_data = "$ASSET_DATA_URL:pdf_1page" } } ] } ]
+
+[[probe]]
+id         = "chat.media.file_pdf_without_filename"
+protocol   = "chat"
+tags       = ["explore", "media", "errors"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "A `file` part WITHOUT filename -> 400 (filename required) or accepted; documents the requirement."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "user", content = [ { type = "text", text = "How many pages?" }, { type = "file", file = { file_data = "$ASSET_DATA_URL:pdf_1page" } } ] } ]
+
+[[probe]]
+id         = "chat.media.input_audio"
+protocol   = "chat"
+tags       = ["media", "errors"]
+models     = "openai_chat"
+stream     = false
+requires   = ["manual"]
+hypothesis = "An input_audio part is accepted only on audio-capable models; on gpt-4o-mini -> 400 naming the capability."
+expect     = "any"
+notes      = "requires manual: no audio asset is bundled; operator supplies one. Dry-run uses a tiny placeholder base64."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "user", content = [ { type = "text", text = "Transcribe." }, { type = "input_audio", input_audio = { data = "UklGRg==", format = "wav" } } ] } ]
+
+[[probe]]
+id         = "chat.media.image_bad_mime"
+protocol   = "chat"
+tags       = ["explore", "media", "errors"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "A data: URL with an unsupported mime -> 400 naming supported image types."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "user", content = [ { type = "text", text = "One word." }, { type = "image_url", image_url = { url = "data:image/tiff;base64,$ASSET:png_1px" } } ] } ]

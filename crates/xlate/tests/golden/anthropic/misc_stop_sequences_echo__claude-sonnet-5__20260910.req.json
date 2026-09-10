@@ -1,0 +1,14 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": "Write the word START then the word END and nothing after.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "stop_sequences": [
+    "END"
+  ],
+  "stream": true
+}

@@ -1,0 +1,14 @@
+{
+  "model": "gpt-5.4",
+  "messages": [
+    { "role": "user", "content": "Think carefully: what is 17 * 23?" },
+    {
+      "role": "assistant",
+      "reasoning_content": "17*23 = 17*20 + 17*3 = 340 + 51 = 391.",
+      "content": "391"
+    },
+    { "role": "user", "content": "And 17 * 24?" }
+  ],
+  "reasoning_effort": "high",
+  "max_completion_tokens": 2048
+}

@@ -1,0 +1,24 @@
+{
+  "input": "Give a code.",
+  "max_output_tokens": 128,
+  "model": "gpt-4o-mini",
+  "text": {
+    "format": {
+      "name": "code",
+      "schema": {
+        "properties": {
+          "code": {
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "strict": false,
+      "type": "json_schema"
+    }
+  }
+}

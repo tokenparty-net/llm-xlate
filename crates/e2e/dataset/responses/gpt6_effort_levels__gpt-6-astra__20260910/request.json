@@ -1,0 +1,17 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/responses",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "input": "Prove sqrt(2) is irrational in two lines.",
+    "max_output_tokens": 256,
+    "model": "gpt-6-astra",
+    "reasoning": {
+      "effort": "high"
+    }
+  }
+}

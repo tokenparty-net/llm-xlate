@@ -1,0 +1,98 @@
+# Anthropic family 3 — sampling parameter rejection (plan §5.3).
+# llm-xlate assumption: plan §2 row 2 + §7.6 — temperature/top_p/top_k are DROPPED (not clamped) because
+# non-default values -> 400 on Claude 4.7+, while 4.6 and earlier accept them. data/caps sampling gate.
+
+[[probe]]
+id         = "ant.sampling.temperature_nondefault"
+protocol   = "anthropic"
+tags       = ["explore", "sampling", "errors"]
+models     = "anthropic_all"
+stream     = false
+hypothesis = "temperature=0.5 -> 400 invalid_request_error on 4.7+/5; accepted on 4.6 and 4.5. Confirms §7.6 'drop, do not clamp'."
+expect     = "any"
+notes      = "Per-model boundary probe; verdict is per-capture. Swept across anthropic_all."
+
+[probe.body]
+model       = "$MODEL"
+max_tokens  = 64
+temperature = 0.5
+messages    = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "ant.sampling.top_p_nondefault"
+protocol   = "anthropic"
+tags       = ["explore", "sampling", "errors"]
+models     = "anthropic_all"
+stream     = false
+hypothesis = "top_p=0.5 -> 400 on 4.7+/5; accepted on 4.6/4.5."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+top_p      = 0.5
+messages   = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "ant.sampling.top_k_nondefault"
+protocol   = "anthropic"
+tags       = ["explore", "sampling", "errors"]
+models     = "anthropic_all"
+stream     = false
+hypothesis = "top_k=10 -> 400 on 4.7+/5; accepted on 4.6/4.5."
+expect     = "any"
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+top_k      = 10
+messages   = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "ant.sampling.temperature_default_one"
+protocol   = "anthropic"
+tags       = ["explore", "sampling"]
+models     = "anthropic_all"
+stream     = false
+hypothesis = "temperature=1.0 (the default) is accepted on ALL models, including 4.7+/5, because only NON-default sampling is rejected."
+expect     = "any"
+notes      = "Distinguishes 'field forbidden' from 'non-default value forbidden'. Expected 200 everywhere."
+
+[probe.body]
+model       = "$MODEL"
+max_tokens  = 64
+temperature = 1.0
+messages    = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "ant.sampling.on_46"
+protocol   = "anthropic"
+tags       = ["explore", "sampling"]
+models     = "anthropic_46"
+stream     = false
+hypothesis = "The 4.6 family accepts non-default temperature (200) — the boundary is at 4.7."
+expect     = "any"
+
+[probe.body]
+model       = "$MODEL"
+max_tokens  = 64
+temperature = 0.3
+messages    = [ { role = "user", content = "Say ok." } ]
+
+[[probe]]
+id         = "ant.sampling.combined_all_three"
+protocol   = "anthropic"
+tags       = ["explore", "sampling", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "All three sampling params together -> a single 400 on 4.7+/5; error message names the first offending field."
+expect     = "any"
+notes      = "Documents which field the error message blames when several are present (affects error mapping)."
+
+[probe.body]
+model       = "$MODEL"
+max_tokens  = 64
+temperature = 0.5
+top_p       = 0.5
+top_k       = 10
+messages    = [ { role = "user", content = "Say ok." } ]

@@ -1,0 +1,50 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "object": "response",
+  "created_at": 1700000000,
+  "status": "completed",
+  "background": null,
+  "error": null,
+  "incomplete_details": null,
+  "instructions": null,
+  "max_output_tokens": null,
+  "metadata": {},
+  "model": "golden-model",
+  "output": [
+    {
+      "id": "fc_resp_golden_0",
+      "type": "function_call",
+      "status": "completed",
+      "call_id": "toolu_015RmZoq2FqxJaorv75fRqDT",
+      "name": "get_weather",
+      "arguments": "{\"city\":\"Paris\"}"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "previous_response_id": null,
+  "reasoning": null,
+  "service_tier": null,
+  "store": null,
+  "temperature": null,
+  "text": null,
+  "tool_choice": "auto",
+  "tools": [],
+  "top_p": null,
+  "truncation": "disabled",
+  "usage": {
+    "input_tokens": 451,
+    "input_tokens_details": {
+      "cached_tokens": 0
+    },
+    "output_tokens": 50,
+    "output_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "total_tokens": 501
+  },
+  "user": null
+}

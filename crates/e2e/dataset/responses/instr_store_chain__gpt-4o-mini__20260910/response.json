@@ -1,0 +1,121 @@
+{
+  "status": 200,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d062dcf24b295-EWR",
+    "connection": "keep-alive",
+    "content-length": "2026",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:19 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "656",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9995",
+    "x-ratelimit-remaining-tokens": "199958",
+    "x-ratelimit-reset-requests": "36.519s",
+    "x-ratelimit-reset-tokens": "12ms",
+    "x-request-id": "req_a79aa4a2a78d4a6982582ed0f22aa335"
+  },
+  "elapsed_ms": 753,
+  "body": {
+    "id": "resp_0f0d5cd7e4f07592006aa268baa12487d2a00750042dfb41b8",
+    "object": "response",
+    "created_at": 1789028538,
+    "status": "completed",
+    "background": false,
+    "billing": {
+      "payer": "developer"
+    },
+    "completed_at": 1789028539,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "incomplete_details": null,
+    "instructions": "Always answer only in French.",
+    "max_output_tokens": 64,
+    "max_tool_calls": null,
+    "model": "gpt-4o-mini-2024-07-18",
+    "moderation": null,
+    "output": [
+      {
+        "id": "msg_0f0d5cd7e4f07592006aa268baec8487d298369beb56f0e51f",
+        "type": "message",
+        "status": "completed",
+        "content": [
+          {
+            "type": "output_text",
+            "annotations": [],
+            "logprobs": [],
+            "text": "Je me souviendrai du nombre 42."
+          }
+        ],
+        "role": "assistant"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "prompt_cache_retention": "in_memory",
+    "reasoning": {
+      "context": null,
+      "effort": null,
+      "summary": null
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "store": true,
+    "temperature": 1.0,
+    "text": {
+      "format": {
+        "type": "text"
+      },
+      "verbosity": "medium"
+    },
+    "tool_choice": "auto",
+    "tool_usage": {
+      "image_gen": {
+        "input_tokens": 0,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "output_tokens": 0,
+        "output_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "total_tokens": 0
+      },
+      "web_search": {
+        "num_requests": 0
+      }
+    },
+    "tools": [],
+    "top_logprobs": 0,
+    "top_p": 1.0,
+    "truncation": "disabled",
+    "usage": {
+      "input_tokens": 23,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 0
+      },
+      "output_tokens": 12,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 35
+    },
+    "user": null,
+    "metadata": {}
+  }
+}

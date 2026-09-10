@@ -1,0 +1,65 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=billing status=429 retryable=false param=- provider_type=insufficient_quota retry_after=- upstream_request_id=-
+message: You exceeded your current quota.
+
+--- chat (non-streaming) ---
+status: 429
+headers:
+  content-type: application/json
+body:
+{
+  "error": {
+    "message": "You exceeded your current quota.",
+    "type": "insufficient_quota",
+    "param": null,
+    "code": "insufficient_quota"
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 429
+frames:
+data: {"error":{"message":"You exceeded your current quota.","type":"insufficient_quota","param":null,"code":"insufficient_quota"}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 429
+headers:
+  content-type: application/json
+body:
+{
+  "error": {
+    "message": "You exceeded your current quota.",
+    "type": "insufficient_quota",
+    "param": null,
+    "code": "insufficient_quota"
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 429
+frames:
+event: error
+data: {"type":"error","code":"insufficient_quota","message":"You exceeded your current quota.","param":null,"sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 400
+headers:
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "billing_error",
+    "message": "You exceeded your current quota."
+  }
+}
+--- anthropic (streaming, pre-start) ---
+status: 400
+frames:
+event: error
+data: {"type":"error","error":{"type":"billing_error","message":"You exceeded your current quota."}}

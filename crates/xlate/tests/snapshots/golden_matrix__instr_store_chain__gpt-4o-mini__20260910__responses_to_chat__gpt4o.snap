@@ -1,0 +1,23 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Always answer only in French."
+    },
+    {
+      "role": "user",
+      "content": "Remember the number 42."
+    }
+  ],
+  "max_completion_tokens": 64,
+  "store": true
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

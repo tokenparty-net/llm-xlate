@@ -1,0 +1,23 @@
+{
+  "label": "resp.reason.on_nonreasoning_model/gpt-4o-mini",
+  "protocol": "responses",
+  "model": "gpt-4o-mini",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "2 path(s) differ (normalizations): ~/input, +/reasoning/summary"
+    },
+    {
+      "name": "error_decode",
+      "pass": true,
+      "detail": "kind=invalid_request status=400"
+    }
+  ]
+}

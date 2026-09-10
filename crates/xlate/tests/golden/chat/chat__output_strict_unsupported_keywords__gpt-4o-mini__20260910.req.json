@@ -1,0 +1,32 @@
+{
+  "max_completion_tokens": 128,
+  "messages": [
+    {
+      "content": "Give a 3-letter code.",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini",
+  "response_format": {
+    "json_schema": {
+      "name": "code",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "maxLength": 4,
+            "minLength": 2,
+            "pattern": "^[A-Z]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "strict": true
+    },
+    "type": "json_schema"
+  }
+}

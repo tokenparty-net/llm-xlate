@@ -1,0 +1,23 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": [
+        {
+          "source": {
+            "data": "$ASSET:png_1px",
+            "media_type": "image/tiff",
+            "type": "base64"
+          },
+          "type": "image"
+        },
+        {
+          "text": "One word.",
+          "type": "text"
+        }
+      ],
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5"
+}

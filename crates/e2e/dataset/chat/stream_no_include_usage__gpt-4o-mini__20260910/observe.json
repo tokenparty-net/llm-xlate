@@ -1,0 +1,38 @@
+{
+  "protocol": "chat",
+  "stream": true,
+  "status": 200,
+  "verdict": "pass",
+  "request_id": "req_dfd7997cbe8341fab08e795c3bbcb896",
+  "rate_limit": {
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9986",
+    "x-ratelimit-remaining-tokens": "199993",
+    "x-ratelimit-reset-requests": "1m59.872s",
+    "x-ratelimit-reset-tokens": "2ms"
+  },
+  "stop_reason": "stop",
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "event_sequence": [
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "finish:stop",
+    "[DONE]"
+  ],
+  "usage_only_final_chunk": false,
+  "done_present": true,
+  "ping_count": 0
+}

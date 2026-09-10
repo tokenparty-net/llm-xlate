@@ -1,0 +1,16 @@
+{
+  "max_tokens": 256,
+  "messages": [
+    {
+      "content": "What is the 7th prime?",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "output_config": {
+    "effort": "xhigh"
+  },
+  "thinking": {
+    "type": "adaptive"
+  }
+}

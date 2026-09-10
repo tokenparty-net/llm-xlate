@@ -1,0 +1,39 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/chat/completions",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "max_completion_tokens": 128,
+    "messages": [
+      {
+        "content": "Give a code.",
+        "role": "user"
+      }
+    ],
+    "model": "gpt-4o-mini",
+    "response_format": {
+      "json_schema": {
+        "name": "code",
+        "schema": {
+          "properties": {
+            "code": {
+              "minLength": 2,
+              "pattern": "^[A-Z]+$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "code"
+          ],
+          "type": "object"
+        },
+        "strict": false
+      },
+      "type": "json_schema"
+    }
+  }
+}

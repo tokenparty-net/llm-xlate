@@ -1,0 +1,69 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: out
+---
+--- decoded XlateError ---
+kind=authentication status=401 retryable=false param=- provider_type=invalid_request_error retry_after=- upstream_request_id=req_auth_1
+message: Incorrect API key provided.
+
+--- chat (non-streaming) ---
+status: 401
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_auth_1
+body:
+{
+  "error": {
+    "message": "Incorrect API key provided.",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": "invalid_api_key"
+  }
+}
+--- chat (streaming, pre-start) ---
+status: 401
+frames:
+data: {"error":{"message":"Incorrect API key provided.","type":"invalid_request_error","param":null,"code":"invalid_api_key"}}
+
+data: [DONE]
+
+
+--- responses (non-streaming) ---
+status: 401
+headers:
+  content-type: application/json
+  x-router-upstream-request-id: req_auth_1
+body:
+{
+  "error": {
+    "message": "Incorrect API key provided.",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": "invalid_api_key"
+  }
+}
+--- responses (streaming, pre-start) ---
+status: 401
+frames:
+event: error
+data: {"type":"error","code":"invalid_api_key","message":"Incorrect API key provided.","param":null,"sequence_number":0}
+
+
+--- anthropic (non-streaming) ---
+status: 401
+headers:
+  x-router-upstream-request-id: req_auth_1
+body:
+{
+  "type": "error",
+  "error": {
+    "type": "authentication_error",
+    "message": "Incorrect API key provided."
+  },
+  "request_id": "req_auth_1"
+}
+--- anthropic (streaming, pre-start) ---
+status: 401
+frames:
+event: error
+data: {"type":"error","error":{"type":"authentication_error","message":"Incorrect API key provided."},"request_id":"req_auth_1"}

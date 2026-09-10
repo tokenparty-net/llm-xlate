@@ -1,0 +1,13 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "What is 2+2?",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "thinking": {
+    "type": "disabled"
+  }
+}

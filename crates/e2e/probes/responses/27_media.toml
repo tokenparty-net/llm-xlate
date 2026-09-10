@@ -1,0 +1,75 @@
+# Responses family 27 — media: input_image / input_file (plan §5.27).
+# llm-xlate assumption: §7.5 media lowering to Responses content parts (input_image url/data/file_id/detail;
+# input_file file_data+filename / file_url / file_id). data/caps media.
+
+[[probe]]
+id         = "resp.media.input_image_data"
+protocol   = "responses"
+tags       = ["dataset", "media"]
+models     = "openai_responses"
+stream     = "both"
+hypothesis = "An input_image content part with a data: URL (base64 png) is accepted (200)."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+input             = [ { role = "user", content = [ { type = "input_text", text = "One word." }, { type = "input_image", image_url = "$ASSET_DATA_URL:png_1px" } ] } ]
+
+[[probe]]
+id         = "resp.media.input_image_url_detail"
+protocol   = "responses"
+tags       = ["explore", "media"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "An input_image with an https image_url and detail:\"low\" is accepted."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+input             = [ { role = "user", content = [ { type = "input_text", text = "One word." }, { type = "input_image", image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png", detail = "low" } ] } ]
+
+[[probe]]
+id         = "resp.media.input_file_data"
+protocol   = "responses"
+tags       = ["dataset", "media"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "An input_file part with file_data (base64 PDF) + filename is accepted."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+input             = [ { role = "user", content = [ { type = "input_text", text = "How many pages?" }, { type = "input_file", filename = "doc.pdf", file_data = "$ASSET_DATA_URL:pdf_1page" } ] } ]
+
+[[probe]]
+id         = "resp.media.input_file_url"
+protocol   = "responses"
+tags       = ["explore", "media"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "An input_file referenced by file_url (https) is accepted."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+input             = [ { role = "user", content = [ { type = "input_text", text = "Summarise." }, { type = "input_file", file_url = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" } ] } ]
+
+[[probe]]
+id         = "resp.media.input_image_file_id"
+protocol   = "responses"
+tags       = ["media", "files_api"]
+models     = "openai_responses"
+stream     = false
+requires   = ["files_api"]
+hypothesis = "An input_image/input_file referencing a Files-API file_id is accepted when the Files API is enabled."
+expect     = "any"
+notes      = "requires files_api: the file_id must be uploaded first; placeholder id for dry-run only."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+input             = [ { role = "user", content = [ { type = "input_text", text = "One word." }, { type = "input_image", file_id = "file-PLACEHOLDER" } ] } ]

@@ -1,0 +1,22 @@
+{
+  "max_tokens": 64,
+  "messages": [
+    {
+      "content": "Say hi.",
+      "role": "user"
+    },
+    {
+      "content": "Hi.",
+      "role": "assistant"
+    },
+    {
+      "content": "Be terse.",
+      "role": "system"
+    },
+    {
+      "content": "Explain gravity.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5"
+}

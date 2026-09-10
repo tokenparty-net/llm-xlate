@@ -1,0 +1,68 @@
+# Chat family 21 — third-party OpenAI-compatible server (plan §5.21).
+# llm-xlate assumption: plan §2 last row — Chat has no reasoning-input slot; de-facto output field is
+# reasoning_content (and reasoning_details arrays on some gateways). data/caps compat / reasoning envelope.
+#
+# The openai_compat set is EMPTY unless E2E_OPENAI_COMPAT_BASE_URL is configured, so these probes expand to
+# nothing under --cheap on an unconfigured machine; they are documented here for completeness and E4.
+
+[[probe]]
+id         = "chat.compat.text_basic"
+protocol   = "chat"
+tags       = ["explore", "compat"]
+models     = "openai_compat"
+stream     = "both"
+requires   = ["manual"]
+hypothesis = "A third-party OpenAI-compatible server accepts a plain chat request (200) — establishes baseline conformance."
+expect     = "any"
+notes      = "requires manual + E2E_OPENAI_COMPAT_* env. Empty model set -> zero expansions when unconfigured."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "user", content = "Say hello." } ]
+
+[[probe]]
+id         = "chat.compat.reasoning_content"
+protocol   = "chat"
+tags       = ["explore", "compat", "reasoning"]
+models     = "openai_compat"
+stream     = false
+requires   = ["manual"]
+hypothesis = "A reasoning-capable compatible model returns reasoning in a reasoning_content field (or reasoning_details array); documents the envelope llm-xlate must round-trip."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 256
+messages              = [ { role = "user", content = "What is 17*23? Think step by step." } ]
+
+[[probe]]
+id         = "chat.compat.reasoning_stream"
+protocol   = "chat"
+tags       = ["explore", "compat", "reasoning", "streaming"]
+models     = "openai_compat"
+stream     = true
+requires   = ["manual"]
+hypothesis = "Streamed reasoning arrives as reasoning_content deltas (or reasoning_details); documents the stream envelope."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 256
+messages              = [ { role = "user", content = "What is 17*23? Think step by step." } ]
+
+[[probe]]
+id         = "chat.compat.tools"
+protocol   = "chat"
+tags       = ["explore", "compat", "tools"]
+models     = "openai_compat"
+stream     = false
+requires   = ["manual"]
+hypothesis = "A compatible server accepts OpenAI-style function tools and returns tool_calls in the standard shape."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Weather in Paris? Use the tool." } ]

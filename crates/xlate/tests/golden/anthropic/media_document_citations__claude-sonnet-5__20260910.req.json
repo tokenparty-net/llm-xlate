@@ -1,0 +1,28 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": [
+        {
+          "citations": {
+            "enabled": true
+          },
+          "source": {
+            "data": "Fact 1: The Eiffel Tower is 330 metres tall. Fact 2: It was completed in 1889.",
+            "media_type": "text/plain",
+            "type": "text"
+          },
+          "title": "facts.txt",
+          "type": "document"
+        },
+        {
+          "text": "How tall is the Eiffel Tower? Cite the document.",
+          "type": "text"
+        }
+      ],
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "stream": true
+}

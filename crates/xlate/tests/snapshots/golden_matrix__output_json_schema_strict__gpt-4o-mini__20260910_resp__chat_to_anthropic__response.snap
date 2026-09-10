@@ -1,0 +1,23 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "type": "message",
+  "role": "assistant",
+  "model": "golden-model",
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"city\":\"Paris\",\"population\":2148000}"
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 53,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 11
+  }
+}

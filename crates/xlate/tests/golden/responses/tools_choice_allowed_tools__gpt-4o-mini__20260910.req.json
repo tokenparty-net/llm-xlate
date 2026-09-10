@@ -1,0 +1,51 @@
+{
+  "input": "Weather in Paris?",
+  "max_output_tokens": 128,
+  "model": "gpt-4o-mini",
+  "tool_choice": {
+    "mode": "auto",
+    "tools": [
+      {
+        "name": "get_weather",
+        "type": "function"
+      }
+    ],
+    "type": "allowed_tools"
+  },
+  "tools": [
+    {
+      "description": "Get weather.",
+      "name": "get_weather",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "type": "object"
+      },
+      "type": "function"
+    },
+    {
+      "description": "Get time.",
+      "name": "get_time",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "tz": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tz"
+        ],
+        "type": "object"
+      },
+      "type": "function"
+    }
+  ]
+}

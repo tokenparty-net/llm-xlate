@@ -1,0 +1,27 @@
+{
+  "protocol": "chat",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "param": "messages",
+    "message": "'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'."
+  },
+  "request_id": "req_a46b6f50d8bd4e1290ace3eedb1964f8",
+  "rate_limit": {
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9982",
+    "x-ratelimit-remaining-tokens": "199983",
+    "x-ratelimit-reset-requests": "2m34.129s",
+    "x-ratelimit-reset-tokens": "5ms"
+  },
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

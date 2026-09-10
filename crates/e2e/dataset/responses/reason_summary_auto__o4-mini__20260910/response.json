@@ -1,0 +1,134 @@
+{
+  "status": 200,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d05a34b75b295-EWR",
+    "connection": "keep-alive",
+    "content-length": "4715",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:01 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "4737",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-ratelimit-limit-requests": "500",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "499",
+    "x-ratelimit-remaining-tokens": "199775",
+    "x-ratelimit-reset-requests": "120ms",
+    "x-ratelimit-reset-tokens": "67ms",
+    "x-request-id": "req_2fe9ba53b2654fb3b7a22888957dcca7"
+  },
+  "elapsed_ms": 4851,
+  "body": {
+    "id": "resp_0f3bba60016a6f6c006aa268a46e8087d281b3ea8738b8f9df",
+    "object": "response",
+    "created_at": 1789028516,
+    "status": "completed",
+    "background": false,
+    "billing": {
+      "payer": "developer"
+    },
+    "completed_at": 1789028520,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": 256,
+    "max_tool_calls": null,
+    "model": "o4-mini-2025-04-16",
+    "moderation": null,
+    "output": [
+      {
+        "id": "rs_0f3bba60016a6f6c006aa268a4d34c87d2939ddff562aa64b9",
+        "type": "reasoning",
+        "content": [],
+        "encrypted_content": "gAAAAABqomipgr_BdANloMw5O-YfMVy_gFyl4D87dNWAYfcr5fAHembfJUXrq5Y1ya2JpYpGRyoCEtuCMF6cF94ezZAJvbqWHtC21IQoikuDh-SCfODHMq33SD4AxoC4b4PM3H9j6SIm3vmrqMhe4io8lfBc7v3ZzojpFkkGBJmqu8GZoLtqn6XoLA2BC_sVK0oOfwhGFiwWLIUbk5kQQHQ63TEZwobjSQK6n2iRnycs6Bec6fujmsMPD8WKgY0_P7a8GqrSBmHKlClTJSS7jPTo44s7LJ1eWgofV8OqO-6XcefGOdKsnSGuHqmqwU617L57E05_YSjlqIZXyRDkHg8KLSFL_j0nYvbZzhVrJVkY9zhdB1Ko9zReKo2g1KikkRlDXPNN1SN3taKuMiP8eTcgjt1NrFkisLKYKZOwn5I_c1vBAguqoHIesFFAjCEwlfBUeIIeLf3MtzYZIOp6D3g7tlopYq-DPfECtQG7LQRsyWVowCjrHND72NAcCQOre6S73xzqtgJk7h0lhyWumUNJAjIvcT0JoQ7ja5AA-ntD1PN7U_jCmkuKI0S8B3ZaO3ZkEwhpzC2jip1IvppcCaGYM6NuwyQz7BP5iB5kWtGIe3xUR3mzE4k3WfUHPi8W2WTM-NN4s8MUN8uiJZrWH1eFovn6BSMM4sP3fDjFQtg0N7mPsr6jRMAcmTZTg5oVURo8CERe02xTJ3nbMWnkE6c23fYd-wqJpjhYqfZLwsl8523itoysXIZ1ldzd9c9dO_4zvElWBPMleXMeumb3ZwSCZFG3ug1qTMwuZ4y43Rg612aMbuZqOuwMMuN3nHOQiyVWhun0Co2q36QtgYjmYj9Ul2R7V9JkHDvpEdi4OhKoTbSpoOsLCZ4ZVdeXW9oGiCNwCeBH0wU5bnM9LxGDFmUMN6tNTYE1t1eyOVDUUrWbTS_orB7fAnCXx2EpT8-LqhbwQcy5101HibIQ3S03cM9MFDC31dH_41bp9iEnl-Hre2BzTPe6fxDqkNQ25nxundNOKiYAEk4zNC91p-YwaMNOAsV0dwMhySWC3nQKuCfuRDaXMRh0UE2Q14ZZ5Nm7mQmekWIRjcjRw2S3H4LG4DrSiY7s-hN77f0L505-MUyKlkGJoa6dzoAHLSTg7CSasc5rM_uIErj3-5NV1tw-6VpgqMXRECgimNqsfQqhlO62aQhjc7sxG-kYc3nRke9rBXitvmWLti5s02s2PsBjMZmrcEcYO4N4smN7D2lGQCUzMz0tfHSbDtyFOwEvMzrmNMv7CwpOoEI8WYhsISMXSH9rCmjXcM2UEEdEq6bWYJDCDYQjfdqi_34JZJ75HWLcGpeQrhlYL6Zdx--xX9X_majK8jT7zikAgTPJJw2J9FSXFWR_cfhupjIonAzr6me1DpGqmqMzVhorgqCec6dEsKOkdF0Af_mFAP8WDJAWC0JwZ4gv86Jj3p9DocLsYr7hoMclYj-c-uNYaaqvFATp9NSR2VYHT10vBrkJA1oOHCVHZVb6RvXgK0x9L1__0jNw4qy2mSGBoerNb0Sgv2PEyOFPlhO5q3v2f6EbTQChi9___VRKu_mGerZC7CJFB0VdPtHpWvQPClB_M1ILSfSulfXE-GzdgahB1KtSBbo4ohn3S4Z-B-vK9YESqcaFOsep2EgVl9M-slBf7Mob5-2nwidSaAAAnHlu3xLfI28aJtYXAruBiLJXtHaDvuCjR_Q8ssZOckenhKkkXiy_xApTVjbU-dll-e7Oenk7qE5938zkkjJh0hvJ1MIG2jzpFXuFjEZo1DBu2nhD0w5JUXHvgqHtCTxXBdfZuYWSA56AklT6JKnejZM6fgN8z6rs1ic5ZKZKUanVjOO-6WqBlXPoeRLiSR65dFvqhtUt2VIlQrmXK4uvK7U1rhIgX4wYsLv7Nc0p_nbDtF7SnLWRTkDkc05ggIdb6YCGjGAbk9VlVg5AmeqyXyQ2E_S3PQDvMpr9rzWlquCfVlN8_6qe0LVmueH51QSfUQQZ3Q==",
+        "summary": [
+          {
+            "type": "summary_text",
+            "text": "**Calculating 17 times 23**\n\nThe user asks for 17 times 23 and suggests I think before answering. So, I could show some reasoning but keep it brief. I can break it down into parts: 17 times 20 equals 340, and 17 times 3 equals 51. Adding those gives me 391. So, I can confidently say that 17 times 23 is 391, including the succinct reasoning for clarity."
+          }
+        ]
+      },
+      {
+        "id": "msg_0f3bba60016a6f6c006aa268a8955087d2aff725143035b9b6",
+        "type": "message",
+        "status": "completed",
+        "content": [
+          {
+            "type": "output_text",
+            "annotations": [],
+            "logprobs": [],
+            "text": "17 × 23 = (17 × 20) + (17 × 3) = 340 + 51 = 391."
+          }
+        ],
+        "role": "assistant"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "prompt_cache_retention": "in_memory",
+    "reasoning": {
+      "context": "current_turn",
+      "effort": "medium",
+      "mode": "standard",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "store": true,
+    "temperature": 1.0,
+    "text": {
+      "format": {
+        "type": "text"
+      },
+      "verbosity": "medium"
+    },
+    "tool_choice": "auto",
+    "tool_usage": {
+      "image_gen": {
+        "input_tokens": 0,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "output_tokens": 0,
+        "output_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 0
+        },
+        "total_tokens": 0
+      },
+      "web_search": {
+        "num_requests": 0
+      }
+    },
+    "tools": [],
+    "top_logprobs": 0,
+    "top_p": 1.0,
+    "truncation": "disabled",
+    "usage": {
+      "input_tokens": 18,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 0
+      },
+      "output_tokens": 212,
+      "output_tokens_details": {
+        "reasoning_tokens": 128
+      },
+      "total_tokens": 230
+    },
+    "user": null,
+    "metadata": {}
+  }
+}

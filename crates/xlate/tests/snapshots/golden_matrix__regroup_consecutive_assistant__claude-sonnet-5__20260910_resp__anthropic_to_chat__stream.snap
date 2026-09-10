@@ -1,0 +1,15 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: render_frames(&frames)
+---
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"reasoning_details":[{"type":"router.opaque","data":"rtr1.eyJ2IjoxLCJwIjoiYW50aHJvcGljIiwibSI6ImNsYXVkZS1zb25uZXQtNSIsImsiOiJzaWduYXR1cmUiLCJkIjoiRW93Q0NwQUJDQkVZQWlwQVBtMHp0UTlJYi9oQkN2bWpLdGtyaUhGanhXUlRFcndoSnVUSjhVOVZxRjZGNWpER0xTOGo3NDh4cXFDbE9UckQwK2YrTXlTZlhiWS9BR1F1eEdOZVpESVBZMnhoZFdSbExYTnZibTVsZEMwMU9BQkNDSFJvYVc1cmFXNW5XaVJrWm1RME5USmtNQzAwTldFeUxUUTRZakF0T0RoaVpTMDVOV0V4TVdVM1lUUTFaakNvQVpuU2lkVUdFZ3hYSUw0RzFSZjNDbURkOVdJYURMMHdBamxQNGFpMGpvWkdaQ0l3NDNaamxwWWlTaVZQQ1poN2pMR0Vic043QVRFQzhQdzcxUTVFSHY3MVRuOU1qVmhReHYwbERBZzBNRFgrZHpHdUtpa1BzU0R1enhnRGpJZWtYWVFIR2NRZyt3SjUyOTBsNXRXZDNwRnpuMHoybDhJalFkZTc3N25rU1JnQiIsImgiOiJXZ1Q2ZFp0bEdQUDROUzd2X1dBbENVSmJpZTRKRlJRakt4Zk9BNmhTQXEwIn0"}]},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"content":"I'm doing well, thanks for asking! How about you—how's your day going?"},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[],"usage":{"prompt_tokens":28,"completion_tokens":36,"total_tokens":64,"prompt_tokens_details":{"cached_tokens":0}}}
+
+data: [DONE]

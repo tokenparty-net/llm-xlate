@@ -1,0 +1,50 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "object": "response",
+  "created_at": 1700000000,
+  "status": "incomplete",
+  "background": null,
+  "error": null,
+  "incomplete_details": {
+    "reason": "max_output_tokens"
+  },
+  "instructions": null,
+  "max_output_tokens": null,
+  "metadata": {},
+  "model": "golden-model",
+  "output": [
+    {
+      "type": "reasoning",
+      "id": "rs_0c67caaadd6ef05a016aa26894e93c87d2a10f81f231eb78c1",
+      "summary": [],
+      "status": "completed"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "previous_response_id": null,
+  "reasoning": null,
+  "service_tier": null,
+  "store": null,
+  "temperature": null,
+  "text": null,
+  "tool_choice": "auto",
+  "tools": [],
+  "top_p": null,
+  "truncation": "disabled",
+  "usage": {
+    "input_tokens": 44,
+    "input_tokens_details": {
+      "cached_tokens": 0
+    },
+    "output_tokens": 256,
+    "output_tokens_details": {
+      "reasoning_tokens": 256
+    },
+    "total_tokens": 300
+  },
+  "user": null
+}

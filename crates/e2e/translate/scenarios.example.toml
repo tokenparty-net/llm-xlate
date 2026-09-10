@@ -1,0 +1,61 @@
+# Minimal example scenario file for `llm-xlate-e2e translate` (plan §8).
+#
+# `translate` loads `translate/scenarios.toml` when it exists, otherwise this example. The file has
+# two tables and the runner takes their cross product (each pair × every scenario whose `source`
+# matches the pair's `source`), doing the §8 round trip for each.
+#
+# [[pair]]  source, target (wire protocols), target_models (a model-set name from models.toml; the
+#           cheap first member is used unless --model overrides it).
+# [[scenario]]  name, kind (free tag), source (wire protocol), and EITHER request (a *.req.json path
+#           relative to crates/e2e, or absolute) OR probe (a probe id whose [probe.body] is the
+#           source; assets/$MODEL are substituted, ${ref:...} chains are not — pick ref-free probes).
+
+# --- the six directed pairs ---
+[[pair]]
+source = "chat"
+target = "anthropic"
+target_models = "anthropic_new"
+
+[[pair]]
+source = "chat"
+target = "responses"
+target_models = "openai_responses"
+
+[[pair]]
+source = "anthropic"
+target = "chat"
+target_models = "openai_chat"
+
+[[pair]]
+source = "anthropic"
+target = "responses"
+target_models = "openai_responses"
+
+[[pair]]
+source = "responses"
+target = "chat"
+target_models = "openai_chat"
+
+[[pair]]
+source = "responses"
+target = "anthropic"
+target_models = "anthropic_new"
+
+# --- one source request per client protocol (golden fixtures) ---
+[[scenario]]
+name = "text"
+kind = "text"
+source = "chat"
+request = "../xlate/tests/golden/chat/text.req.json"
+
+[[scenario]]
+name = "multimodal"
+kind = "media"
+source = "anthropic"
+request = "../xlate/tests/golden/anthropic/multimodal.req.json"
+
+[[scenario]]
+name = "full"
+kind = "tools_loop"
+source = "responses"
+request = "../xlate/tests/golden/responses/full.req.json"

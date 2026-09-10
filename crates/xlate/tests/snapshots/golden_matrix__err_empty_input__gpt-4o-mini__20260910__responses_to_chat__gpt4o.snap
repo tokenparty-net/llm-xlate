@@ -1,0 +1,13 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "messages": [],
+  "max_completion_tokens": 32
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

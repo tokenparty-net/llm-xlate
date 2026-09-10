@@ -1,0 +1,35 @@
+{
+  "model": "gpt-4o",
+  "messages": [
+    { "role": "user", "content": "What is the weather in Paris and Tokyo?" },
+    {
+      "role": "assistant",
+      "content": null,
+      "tool_calls": [
+        { "id": "call_a", "type": "function", "function": { "name": "get_weather", "arguments": "{\"city\":\"Paris\"}" } },
+        { "id": "call_b", "type": "function", "function": { "name": "get_weather", "arguments": "{\"city\":\"Tokyo\"}" } }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_a",
+      "content": [
+        { "type": "text", "text": "Paris: sunny, 21C" },
+        { "type": "image_url", "image_url": { "url": "data:image/png;base64,aGVsbG8=" } }
+      ]
+    },
+    { "role": "tool", "tool_call_id": "call_b", "content": "Tokyo: rainy, 18C" }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get the weather for a city",
+        "parameters": { "type": "object", "properties": { "city": { "type": "string" } }, "required": ["city"] }
+      }
+    }
+  ],
+  "tool_choice": "auto",
+  "parallel_tool_calls": true
+}

@@ -1,0 +1,110 @@
+# Responses family 22 — instructions & chaining (plan §5.22).
+# llm-xlate assumption: plan §2 row 7 — `instructions` is NOT inherited across previous_response_id;
+# §7.1 instructions; §9 stored/non-stored Responses. data/caps.
+
+[[probe]]
+id         = "resp.instr.basic_instructions"
+protocol   = "responses"
+tags       = ["dataset", "instructions"]
+models     = "openai_responses"
+stream     = "both"
+hypothesis = "top-level `instructions` + a string `input` is accepted (200) and steers the reply."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+instructions      = "Answer only in French."
+input             = "How are you?"
+
+[[probe]]
+id         = "resp.instr.system_item_mid_input"
+protocol   = "responses"
+tags       = ["explore", "instructions"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "A system/developer message ITEM mid-input (input as an array of items) is accepted."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+input             = [ { role = "user", content = "Say hi." }, { role = "assistant", content = "Hi." }, { role = "developer", content = "From now on answer in French." }, { role = "user", content = "How are you?" } ]
+
+[[probe]]
+id         = "resp.instr.message_shorthand"
+protocol   = "responses"
+tags       = ["explore", "instructions"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "The message-shorthand input form (role + string content) is accepted alongside the typed input_text form."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+input             = [ { role = "user", content = "What is 2+2?" } ]
+
+[[probe]]
+id         = "resp.instr.typed_input_text"
+protocol   = "responses"
+tags       = ["dataset", "instructions"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "The typed content-part form (type:input_text) is accepted and equivalent to the shorthand."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+input             = [ { role = "user", content = [ { type = "input_text", text = "What is 2+2?" } ] } ]
+
+[[probe]]
+id         = "resp.instr.store_chain"
+protocol   = "responses"
+tags       = ["explore", "dataset", "state"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "store:true returns an id usable as previous_response_id on a follow-up call (server-side chaining)."
+expect     = { status = 200 }
+notes      = "Base of both chain probes below; captures a stored response id. Carries `instructions` so the not-inherited probe can test whether they persist across the chain."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+store             = true
+instructions      = "Always answer only in French."
+input             = "Remember the number 42."
+
+[[probe]]
+id         = "resp.instr.chain_previous_response"
+protocol   = "responses"
+tags       = ["explore", "dataset", "state"]
+models     = "openai_responses"
+stream     = false
+after      = ["resp.instr.store_chain"]
+hypothesis = "A follow-up with previous_response_id continues the conversation (the model recalls the number); the prior turns are inherited."
+expect     = "any"
+
+[probe.body]
+model                = "$MODEL"
+max_output_tokens    = 64
+previous_response_id = "${ref:resp.instr.store_chain:/id}"
+input                = "What number did I ask you to remember?"
+
+[[probe]]
+id         = "resp.instr.instructions_not_inherited"
+protocol   = "responses"
+tags       = ["explore", "instructions", "state"]
+models     = "openai_responses"
+stream     = false
+after      = ["resp.instr.store_chain"]
+hypothesis = "`instructions` set on the first call is NOT inherited by a previous_response_id follow-up (plan §2 row 7); the follow-up without instructions reverts to default behaviour."
+expect     = "any"
+notes      = "Central plan claim. The follow-up sets NO instructions; if the French-only rule persists, the claim is wrong. Record either way."
+
+[probe.body]
+model                = "$MODEL"
+max_output_tokens    = 64
+previous_response_id = "${ref:resp.instr.store_chain:/id}"
+input                = "Reply with a short greeting."

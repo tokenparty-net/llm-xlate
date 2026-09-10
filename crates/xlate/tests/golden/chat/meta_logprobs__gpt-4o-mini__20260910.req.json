@@ -1,0 +1,12 @@
+{
+  "logprobs": true,
+  "max_completion_tokens": 16,
+  "messages": [
+    {
+      "content": "Say the single word yes.",
+      "role": "user"
+    }
+  ],
+  "model": "gpt-4o-mini",
+  "top_logprobs": 3
+}

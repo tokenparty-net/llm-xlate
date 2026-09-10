@@ -1,0 +1,28 @@
+{
+  "protocol": "chat",
+  "stream": false,
+  "status": 400,
+  "verdict": "pass",
+  "error": {
+    "type": "invalid_request_error",
+    "code": "decimal_above_max_value",
+    "param": "temperature",
+    "message": "Invalid 'temperature': decimal above maximum value. Expected a value <= 2, but got 3.0 instead."
+  },
+  "request_id": "req_edc6fffb67054cf48b6f42e2665dbcea",
+  "rate_limit": {
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9966",
+    "x-ratelimit-remaining-tokens": "199996",
+    "x-ratelimit-reset-requests": "4m50.309s",
+    "x-ratelimit-reset-tokens": "1ms"
+  },
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

@@ -1,0 +1,22 @@
+{
+  "method": "POST",
+  "url": "https://api.openai.com/v1/chat/completions",
+  "stream": false,
+  "headers": {
+    "authorization": "<redacted>",
+    "content-type": "application/json"
+  },
+  "body": {
+    "logit_bias": {
+      "1734": -100
+    },
+    "max_completion_tokens": 16,
+    "messages": [
+      {
+        "content": "Say the word yes.",
+        "role": "user"
+      }
+    ],
+    "model": "gpt-4o-mini"
+  }
+}

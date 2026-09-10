@@ -1,0 +1,7 @@
+{
+  "input": "Remember the number 42.",
+  "instructions": "Always answer only in French.",
+  "max_output_tokens": 64,
+  "model": "gpt-4o-mini",
+  "store": true
+}

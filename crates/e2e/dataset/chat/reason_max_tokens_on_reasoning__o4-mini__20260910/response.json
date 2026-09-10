@@ -1,0 +1,38 @@
+{
+  "status": 400,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d06ba4fa7b295-EWR",
+    "connection": "keep-alive",
+    "content-length": "245",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:22:41 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "20",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-openai-proxy-wasm": "v0.1",
+    "x-ratelimit-limit-requests": "500",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "499",
+    "x-ratelimit-remaining-tokens": "199995",
+    "x-ratelimit-reset-requests": "120ms",
+    "x-ratelimit-reset-tokens": "1ms",
+    "x-request-id": "req_a2674c50a4dd4019bd2695fae627b215"
+  },
+  "elapsed_ms": 95,
+  "body": {
+    "error": {
+      "message": "Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.",
+      "type": "invalid_request_error",
+      "param": "max_tokens",
+      "code": "unsupported_parameter"
+    }
+  }
+}

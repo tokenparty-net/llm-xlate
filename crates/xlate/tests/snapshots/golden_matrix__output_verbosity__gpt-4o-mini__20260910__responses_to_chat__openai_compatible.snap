@@ -1,0 +1,19 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "llama-x",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Explain photosynthesis."
+    }
+  ],
+  "max_tokens": 128
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---
+verbosity=dropped

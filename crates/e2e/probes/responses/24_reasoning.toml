@@ -1,0 +1,110 @@
+# Responses family 24 — reasoning effort & summaries (plan §5.24).
+# llm-xlate assumption: §7.2 reasoning — reasoning.effort per model; summary auto/concise/detailed ->
+# summary_text parts; whether raw reasoning_text is ever returned. data/caps reasoning.
+
+[[probe]]
+id         = "resp.reason.effort_low"
+protocol   = "responses"
+tags       = ["explore", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "reasoning.effort=low is accepted and emits a reasoning item with less thinking."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 256
+reasoning         = { effort = "low" }
+input             = "What is 12+30?"
+
+[[probe]]
+id         = "resp.reason.effort_high"
+protocol   = "responses"
+tags       = ["explore", "dataset", "reasoning"]
+models     = "openai_reasoning"
+stream     = "both"
+hypothesis = "reasoning.effort=high is accepted; the output type sequence begins with a reasoning item then a message."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 512
+reasoning         = { effort = "high" }
+input             = "Prove there are infinitely many primes in two lines."
+
+[[probe]]
+id         = "resp.reason.summary_auto"
+protocol   = "responses"
+tags       = ["explore", "dataset", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "reasoning.summary=auto yields summary_text parts inside the reasoning item."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 512
+reasoning         = { effort = "medium", summary = "auto" }
+input             = "What is 17*23? Think, then answer."
+
+[[probe]]
+id         = "resp.reason.summary_detailed"
+protocol   = "responses"
+tags       = ["explore", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "reasoning.summary=detailed yields multiple summary_text parts."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 512
+reasoning         = { effort = "high", summary = "detailed" }
+input             = "Explain why the sky is blue, step by step."
+
+[[probe]]
+id         = "resp.reason.raw_reasoning_text"
+protocol   = "responses"
+tags       = ["explore", "reasoning"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "include:[reasoning.encrypted_content] returns encrypted content but NEVER raw reasoning_text; documents that raw chain-of-thought is not exposed."
+expect     = "any"
+notes      = "Confirms the reasoning item carries encrypted_content and/or summary_text but no plaintext reasoning_text."
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 256
+include           = ["reasoning.encrypted_content"]
+reasoning         = { effort = "medium", summary = "auto" }
+input             = "What is 9*9?"
+
+[[probe]]
+id         = "resp.reason.effort_invalid"
+protocol   = "responses"
+tags       = ["explore", "reasoning", "errors"]
+models     = "openai_reasoning"
+stream     = false
+hypothesis = "An out-of-enum reasoning.effort -> 400 naming the allowed set."
+expect     = { status = 400 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+reasoning         = { effort = "turbo" }
+input             = "Hi."
+
+[[probe]]
+id         = "resp.reason.on_nonreasoning_model"
+protocol   = "responses"
+tags       = ["explore", "reasoning", "errors"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "reasoning.effort on a non-reasoning Responses model (gpt-4o-mini) is ignored or 400; documents the boundary."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+reasoning         = { effort = "medium" }
+input             = "What is 2+2?"

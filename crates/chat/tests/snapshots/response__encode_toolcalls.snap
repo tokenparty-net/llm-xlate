@@ -1,0 +1,5 @@
+---
+source: crates/chat/tests/response.rs
+expression: "encode_response(&r, &ctx())"
+---
+{"id":"chatcmpl-test","object":"chat.completion","created":1700000000,"model":"gpt-4o","choices":[{"index":0,"message":{"role":"assistant","content":null,"refusal":null,"tool_calls":[{"id":"call_a","type":"function","function":{"name":"get_weather","arguments":"{\"city\":\"Paris\"}"}},{"id":"call_b","type":"function","function":{"name":"get_weather","arguments":"{\"city\":\"Tokyo\"}"}}]},"finish_reason":"tool_calls","logprobs":null}],"usage":{"prompt_tokens":40,"completion_tokens":30,"total_tokens":70}}

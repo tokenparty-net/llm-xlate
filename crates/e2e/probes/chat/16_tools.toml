@@ -1,0 +1,160 @@
+# Chat family 16 — tools: parallel, tool_choice, legacy functions, strict, ordering (plan §5.16).
+# llm-xlate assumption: §7.4 tool lowering, tool-message ordering, legacy functions handling, strict carry
+# (plan §2 row 7). data/caps tools.
+
+[[probe]]
+id         = "chat.tools.auto_call"
+protocol   = "chat"
+tags       = ["dataset", "tools"]
+models     = "openai_chat"
+stream     = "both"
+hypothesis = "A function tool with tool_choice auto yields a tool_calls array; finish_reason=tool_calls."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Weather in Paris? Use the tool." } ]
+
+[[probe]]
+id         = "chat.tools.choice_required"
+protocol   = "chat"
+tags       = ["explore", "tools"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "tool_choice:\"required\" forces a tool call even for a non-tool prompt."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+tool_choice           = "required"
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Hello there." } ]
+
+[[probe]]
+id         = "chat.tools.choice_named"
+protocol   = "chat"
+tags       = ["explore", "tools"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "tool_choice naming a specific function forces exactly that function."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+tool_choice           = { type = "function", function = { name = "get_time" } }
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } }, { type = "function", function = { name = "get_time", description = "Get time.", parameters = { type = "object", properties = { tz = { type = "string" } }, required = ["tz"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "What time is it in Tokyo?" } ]
+
+[[probe]]
+id         = "chat.tools.parallel_false"
+protocol   = "chat"
+tags       = ["explore", "tools"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "parallel_tool_calls:false limits the turn to a single tool_call even for a multi-item prompt."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+parallel_tool_calls   = false
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Weather in Paris and Tokyo?" } ]
+
+[[probe]]
+id         = "chat.tools.parallel_capture"
+protocol   = "chat"
+tags       = ["dataset", "tools"]
+models     = "openai_chat"
+stream     = "both"
+hypothesis = "A multi-item prompt with parallel enabled yields multiple tool_calls in one message (parallel-tool dataset)."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 256
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Get the weather for Paris and Tokyo, one tool call each." } ]
+
+[[probe]]
+id         = "chat.tools.result_roundtrip"
+protocol   = "chat"
+tags       = ["dataset", "tools"]
+models     = "openai_chat"
+stream     = false
+after      = ["chat.tools.parallel_capture"]
+hypothesis = "Replaying the assistant tool_calls message followed by tool-role result messages is accepted and the model produces a final answer."
+expect     = "any"
+notes      = "Each tool message must carry the tool_call_id from the captured assistant message (content[0])."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Get the weather for Paris and Tokyo, one tool call each." }, "${ref:chat.tools.parallel_capture:/choices/0/message}", { role = "tool", tool_call_id = "${ref:chat.tools.parallel_capture:/choices/0/message/tool_calls/0/id}", content = "18C sunny" } ]
+
+[[probe]]
+id         = "chat.tools.tool_message_without_call"
+protocol   = "chat"
+tags       = ["explore", "tools", "errors"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "A tool-role message with a tool_call_id that no preceding assistant message produced -> 400 (ordering violation)."
+expect     = "any"
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 64
+messages              = [ { role = "user", content = "hi" }, { role = "tool", tool_call_id = "call_does_not_exist", content = "18C" } ]
+
+[[probe]]
+id         = "chat.tools.legacy_functions"
+protocol   = "chat"
+tags       = ["explore", "tools"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "The legacy `functions` + `function_call` fields are still accepted (deprecated) on chat models."
+expect     = "any"
+notes      = "Determines whether llm-xlate can still emit / must migrate legacy function calling."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+function_call         = "auto"
+functions             = [ { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"] } } ]
+messages              = [ { role = "user", content = "Weather in Paris?" } ]
+
+[[probe]]
+id         = "chat.tools.strict_true"
+protocol   = "chat"
+tags       = ["explore", "tools"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "A function tool with strict:true and a closed schema is accepted and arguments strictly match (plan §2 row 7: carry strict explicitly)."
+expect     = { status = 200 }
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", strict = true, parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Weather in Paris? Use the tool." } ]
+
+[[probe]]
+id         = "chat.tools.strict_unsatisfiable_schema"
+protocol   = "chat"
+tags       = ["explore", "tools", "errors"]
+models     = "openai_chat"
+stream     = false
+hypothesis = "strict:true with a schema that cannot be made strict (e.g. minLength present) -> 400 naming the keyword (or silent fallback?)."
+expect     = "any"
+notes      = "Chat is documented non-strict-by-default; this tests strict-mode keyword handling for tool schemas."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+tools                 = [ { type = "function", function = { name = "make_code", description = "Make a code.", strict = true, parameters = { type = "object", properties = { code = { type = "string", minLength = 2 } }, required = ["code"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Make a code and call the tool." } ]

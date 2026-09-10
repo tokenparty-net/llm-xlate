@@ -1,0 +1,64 @@
+{
+  "status": 200,
+  "headers": {
+    "anthropic-organization-id": "<redacted>",
+    "anthropic-ratelimit-input-tokens-limit": "5000000",
+    "anthropic-ratelimit-input-tokens-remaining": "5000000",
+    "anthropic-ratelimit-input-tokens-reset": "2026-09-10T08:23:29Z",
+    "anthropic-ratelimit-output-tokens-limit": "1000000",
+    "anthropic-ratelimit-output-tokens-remaining": "1000000",
+    "anthropic-ratelimit-output-tokens-reset": "2026-09-10T08:23:30Z",
+    "anthropic-ratelimit-requests-limit": "5000",
+    "anthropic-ratelimit-requests-remaining": "4999",
+    "anthropic-ratelimit-requests-reset": "2026-09-10T08:23:25Z",
+    "anthropic-ratelimit-tokens-limit": "6000000",
+    "anthropic-ratelimit-tokens-remaining": "6000000",
+    "anthropic-ratelimit-tokens-reset": "2026-09-10T08:23:29Z",
+    "anthropic-workspace-id": "<redacted>",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d07cdd87f7327-EWR",
+    "connection": "keep-alive",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:23:30 GMT",
+    "request-id": "req_011CeuSHSwvA8nXez8CwHJMH",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "traceresponse": "00-913aaf06a4b9d3293a207c653937133e-0f9531477f6f450d-01",
+    "transfer-encoding": "chunked",
+    "vary": "Accept-Encoding",
+    "x-robots-tag": "none"
+  },
+  "elapsed_ms": 5164,
+  "body": {
+    "model": "claude-sonnet-5",
+    "id": "msg_011CeuSHTSwDaGMQJdyPjwzg",
+    "type": "message",
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "# 144 ÷ 12 = 12\n\n**Verification:** 12 × 12 = 144 ✓"
+      }
+    ],
+    "container": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "stop_details": null,
+    "usage": {
+      "input_tokens": 13,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 37,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "inference_geo": "global"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "type": "message",
+  "role": "assistant",
+  "model": "golden-model",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "call_a",
+      "name": "get_weather",
+      "input": {
+        "city": "Paris"
+      }
+    },
+    {
+      "type": "tool_use",
+      "id": "call_b",
+      "name": "get_weather",
+      "input": {
+        "city": "Tokyo"
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 40,
+    "output_tokens": 30
+  }
+}

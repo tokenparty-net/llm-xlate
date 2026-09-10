@@ -1,0 +1,27 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: render_frames(&frames)
+---
+event: message_start
+data: {"type":"message_start","message":{"id":"resp_golden","type":"message","role":"assistant","model":"golden-model","content":[],"stop_reason":null,"stop_sequence":null,"usage":{"input_tokens":15,"cache_read_input_tokens":0,"cache_creation_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":150}}}
+
+event: content_block_start
+data: {"type":"content_block_start","index":0,"content_block":{"type":"redacted_thinking","data":"Et8CCpABCBEYAipAiAKcB7MhEm0tiAC5qk9kW+1A3oi5aPW+LnMtlDLAclGB6O4VOQnQgn1ruasqGi22mIKcWpTK6hnQafeAHYvEqDIPY2xhdWRlLXNvbm5ldC01OABCCHRoaW5raW5nWiRkZmQ0NTJkMC00NWEyLTQ4YjAtODhiZS05NWExMWU3YTQ1ZjCoAfrRidUGEgyWhqRBNpVfrpkueFYaDNRYTFc6WLOgk3Q+ESIwnGtF+UHC8ySe5WS95Eq8iRvkbLxJNWdj6vi9wuWPo+GGGKcr2R5dU62/mMTILlenKnwxqVIGnVF//Way9DGRrtDU1ZVYeGYmqqX5qz1pX3wI70V910liYFQfoOX+ASrVHbcYcw+70SVvQWktj+9QX7MgbVPJpV5jNA7AjNYzxWiQlYbMj6Z6rF4kfC5i4PQJkYOFLKIgoA+qeg5qIpAdVgY4TW7WHE9XbYcVvX7QGAE="}}
+
+event: content_block_stop
+data: {"type":"content_block_stop","index":0}
+
+event: content_block_start
+data: {"type":"content_block_start","index":1,"content_block":{"type":"text","text":""}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":1,"delta":{"type":"text_delta","text":"The 7th prime number is **17**.\n\nHere's the sequence for reference:\n1st: 2\n2nd: 3\n3rd: 5\n4th: 7\n5th: 11\n6th: 13\n7th: **17**"}}
+
+event: content_block_stop
+data: {"type":"content_block_stop","index":1}
+
+event: message_delta
+data: {"type":"message_delta","delta":{"stop_reason":"end_turn","stop_sequence":null},"usage":{"output_tokens":150}}
+
+event: message_stop
+data: {"type":"message_stop"}

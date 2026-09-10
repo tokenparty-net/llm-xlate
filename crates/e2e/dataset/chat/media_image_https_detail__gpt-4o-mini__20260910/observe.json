@@ -1,0 +1,30 @@
+{
+  "protocol": "chat",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "code": "invalid_image_url",
+    "message": "Error while downloading file. Upstream status code: 400."
+  },
+  "request_id": "req_8ba1611b5f7e4e9ba22ada437f65b569",
+  "rate_limit": {
+    "x-ratelimit-limit-input-images": "50000",
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-input-images": "49999",
+    "x-ratelimit-remaining-requests": "9972",
+    "x-ratelimit-remaining-tokens": "199230",
+    "x-ratelimit-reset-input-images": "1ms",
+    "x-ratelimit-reset-requests": "3m56.746s",
+    "x-ratelimit-reset-tokens": "231ms"
+  },
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

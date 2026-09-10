@@ -1,0 +1,33 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: render_frames(&frames)
+---
+event: message_start
+data: {"type":"message_start","message":{"id":"resp_golden","type":"message","role":"assistant","model":"golden-model","content":[],"stop_reason":null,"stop_sequence":null,"usage":{"input_tokens":0,"output_tokens":0}}}
+
+event: content_block_start
+data: {"type":"content_block_start","index":0,"content_block":{"type":"thinking","thinking":""}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"thinking_delta","thinking":"**Calculating multiplication**\n\nOkay, the user wants to know what 9 times 9 is. The straightforward answer is just 81. I should keep it clear and simple for them. There's no need for any complicated explanation or formatting here. Just a plain answer will do. So, I’ll respond with 81 as the answer. That should satisfy their question perfectly!"}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"signature_delta","signature":"rtr1.eyJ2IjoxLCJwIjoib3BlbmFpIiwibSI6Im80LW1pbmktMjAyNS0wNC0xNiIsImsiOiJlbmNyeXB0ZWQiLCJkIjoiZ0FBQUFBQnFvbWlyaVZEb1BvdGxuQklQWTNRdThaQUp1eFNBa2JCZmJSOGdKM2RtSDNUR2ZYdVlKYzh2QWxnbkRVLXdZenJyZ1o4dllXNUVuUFJQVGNrZ0tuZlpEay0xRmZyWURiSUVwU2VUakY1dlZpTS1UUTVFM21rbFBVdHo4OGxjVkVUc3ZaeEU2a0E4eGVnNWU0TDFLR1dpaXJwSnRPcjBvR3lkUTJNcjRpM1dfRExfZzBOUVJzeHJTamRZUmxheHA3UnFaM2hwX2c0aDc3LXhhSzMzT01uUWw1Q1gxRHNWSHFVUzZMSW56ZmhkQ0NfUEp0ZlhVU0ItYk5MLXRzZmNWU1VaOWplMHEyY3VMQzlJdFlDS1Zzcm1OQVdTcHNNdkFoV3Mtc2ZuVkV5elVjTDhxYy1TeHQ4RTEyWG1HNEVYeVFXLWdHeURieGdBMFhIM2h4b0t1enBLczYwcE9uaHJzQnktUlhwYThqS0l1XzVYZ1I0dlJlNElwVWRzNllfQk9INWVVdkdzcnZJMTBFUGFOenF5czhhUTRwSVJuWWlaSXhNeW8yVFVnUzRqVjk0Si1udTJjc1EySXlUQ09YUEVWOVlyaVpFOXMyWXFjNUxjbDFwOFNMWUc5V3l0VlZ4bWdsdHctYW03Q0ZuUUdPRjIyMEw4eThSQWdmUDlBRHJfWk4zQUhtSHZjazNUcFdyUF9rbTJOemJCRmVmMnBIYzd2MXJMcWYtQjVYcTNaSDVkNGNqc2FBcTd6TUVKNkJ5QzB4UTJ3Yi1BaDNRM1FyMlVFQVE2aU5pcmJRRmFtM2wxbURIb3NnNFdSYkVZMmZOdUtkRVFHOXdXZUg2Z3hFSnQ0Tk9QS01QamsxUERPdnFKaXFiWWxuRkh0QktnaW5VcEdLVlZoUnRwWkpLLVdBSzFhWjA0MVVPd294MmFfa3FrMllfNjhTcHg3b1dydTZXRTRMNlBFb3EyeXhuajFkbkdrc1d6U1Ftdl9HNFN4NXpOV1F4dmJfbXlibDB6X0k0aXIzVUNIYUtUMFk3TXFBbHY4RzdoZ1NlLVNEU1RmbVRvclNCNmhScTdxekZWWEJfOUdxeUFkcnVQanYwZk81VXJXN3R3S25IdFk3d0FfOG1ZakI1Z0VMdmFHTVB1VWtkcHA2T0xMR0l5VWNJajQyNEg1Y0daeDZLcUhES1pPOVF6ZE5wcDVER3hRNTBJaGtmOE5OTmpPMlZheWw3ckZFaXUwMmJZWkdTa0FncEptZDZCOEpSNUZVQllaSDFPNWE2NElGenpfYmRDVVV3UDA1ZElFalA5R0lJZUZqQkJpY25fbmlEZWlVQUNkRGppc0pGOEZ6dy16NktIYnZfVGJvZzlsRGdyMmhvYjV3X3dBMnRyeDVKS25VTlZSZW8xX25Qc1NrdVkxQzgzaFpyaDZVSUQ1b3VFdF9Cc1g0V1FLRWszZ1AxRFlMUU01TC1NNmFkeGxoOEV6RTJxYmM3dTUtSlVOWm83V0I0VUNZTFRxc3E4ZG55U2FKYmFaaDNxVWRrMHpjZXlYYjlkc1RFbS04dnRsSTI1TmJkYzB5RnlXWVh3ME1CamhINHR1ZGh5Yks0Z3VoTnR3SU92T092YXZSemtEM1p3elFRajQxYjJfTkJoZzZFTjg4N0I1T0w4VG1GNEVOcC0xXzlKbllYakxhNDdVVGE2aE5EdlBLbFpDdEo1bVFTcFNmTGxuNzZEblFvQ0NacDR4SkQxekItT2RPY21nWEVZZ0Z0N054dTR3RWVaemVfcVlSUFNhVmJkMU4wc0ZtZHVfTkVPd3RfM1kyN3Nub3hWTU5nUkIyMGFkZz09IiwiaCI6IktOdldEVzlkWFN6dzktN0FSV3YxQi0xNlQyVVk1OENiS0FGREF5TGtJVmcifQ"}}
+
+event: content_block_stop
+data: {"type":"content_block_stop","index":0}
+
+event: content_block_start
+data: {"type":"content_block_start","index":1,"content_block":{"type":"text","text":""}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":1,"delta":{"type":"text_delta","text":"9 × 9 = 81"}}
+
+event: content_block_stop
+data: {"type":"content_block_stop","index":1}
+
+event: message_delta
+data: {"type":"message_delta","delta":{"stop_reason":"end_turn","stop_sequence":null},"usage":{"input_tokens":13,"cache_read_input_tokens":0,"output_tokens":50}}
+
+event: message_stop
+data: {"type":"message_stop"}

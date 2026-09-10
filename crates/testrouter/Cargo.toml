@@ -1,0 +1,59 @@
+[package]
+name = "llm-xlate-testrouter"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "llm-xlate: a tracing test router (offline-hermetic; points real tools at llm-xlate to find integration bugs)"
+
+[lib]
+name = "llm_xlate_testrouter"
+path = "src/lib.rs"
+
+[[bin]]
+name = "xlate-testrouter"
+path = "src/main.rs"
+
+[features]
+# Exposes the in-process `test_support` module (MockUpstream, fixtures) to downstream
+# integration tests and the `--features live` operator smoke test scaffolding.
+test-support = []
+live = []
+
+[dependencies]
+llm-xlate-core = { workspace = true }
+llm-xlate = { workspace = true }
+llm-xlate-e2e = { workspace = true }
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+bytes = { workspace = true }
+base64 = { workspace = true }
+sha2 = { workspace = true }
+regex = { workspace = true }
+http = { workspace = true }
+
+tokio = { workspace = true }
+reqwest = { workspace = true }
+clap = { workspace = true }
+anyhow = { workspace = true }
+chrono = { workspace = true }
+futures = { workspace = true }
+
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { workspace = true }
+tokio-util = { workspace = true }
+tokio-stream = { workspace = true }
+async-stream = { workspace = true }
+
+[dev-dependencies]
+pretty_assertions = { workspace = true }
+http-body-util = { workspace = true }
+tower = { workspace = true }
+# The integration tests drive the app through its own test_support module.
+llm-xlate-testrouter = { path = ".", features = ["test-support"] }

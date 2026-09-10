@@ -1,0 +1,67 @@
+# Responses family 29 — GPT-6 (plan §5.29).
+# llm-xlate assumption: plan §2 row 6 — GPT-6 Astra requires Responses for tool calling; §7.4. This is why
+# Chat-in must lower to Resp-out for GPT-6 backends. data/caps api_surfaces for gpt-6.
+
+[[probe]]
+id         = "resp.gpt6.text"
+protocol   = "responses"
+tags       = ["explore", "dataset"]
+models     = "openai_gpt6"
+stream     = "both"
+hypothesis = "gpt-6-astra answers a plain text Responses request (200) — GPT-6 lives on Responses."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+input             = "Say hello in one short sentence."
+
+[[probe]]
+id         = "resp.gpt6.tools"
+protocol   = "responses"
+tags       = ["explore", "dataset", "tools"]
+models     = "openai_gpt6"
+stream     = false
+hypothesis = "gpt-6-astra performs tool calling on Responses (200 with a function_call), unlike Chat where it is unsupported."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+tools             = [ { type = "function", name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } ]
+input             = "Weather in Paris? Use the tool."
+
+[[probe]]
+id         = "resp.gpt6.effort_levels"
+protocol   = "responses"
+tags       = ["explore", "reasoning"]
+models     = "openai_gpt6"
+stream     = false
+hypothesis = "gpt-6-astra accepts reasoning.effort levels; documents its allowed set."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 256
+reasoning         = { effort = "high" }
+input             = "Prove sqrt(2) is irrational in two lines."
+
+# NOTE: the paired Chat-side claim (gpt-6-astra tool calling on Chat -> error) is a Chat-protocol probe
+# and lives in probes/chat/14_reasoning.toml family territory; it is captured here as a cross-reference for
+# FINDINGS but written as a Chat probe so the client hits /chat/completions.
+
+[[probe]]
+id         = "chat.gpt6.tools_rejected"
+protocol   = "chat"
+tags       = ["explore", "tools", "errors"]
+models     = "openai_gpt6"
+stream     = false
+hypothesis = "gpt-6-astra tool calling via Chat Completions is rejected (plan §2 row 6: GPT-6 requires Responses for tool calling)."
+expect     = "any"
+notes      = "Cross-protocol: sent to /chat/completions. Verdict per capture; expected an error steering to Responses."
+
+[probe.body]
+model                 = "$MODEL"
+max_completion_tokens = 128
+tools                 = [ { type = "function", function = { name = "get_weather", description = "Get weather.", parameters = { type = "object", properties = { city = { type = "string" } }, required = ["city"], additionalProperties = false } } } ]
+messages              = [ { role = "user", content = "Weather in Paris? Use the tool." } ]

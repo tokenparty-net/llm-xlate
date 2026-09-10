@@ -1,0 +1,29 @@
+{
+  "status": 400,
+  "headers": {
+    "anthropic-organization-id": "<redacted>",
+    "anthropic-workspace-id": "<redacted>",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a38d07f6e8cd7327-EWR",
+    "connection": "keep-alive",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "content-type": "application/json",
+    "date": "Thu, 10 Sep 2026 08:23:31 GMT",
+    "request-id": "req_011CeuSHvxPuQPkyHXjxeVds",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "traceresponse": "00-80032721145654ff6d0ee3c9bf0f7bad-62839cf001ecb91b-01",
+    "transfer-encoding": "chunked",
+    "vary": "Accept-Encoding",
+    "x-robots-tag": "none",
+    "x-should-retry": "false"
+  },
+  "body": {
+    "type": "error",
+    "error": {
+      "type": "invalid_request_error",
+      "message": "thinking.enabled.budget_tokens: Input should be greater than or equal to 1024"
+    },
+    "request_id": "req_011CeuSHvxPuQPkyHXjxeVds"
+  }
+}

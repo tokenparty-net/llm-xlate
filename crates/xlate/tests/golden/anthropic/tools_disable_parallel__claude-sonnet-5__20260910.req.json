@@ -1,0 +1,32 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": "Weather in Paris, London and Rome please.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "tool_choice": {
+    "disable_parallel_tool_use": true,
+    "type": "any"
+  },
+  "tools": [
+    {
+      "description": "Get weather.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "type": "object"
+      },
+      "name": "get_weather"
+    }
+  ]
+}

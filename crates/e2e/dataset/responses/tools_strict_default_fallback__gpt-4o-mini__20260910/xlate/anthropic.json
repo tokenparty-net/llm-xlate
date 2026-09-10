@@ -1,0 +1,1 @@
+{"id":"resp_check","type":"message","role":"assistant","model":"check-model","content":[{"type":"tool_use","id":"call_Y9KbGUi8yDxzl7zNupWoSdJr","name":"make_code","input":{"code":"example"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":51,"cache_read_input_tokens":0,"output_tokens":15}}

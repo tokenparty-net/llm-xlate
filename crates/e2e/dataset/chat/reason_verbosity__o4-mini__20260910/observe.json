@@ -1,0 +1,28 @@
+{
+  "protocol": "chat",
+  "stream": false,
+  "status": 400,
+  "verdict": "na",
+  "error": {
+    "type": "invalid_request_error",
+    "code": "unsupported_value",
+    "param": "verbosity",
+    "message": "Unsupported value: 'verbosity' does not support 'low' with this model. Supported values are: 'medium'."
+  },
+  "request_id": "req_bebc5bd95c5940e3a929a8628f706762",
+  "rate_limit": {
+    "x-ratelimit-limit-requests": "500",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "499",
+    "x-ratelimit-remaining-tokens": "199992",
+    "x-ratelimit-reset-requests": "120ms",
+    "x-ratelimit-reset-tokens": "2ms"
+  },
+  "tool_call_count": 0,
+  "has_signature": false,
+  "has_encrypted_content": false,
+  "has_refusal": false,
+  "usage_only_final_chunk": false,
+  "done_present": false,
+  "ping_count": 0
+}

@@ -1,0 +1,6 @@
+{
+  "frobnicate": true,
+  "input": "Say ok.",
+  "max_output_tokens": 32,
+  "model": "gpt-4o-mini"
+}

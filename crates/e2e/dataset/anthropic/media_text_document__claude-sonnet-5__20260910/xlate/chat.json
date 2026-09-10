@@ -1,0 +1,1 @@
+{"id":"resp_check","object":"chat.completion","created":1700000000,"model":"check-model","choices":[{"index":0,"message":{"role":"assistant","content":"The capital of France is **Paris**.","refusal":null},"finish_reason":"stop","logprobs":null}],"usage":{"prompt_tokens":80,"completion_tokens":14,"total_tokens":94,"prompt_tokens_details":{"cached_tokens":0}}}

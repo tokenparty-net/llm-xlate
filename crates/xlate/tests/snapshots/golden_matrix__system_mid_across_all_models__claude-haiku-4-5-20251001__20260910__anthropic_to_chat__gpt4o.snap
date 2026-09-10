@@ -1,0 +1,30 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Say hi."
+    },
+    {
+      "role": "assistant",
+      "content": "Hi."
+    },
+    {
+      "role": "system",
+      "content": "Answer in French."
+    },
+    {
+      "role": "user",
+      "content": "How are you?"
+    }
+  ],
+  "max_completion_tokens": 64
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

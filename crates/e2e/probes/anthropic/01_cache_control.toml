@@ -1,0 +1,123 @@
+# Anthropic family 1 — request-level & block-level `cache_control` (plan §5.1).
+# llm-xlate assumption under test: plan §2 "request-level cache_control:{type:ephemeral} auto-places
+# a breakpoint on the last cacheable block; max 4 explicit breakpoints" and §7.7; data/caps prompt-cache
+# claims. Highest priority per the plan.
+#
+# NOTE: real cache creation needs a prompt above the model's min-cacheable size (~1024 tokens for
+# Sonnet/Opus, ~2048 for Haiku). The system text below is deliberately padded; E4 may need to lengthen
+# it further to reliably observe usage.cache_creation_input_tokens on the first call.
+
+[[probe]]
+id         = "ant.cache.root_ephemeral"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "cache"]
+models     = "anthropic_new"
+stream     = "both"
+hypothesis = "Request-root cache_control:{type:ephemeral} is accepted (200) on current Claude and auto-places one breakpoint on the last cacheable block (plan §2 cache row; data/caps prompt_cache)."
+expect     = { status = 200 }
+notes      = "Root-level cache_control is the OAI-client caching path in llm-xlate; the reviewers' doubt about this is settled here and in translate."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 64
+cache_control = { type = "ephemeral" }
+system        = "You are a precise assistant. Repeat this policy verbatim when asked. Policy section A: always cite sources. Policy section B: never speculate. Policy section C: keep answers short. Policy section D: refuse nothing benign. Policy section E: prefer plain language. This policy block is intentionally padded so it can exceed the minimum cacheable prompt size when repeated by the operator during a live run; the exact length required varies by model and is documented in the family notes."
+messages      = [ { role = "user", content = "Reply with the single word: ok." } ]
+
+[[probe]]
+id         = "ant.cache.root_ephemeral_replay"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "cache"]
+models     = "anthropic_new"
+stream     = false
+after      = ["ant.cache.root_ephemeral"]
+hypothesis = "An identical second call reads the cache: usage.cache_read_input_tokens > 0 and cache_creation_input_tokens == 0 on this call."
+expect     = { status = 200 }
+notes      = "Same body as ant.cache.root_ephemeral; ordered after it so the breakpoint is warm. Non-deterministic; observe usage only."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 64
+cache_control = { type = "ephemeral" }
+system        = "You are a precise assistant. Repeat this policy verbatim when asked. Policy section A: always cite sources. Policy section B: never speculate. Policy section C: keep answers short. Policy section D: refuse nothing benign. Policy section E: prefer plain language. This policy block is intentionally padded so it can exceed the minimum cacheable prompt size when repeated by the operator during a live run; the exact length required varies by model and is documented in the family notes."
+messages      = [ { role = "user", content = "Reply with the single word: ok." } ]
+
+[[probe]]
+id         = "ant.cache.block_level"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "cache"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "cache_control on a specific content block (not the root) is accepted and defines the breakpoint at that block."
+expect     = { status = 200 }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+system     = [ { type = "text", text = "You are a precise assistant. This system block is a cache breakpoint carrier and is padded to be large enough to cache: alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi omicron pi rho sigma tau upsilon phi chi psi omega, repeated context to raise the token count above the minimum cacheable threshold for the target model during a live run.", cache_control = { type = "ephemeral" } } ]
+messages   = [ { role = "user", content = "Reply with the single word: ok." } ]
+
+[[probe]]
+id         = "ant.cache.system_and_message_breakpoints"
+protocol   = "anthropic"
+tags       = ["explore", "dataset", "cache"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "Multiple explicit breakpoints (system block + a message block) are accepted up to the documented max of 4."
+expect     = { status = 200 }
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+system     = [ { type = "text", text = "System policy block padded for caching: aaaa bbbb cccc dddd eeee ffff gggg hhhh iiii jjjj kkkk llll mmmm nnnn oooo pppp qqqq rrrr ssss tttt uuuu vvvv wwww xxxx yyyy zzzz repeated to exceed the minimum cacheable size during a live run.", cache_control = { type = "ephemeral" } } ]
+messages   = [ { role = "user", content = [ { type = "text", text = "A reference document that is padded for caching: one two three four five six seven eight nine ten, repeated to exceed the minimum cacheable size during a live run.", cache_control = { type = "ephemeral" } }, { type = "text", text = "Reply with the single word: ok." } ] } ]
+
+[[probe]]
+id         = "ant.cache.too_many_breakpoints"
+protocol   = "anthropic"
+tags       = ["explore", "cache", "errors"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "More than 4 explicit cache_control breakpoints is a 400 invalid_request_error (documented max is 4)."
+expect     = { status = 400, error_type = "invalid_request_error" }
+notes      = "Five breakpoints across system + four message text blocks."
+
+[probe.body]
+model      = "$MODEL"
+max_tokens = 64
+system     = [ { type = "text", text = "sys breakpoint padded padded padded padded padded padded padded", cache_control = { type = "ephemeral" } } ]
+messages   = [ { role = "user", content = [ { type = "text", text = "b1 padded padded padded padded", cache_control = { type = "ephemeral" } }, { type = "text", text = "b2 padded padded padded padded", cache_control = { type = "ephemeral" } }, { type = "text", text = "b3 padded padded padded padded", cache_control = { type = "ephemeral" } }, { type = "text", text = "b4 padded padded padded padded", cache_control = { type = "ephemeral" } } ] } ]
+
+[[probe]]
+id         = "ant.cache.on_old_model"
+protocol   = "anthropic"
+tags       = ["explore", "cache"]
+models     = "anthropic_old"
+stream     = false
+hypothesis = "cache_control is accepted on the older (4.5) models this account offers as well; caching is not new-generation-only."
+expect     = { status = 200 }
+notes      = "Cross-model check; the account offers no 3.x models so 'old' = the 4.5 family."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 64
+cache_control = { type = "ephemeral" }
+system        = "Padded system for caching: quick brown fox jumps over the lazy dog, repeated for size, repeated for size, repeated for size, repeated for size."
+messages      = [ { role = "user", content = "Reply with the single word: ok." } ]
+
+[[probe]]
+id         = "ant.cache.ttl_1h"
+protocol   = "anthropic"
+tags       = ["explore", "cache"]
+models     = "anthropic_new"
+stream     = false
+hypothesis = "cache_control:{type:ephemeral, ttl:\"1h\"} (extended TTL) is accepted; llm-xlate has no TTL field so this documents whether the ttl key is silently accepted or rejected."
+expect     = { status = 200 }
+notes      = "Extended-cache TTL may require a beta header on some accounts; if rejected, record the required beta in FINDINGS."
+
+[probe.body]
+model         = "$MODEL"
+max_tokens    = 64
+cache_control = { type = "ephemeral", ttl = "1h" }
+system        = "Padded system for caching: lorem ipsum dolor sit amet consectetur adipiscing elit, repeated for size, repeated for size, repeated for size."
+messages      = [ { role = "user", content = "Reply with the single word: ok." } ]

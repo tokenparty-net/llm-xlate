@@ -1,0 +1,15 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: render_frames(&frames)
+---
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"reasoning_details":[{"type":"router.opaque","data":"rtr1.eyJ2IjoxLCJwIjoiYW50aHJvcGljIiwibSI6ImNsYXVkZS1zb25uZXQtNSIsImsiOiJzaWduYXR1cmUiLCJkIjoiRXFFRENwQUJDQkVZQWlwQWJJcXkrK1JjSUxTY2ZvZmZPSDlZNDBSTE9IbW50Y2lyb3V1VGM1eGpWRFkwbG9KSnI5dUhiUnM2Z3RJYW1sd2dlcUNseHJTWGluS2RoYnNjZ0NuOGdESVBZMnhoZFdSbExYTnZibTVsZEMwMU9BQkNDSFJvYVc1cmFXNW5XaVJrWm1RME5USmtNQzAwTldFeUxUUTRZakF0T0RoaVpTMDVOV0V4TVdVM1lUUTFaakNvQVpqU2lkVUdFZ3lLeUcvQ0Z0Z2VLVmI0YVI0YURHYTJpOTV4U3U3NkN4SmRFU0l3QnR1cVRRcHdpMmUwSFV5ZU1acGtwVThqM2tTOGdiQ3lxbmZPMDM2RmdHZU1RWEFNblFLOStQRWdDNjZacTFXYUtyMEJsWlRzNWVlL2VRbWNwUWgwYytOQmprS29BTzExeDFkMnhsY29rbGwyWHpkQ3pjNUw0a1U3L0lFTVdNYlZxWkpSaUNuQll5WmJHUUVnWmZmOUkzcUd3RTZFVjR0Ni91N0VMTTJZWGJ2amFzV1MrRjlhNHY5UzNGT0p1TCtOZEFGNlI5QWVNTjd2c2kzVnh2WTc0ZVVKQ1drZTBIbFZzVkZoRkVpV3VHc2UrMXFnQTN1Z1BkWFVVRDEyOHFrWHdBR2taK1labzVCRml3QjdDNjRjVmRCVDBnMjRia0FGcS82K2pFVzdoN2J0WHE0a0J2TSs0aTRtMjhOczlOOW9HQUU9IiwiaCI6IkJRV3ZNQlhtOW5tM3ZscmZqOFJ2c1VZbktEdkRyVER0ZWczMXhpNko4MEEifQ"}]},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{"content":"It looks like your message got cut off — I don't see any actual quest"},"finish_reason":null}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{},"finish_reason":"length"}]}
+
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[],"usage":{"prompt_tokens":19,"completion_tokens":64,"total_tokens":83,"prompt_tokens_details":{"cached_tokens":0}}}
+
+data: [DONE]

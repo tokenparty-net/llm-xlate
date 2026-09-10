@@ -1,0 +1,33 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+assertion_line: 223
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "type": "message",
+  "role": "assistant",
+  "model": "golden-model",
+  "content": [
+    {
+      "type": "thinking",
+      "thinking": "Consider the tool.",
+      "signature": "rtr1.eyJ2IjoxLCJwIjoib3BlbmFpIiwibSI6ImdwdC01LjQiLCJrIjoiZW5jcnlwdGVkIiwiZCI6IkVOQ0JMT0IiLCJoIjoiT3lSWU13T0wxa3cxdHJfU2tRRTRoWk5ya05KeXAwaFNSUnR0Um1SRnBoOCJ9"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_abc",
+      "name": "get_weather",
+      "input": {
+        "city": "NYC"
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 50,
+    "cache_read_input_tokens": 10,
+    "output_tokens": 20
+  }
+}

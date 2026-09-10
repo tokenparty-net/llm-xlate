@@ -1,0 +1,44 @@
+{
+  "max_tokens": 128,
+  "messages": [
+    {
+      "content": "Return status ok and meta.code 200.",
+      "role": "user"
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "output_config": {
+    "format": {
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "meta": {
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "code"
+            ],
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "error"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "meta"
+        ],
+        "type": "object"
+      },
+      "type": "json_schema"
+    }
+  }
+}

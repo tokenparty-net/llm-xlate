@@ -1,0 +1,54 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Return status ok and meta.code 200."
+    }
+  ],
+  "response_format": {
+    "type": "json_schema",
+    "json_schema": {
+      "name": "response",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "meta": {
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "code"
+            ],
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "error"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "meta"
+        ],
+        "type": "object"
+      },
+      "strict": true
+    }
+  },
+  "max_completion_tokens": 128
+}
+--- headers ---
+upstream_streams: false
+--- degraded ---

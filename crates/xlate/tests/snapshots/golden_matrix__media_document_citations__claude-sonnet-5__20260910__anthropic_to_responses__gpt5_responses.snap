@@ -1,0 +1,30 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: rendered
+---
+--- body ---
+{
+  "model": "gpt-5.4",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "<document title=\"facts.txt\">\nFact 1: The Eiffel Tower is 330 metres tall. Fact 2: It was completed in 1889.\n</document>"
+        },
+        {
+          "type": "input_text",
+          "text": "How tall is the Eiffel Tower? Cite the document."
+        }
+      ]
+    }
+  ],
+  "max_output_tokens": 128,
+  "stream": true
+}
+--- headers ---
+content-type: application/json
+upstream_streams: true
+--- degraded ---

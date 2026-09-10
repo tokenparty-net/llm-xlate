@@ -1,0 +1,77 @@
+# Responses family 26 — structured output via text.format (plan §5.26).
+# llm-xlate assumption: §7.3 — text.format json_schema strict/non-strict/json_object; verbosity. data/caps.
+
+[[probe]]
+id         = "resp.output.json_schema_strict"
+protocol   = "responses"
+tags       = ["dataset", "output"]
+models     = "openai_responses"
+stream     = "both"
+hypothesis = "text.format json_schema strict:true with a closed schema is accepted (200) and the message parses to the schema."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+text              = { format = { type = "json_schema", name = "city_pop", strict = true, schema = { type = "object", properties = { city = { type = "string" }, population = { type = "integer" } }, required = ["city", "population"], additionalProperties = false } } }
+input             = "Give the city Paris and a rough population."
+
+[[probe]]
+id         = "resp.output.strict_unsupported_keywords"
+protocol   = "responses"
+tags       = ["explore", "output", "errors"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "Under strict:true, minLength/pattern/format -> 400 naming the keyword (evidence for the sanitiser; should match Chat's blocklist)."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+text              = { format = { type = "json_schema", name = "code", strict = true, schema = { type = "object", properties = { code = { type = "string", minLength = 2, pattern = "^[A-Z]+$" } }, required = ["code"], additionalProperties = false } } }
+input             = "Give a 3-letter code."
+
+[[probe]]
+id         = "resp.output.non_strict"
+protocol   = "responses"
+tags       = ["explore", "output"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "text.format json_schema strict:false tolerates keywords strict rejects."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+text              = { format = { type = "json_schema", name = "code", strict = false, schema = { type = "object", properties = { code = { type = "string", minLength = 2 } }, required = ["code"] } } }
+input             = "Give a code."
+
+[[probe]]
+id         = "resp.output.json_object"
+protocol   = "responses"
+tags       = ["explore", "output"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "text.format {type:json_object} with the word JSON in the input is accepted."
+expect     = { status = 200 }
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 64
+text              = { format = { type = "json_object" } }
+input             = "Return JSON: an object with a city field set to Paris."
+
+[[probe]]
+id         = "resp.output.verbosity"
+protocol   = "responses"
+tags       = ["explore", "output"]
+models     = "openai_responses"
+stream     = false
+hypothesis = "text.verbosity (low/medium/high) is accepted and affects answer length."
+expect     = "any"
+
+[probe.body]
+model             = "$MODEL"
+max_output_tokens = 128
+text              = { verbosity = "low" }
+input             = "Explain photosynthesis."
