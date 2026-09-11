@@ -25,6 +25,18 @@ pub(crate) fn run(
         }
     }
 
+    // (b') An output-token limit the backend rejects outright (plan §7.6 addendum): drop it
+    // rather than let the request 400 upstream. Only an explicit `Yes` drops — see the
+    // `max_output_tokens_rejected` docs for why `Unknown` forwards.
+    if caps.transport.max_output_tokens_rejected.is_yes() {
+        if let Some(limit) = req.limits.max_output_tokens.take() {
+            degr.dropped(
+                "max_output_tokens",
+                format!("the backend rejects an output-token limit (client asked for {limit})"),
+            );
+        }
+    }
+
     // (b) Stop-sequence count cap.
     if let Some(rule) = &caps.sampling.stop_sequences {
         if let Some(max) = rule.max {

@@ -189,6 +189,13 @@ pub struct TransportCap {
     pub max_output_tokens_required: Tri,
     /// Default `max_output_tokens` to inject when absent.
     pub default_max_output_tokens: Option<u32>,
+    /// The backend rejects any output-token limit (`max_tokens` /
+    /// `max_completion_tokens` / `max_output_tokens`), e.g. the ChatGPT-subscription
+    /// backend behind a Codex connector. `Yes` ⇒ lowering drops the client's limit with a
+    /// `Dropped` degradation; `No`/`Unknown` ⇒ the limit is forwarded as usual (this is a
+    /// deliberate exception to "unknown ⇒ unsupported": a limit is a hint, not a lossy
+    /// feature, and stripping it by default would silently change every backend).
+    pub max_output_tokens_rejected: Tri,
 }
 
 impl TransportCap {
@@ -196,7 +203,7 @@ impl TransportCap {
         overlay_fields!(self, o;
             opt: protocols, streaming, usage_timing, keepalive_interval_secs, api_version,
                  beta_headers, default_max_output_tokens;
-            tri: stream_usage_opt_in, max_output_tokens_required);
+            tri: stream_usage_opt_in, max_output_tokens_required, max_output_tokens_rejected);
     }
 }
 

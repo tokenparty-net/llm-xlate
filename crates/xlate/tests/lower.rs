@@ -802,6 +802,33 @@ fn sampling_stop_sequences_truncated() {
 }
 
 #[test]
+fn max_output_tokens_dropped_when_backend_rejects_it() {
+    // A Codex-style backend overlay: the limit is refused upstream, so lowering drops it
+    // with a Dropped degradation instead of letting the request 400.
+    let mut caps = preset::gpt5_responses();
+    caps.transport.max_output_tokens_rejected = Tri::Yes;
+    let mut req = req_with_items(vec![user("hi")]);
+    req.limits.max_output_tokens = Some(256);
+    let l = low(req, &caps, Protocol::OaiResponses);
+    assert_eq!(l.req.limits.max_output_tokens, None);
+    assert_eq!(kind_of(&l, "max_output_tokens"), Some(DegradationKind::Dropped));
+}
+
+#[test]
+fn max_output_tokens_forwarded_unless_explicitly_rejected() {
+    // Unknown (the default) and No both forward the limit untouched, with no degradation.
+    for tri in [Tri::Unknown, Tri::No] {
+        let mut caps = preset::gpt5_responses();
+        caps.transport.max_output_tokens_rejected = tri;
+        let mut req = req_with_items(vec![user("hi")]);
+        req.limits.max_output_tokens = Some(256);
+        let l = low(req, &caps, Protocol::OaiResponses);
+        assert_eq!(l.req.limits.max_output_tokens, Some(256));
+        assert!(!has_field(&l, "max_output_tokens"));
+    }
+}
+
+#[test]
 fn sampling_service_tier_cleared_when_unknown() {
     // claude_5 service_tier = ["auto","standard_only"].
     let mut req = req_with_items(vec![user("hi")]);
