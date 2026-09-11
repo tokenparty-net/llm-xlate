@@ -11,7 +11,7 @@ use llm_xlate_core::degrade::Degradations;
 use llm_xlate_core::error::XlateError;
 use llm_xlate_core::ir::{Effort, Item, Protocol, ReasoningExposure, ReasoningItem, Role};
 
-use crate::requirements::{last_assistant_run, run_has_native_reasoning};
+use crate::requirements::{last_assistant_run, run_has_replayable_reasoning};
 
 pub(crate) fn run(
     req: &mut llm_xlate_core::ir::IrRequest,
@@ -68,7 +68,7 @@ pub(crate) fn run(
             let is_active_continuation =
                 req.items[range.end..].iter().all(|it| matches!(it, Item::ToolResult { .. }));
             let run = &req.items[range.clone()];
-            if is_active_continuation && !run_has_native_reasoning(run, &target_family) {
+            if is_active_continuation && !run_has_replayable_reasoning(run, &target_family, caps) {
                 let calls: Vec<_> = run
                     .iter()
                     .filter_map(|it| match it {

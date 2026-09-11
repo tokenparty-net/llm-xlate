@@ -25,6 +25,49 @@ const CREATED_AT: u64 = 1_700_000_000;
 // lowering degradations merged ahead of the codec's wiring degradations.
 // ===========================================================================================
 
+/// Regression: a Chat→Chat agentic loop whose assistant turn carries a plain-text
+/// `reasoning_content` must survive translation to a backend that both requires reasoning on the
+/// last tool turn and replays it through that same text field. It used to be rejected as
+/// `incompatible_history` because only opaque carriers counted as replayable reasoning.
+#[test]
+fn text_reasoning_replays_to_a_textfield_backend() {
+    let body = br#"{
+        "model": "kimi-k3",
+        "messages": [
+            {"role": "user", "content": "explore this project"},
+            {"role": "assistant",
+             "content": "I'll look at the structure first.",
+             "reasoning_content": "The user wants me to explore. Let me look around.",
+             "tool_calls": [{"id":"call_1","type":"function",
+                             "function":{"name":"bash","arguments":"{\"command\":\"ls\"}"}}]},
+            {"role": "tool", "tool_call_id": "call_1", "content": "a.txt b.txt"}
+        ],
+        "tools": [{"type":"function","function":{"name":"bash","parameters":{"type":"object"}}}],
+        "reasoning_effort": "high"
+    }"#;
+    let mut caps = preset::gpt4o();
+    caps.reasoning.replay = Some(llm_xlate::caps::ReplayMode::TextField);
+    caps.reasoning.required_on_last_tool_turn = llm_xlate::caps::Tri::Yes;
+
+    let x = xl();
+    let (enc, reqs) = x
+        .translate_request(
+            Protocol::OaiChat,
+            body,
+            &HeaderMap::new(),
+            Protocol::OaiChat,
+            &caps,
+            &Resolutions::new(),
+        )
+        .expect("a replayable text reasoning turn must not be rejected");
+
+    // The text is already the carrier, so the router is asked to resolve nothing …
+    assert!(reqs.reasoning_for_calls.is_empty());
+    // … and it goes back out on the wire for the backend to see.
+    let out = String::from_utf8(enc.body.to_vec()).unwrap();
+    assert!(out.contains("reasoning_content"), "reasoning text was not replayed: {out}");
+}
+
 #[test]
 fn translate_request_matches_stepwise() {
     // A Chat request carrying a tool + reasoning so the lowering to Anthropic produces real

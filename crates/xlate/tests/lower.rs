@@ -156,6 +156,49 @@ fn reasoning_required_skipped_when_reasoning_disabled() {
     assert!(kind_of(&l, "reasoning.required").is_none());
 }
 
+/// A Chat backend whose replay slot is a text field, and which requires reasoning on the last
+/// tool turn: `claude_5`-style gating over an `openai_compatible`-style carrier.
+fn text_replay_required_caps() -> Capabilities {
+    let mut caps = preset::gpt4o();
+    caps.reasoning.replay = Some(ReplayMode::TextField);
+    caps.reasoning.required_on_last_tool_turn = Tri::Yes;
+    caps
+}
+
+#[test]
+fn reasoning_required_satisfied_by_text_when_textfield_replay() {
+    // The last assistant run carries plain reasoning text (a Chat client's `reasoning_content`)
+    // and no opaque carrier. A TextField-replay backend gets that text echoed straight back by
+    // the request encoder, so it satisfies the requirement: no sidecar blob, no rejection.
+    let mut req = req_with_items(vec![
+        user("q"),
+        reasoning_text(),
+        asst("I'll look."),
+        tool_call("call_1", "bash"),
+        tool_result("call_1", "r"),
+    ]);
+    req.reasoning.effort = Some(Effort::Medium);
+    let l = low(req, &text_replay_required_caps(), Protocol::OaiChat);
+    assert!(l.req.items.iter().any(|i| matches!(i, Item::Reasoning(_))));
+    assert!(kind_of(&l, "reasoning.required").is_none());
+}
+
+#[test]
+fn reasoning_required_text_does_not_satisfy_without_textfield_replay() {
+    // Same transcript against a signature-replay backend: the text has no carrier on the wire,
+    // so it must not count as replayable and the request is still rejected.
+    let mut req = req_with_items(vec![
+        user("q"),
+        reasoning_text(),
+        asst("I'll look."),
+        tool_call("call_1", "bash"),
+        tool_result("call_1", "r"),
+    ]);
+    req.reasoning.effort = Some(Effort::Medium);
+    let e = err(req, &preset::claude_5(), Protocol::Anthropic);
+    assert_eq!(e.kind, ErrorKind::IncompatibleHistory);
+}
+
 #[test]
 fn reasoning_required_skipped_for_historical_tool_turn() {
     // The tool turn is answered and a *later* user turn follows, so it is no longer the active

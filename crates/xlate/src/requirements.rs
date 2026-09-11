@@ -11,7 +11,7 @@
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, HashSet};
 
-use llm_xlate_core::caps::Capabilities;
+use llm_xlate_core::caps::{Capabilities, ReplayMode};
 use llm_xlate_core::ir::{
     CallId, IrRequest, Item, MediaSource, OpaqueBlob, Part, Protocol, ProviderFamily, ResponseId,
 };
@@ -110,7 +110,7 @@ pub fn requirements(req: &IrRequest, caps: &Capabilities, target: Protocol) -> R
     let mut reasoning_for_calls = Vec::new();
     if caps.reasoning.required_on_last_tool_turn.is_yes() {
         if let Some(range) = last_assistant_run(&req.items) {
-            if !run_has_native_reasoning(&req.items[range.clone()], &target_family) {
+            if !run_has_replayable_reasoning(&req.items[range.clone()], &target_family, caps) {
                 for item in &req.items[range] {
                     if let Item::ToolCall { call_id, .. } = item {
                         reasoning_for_calls.push(call_id.clone());
@@ -141,11 +141,28 @@ pub(crate) fn last_assistant_run(items: &[Item]) -> Option<std::ops::Range<usize
     Some(start..end)
 }
 
-/// Whether a run already carries a reasoning item with an opaque blob of the target family
-/// (which the backend can replay natively, so no sidecar lookup is needed).
-pub(crate) fn run_has_native_reasoning(run: &[Item], target_family: &ProviderFamily) -> bool {
+/// Whether a run already carries reasoning the target backend can replay, so no sidecar lookup
+/// is needed.
+///
+/// Two carriers qualify, matching what the request encoders actually put back on the wire:
+///
+/// * an opaque blob of the target family (verbatim signature / encrypted-item replay), and
+/// * plain reasoning text or a summary, when the backend's replay slot **is** a text field
+///   (`ReplayMode::TextField`) — a Chat provider that echoes `reasoning_content` back.
+///
+/// Missing the second carrier is what made a transcript carrying `reasoning_content` look like
+/// it had no reasoning at all, so lowering rejected it as `incompatible_history`.
+pub(crate) fn run_has_replayable_reasoning(
+    run: &[Item],
+    target_family: &ProviderFamily,
+    caps: &Capabilities,
+) -> bool {
+    let text_replay = caps.reasoning.replay == Some(ReplayMode::TextField);
     run.iter().any(|it| match it {
-        Item::Reasoning(r) => r.opaque.as_ref().is_some_and(|b| &b.family == target_family),
+        Item::Reasoning(r) => {
+            r.opaque.as_ref().is_some_and(|b| &b.family == target_family)
+                || (text_replay && (r.text.is_some() || !r.summary.is_empty()))
+        }
         _ => false,
     })
 }
