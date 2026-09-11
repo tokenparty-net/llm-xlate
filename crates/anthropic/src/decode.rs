@@ -13,6 +13,8 @@ use llm_xlate_core::{
     XlateError,
 };
 
+use llm_xlate_core::session::capture_session;
+
 use crate::wire::{
     ext_key, is_provider_tool_result_type, is_server_tool_use_type, tool_is_provider,
     AntMessageWire, AntRequestWire, FAMILY,
@@ -86,6 +88,12 @@ pub fn decode_request(
     if wire.cache_control.is_some() {
         req.cache.request_level = true;
     }
+
+    // ---- session affinity ----
+    // Anthropic Messages has no `prompt_cache_key`; a non-standard `session_id` field (if any)
+    // lands in `extra` and also round-trips via ext below. Headers supply the rest.
+    let session_id_field = wire.extra.get("session_id").and_then(Value::as_str);
+    req.session = capture_session(None, session_id_field, hdrs);
 
     // ---- opaque passthrough → ext ----
     if let Some(v) = wire.container {

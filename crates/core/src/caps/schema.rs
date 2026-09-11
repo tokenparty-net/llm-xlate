@@ -674,6 +674,90 @@ impl CacheCap {
     }
 }
 
+// ---------- session ----------
+
+/// A place a backend accepts a session-affinity id.
+///
+/// TOML/JSON shape is a single-key table: `{ field = "prompt_cache_key" }` for a top-level
+/// request body field, or `{ header = "x-session-affinity" }` for a request header.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SessionSink {
+    /// A top-level request body field with this name.
+    Field(String),
+    /// A request header with this name.
+    Header(String),
+}
+
+impl SessionSink {
+    /// The place's name (the field or header name), regardless of kind.
+    pub fn name(&self) -> &str {
+        match self {
+            SessionSink::Field(n) | SessionSink::Header(n) => n,
+        }
+    }
+}
+
+impl Serialize for SessionSink {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeStruct;
+        let mut st = s.serialize_struct("SessionSink", 1)?;
+        match self {
+            SessionSink::Field(n) => st.serialize_field("field", n)?,
+            SessionSink::Header(n) => st.serialize_field("header", n)?,
+        }
+        st.end()
+    }
+}
+
+impl<'de> Deserialize<'de> for SessionSink {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        struct Raw {
+            #[serde(default)]
+            field: Option<String>,
+            #[serde(default)]
+            header: Option<String>,
+        }
+        let raw = Raw::deserialize(d)?;
+        match (raw.field, raw.header) {
+            (Some(f), None) => Ok(SessionSink::Field(f)),
+            (None, Some(h)) => Ok(SessionSink::Header(h)),
+            (Some(_), Some(_)) => Err(serde::de::Error::custom(
+                "session sink must set exactly one of `field` / `header`, not both",
+            )),
+            (None, None) => Err(serde::de::Error::custom(
+                "session sink must set one of `field` / `header`",
+            )),
+        }
+    }
+}
+
+/// Session-affinity capabilities (`[model.session]`).
+///
+/// Describes where, if anywhere, a backend accepts a client session id, and whether one is
+/// mandatory. See [`crate::ir::SessionConfig`] and [`crate::session`].
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct SessionCap {
+    /// Ordered list of places this backend accepts a session id, most-preferred first. The
+    /// first entry is the one used when emitting; the list exists for future expansion.
+    /// `None` / empty ⇒ the backend accepts no session id (nothing is emitted).
+    pub accepts: Option<Vec<SessionSink>>,
+    /// Whether the backend **requires** a session id to function. `Yes` ⇒ a request with no
+    /// captured session id is rejected during lowering.
+    pub required: Tri,
+}
+
+impl SessionCap {
+    fn overlay(&mut self, o: &SessionCap) {
+        overlay_fields!(self, o; opt: accepts; tri: required);
+    }
+    /// The place a session id should be emitted, if any (the first accepted sink).
+    pub fn primary_sink(&self) -> Option<&SessionSink> {
+        self.accepts.as_ref().and_then(|v| v.first())
+    }
+}
+
 // ---------- limits ----------
 
 /// Numeric limits (`[model.limits]`).
@@ -744,6 +828,8 @@ pub struct Capabilities {
     pub sampling: SamplingCap,
     /// State.
     pub state: StateCap,
+    /// Session affinity.
+    pub session: SessionCap,
     /// Cache.
     pub cache: CacheCap,
     /// Limits.
@@ -776,6 +862,7 @@ impl Capabilities {
         self.media.overlay(&other.media);
         self.sampling.overlay(&other.sampling);
         self.state.overlay(&other.state);
+        self.session.overlay(&other.session);
         self.cache.overlay(&other.cache);
         self.limits.overlay(&other.limits);
         self.errors.overlay(&other.errors);

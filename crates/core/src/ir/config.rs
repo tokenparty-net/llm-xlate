@@ -38,6 +38,8 @@ pub struct IrRequest {
     pub sampling: Sampling,
     /// Prompt-cache hints.
     pub cache: CacheHints,
+    /// Session-affinity information captured from the client request.
+    pub session: SessionConfig,
     /// Server-state configuration (store, chaining, background, include list).
     pub state: StateConfig,
     /// Whether the client asked for a streaming response.
@@ -388,6 +390,24 @@ pub struct CacheHints {
     pub request_level: bool,
     /// Explicit prompt cache key (OpenAI `prompt_cache_key`).
     pub prompt_cache_key: Option<String>,
+}
+
+/// Session-affinity information captured from the client request.
+///
+/// `id` is the session id the router uses for sticky routing / affinity, captured from the
+/// first present of (in priority order) the `prompt_cache_key` body field, the `session_id`
+/// body field, the `x-session-affinity` header, the `x-opencode-session` header, and the
+/// `x-session-id` header (see [`crate::session::capture_session`]). On the way out it is
+/// emitted to the first place the backend accepts a session id
+/// ([`crate::caps::SessionCap`]).
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub struct SessionConfig {
+    /// The captured session id, if the client supplied one.
+    pub id: Option<String>,
+    /// Labels of the other sources that also carried a session id whose value **differed**
+    /// from [`SessionConfig::id`]. Populated at decode time so lowering can emit a single
+    /// degradation; empty when the client supplied a consistent (or single) session id.
+    pub conflicting_sources: Vec<String>,
 }
 
 /// Server-state configuration (Responses store / chaining / background / include).

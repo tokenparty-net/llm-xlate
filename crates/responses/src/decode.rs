@@ -3,6 +3,8 @@
 
 use serde_json::{Map, Value};
 
+use llm_xlate_core::codec::HeaderMap;
+use llm_xlate_core::session::capture_session;
 use llm_xlate_core::{
     canon, CacheHints, DecodeCtx, Effort, Extensions, Instruction, InstructionRole, IrRequest, Item,
     ItemId, JsonText, Limits, MediaSource, ModelRef, OpaqueBlob, OpaqueItem, OpaqueKind, OutputConfig,
@@ -43,6 +45,7 @@ const KNOWN: &[&str] = &[
 /// Decode a Responses request body into the IR.
 pub(crate) fn decode_request(
     body: &[u8],
+    hdrs: &HeaderMap,
     ctx: &DecodeCtx,
 ) -> Result<IrRequest, XlateError> {
     let root = canon::parse(body)?;
@@ -121,6 +124,14 @@ pub(crate) fn decode_request(
         request_level: false,
         prompt_cache_key: get_str(&root, "prompt_cache_key").map(str::to_string),
     };
+
+    // session affinity (priority: prompt_cache_key, session_id field, then headers). A
+    // `session_id` field is non-standard for Responses and also round-trips via ext below.
+    req.session = capture_session(
+        req.cache.prompt_cache_key.as_deref(),
+        get_str(&root, "session_id"),
+        hdrs,
+    );
 
     req.stream = get_bool(&root, "stream").unwrap_or(false);
 

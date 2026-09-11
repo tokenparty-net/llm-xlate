@@ -13,9 +13,9 @@ pub use schema::{
     BackendOverrides, BreakpointRule, BudgetRule, BudgetStatus, Capabilities, CacheCap,
     CompactionMode, ErrorsCap, ExposureMode, InstructionsCap, LimitsCap, MaxRule, MediaCap,
     MediaKind, MediaSourceKind, OutputCap, OutputFormatCap, ReasoningCap, ReasoningMode,
-    ReplayMode, ResultContentKind, SamplingCap, SamplingRule, StateCap, Streaming, StrictDefault,
-    StrictRule, ToolChoiceKind, ToolsCap, TopLevelSystem, TransportCap, Tri, UsageTiming,
-    MidConversationSystem,
+    ReplayMode, ResultContentKind, SamplingCap, SamplingRule, SessionCap, SessionSink, StateCap,
+    Streaming, StrictDefault, StrictRule, ToolChoiceKind, ToolsCap, TopLevelSystem, TransportCap,
+    Tri, UsageTiming, MidConversationSystem,
 };
 
 use std::collections::BTreeMap;

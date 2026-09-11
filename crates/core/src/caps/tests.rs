@@ -22,6 +22,65 @@ fn shipped_registry_builds() {
 }
 
 #[test]
+fn session_cap_parses_and_overlays() {
+    use crate::caps::{SessionCap, SessionSink};
+
+    // Base declares a header sink; an overlay replaces the whole list and sets `required`.
+    let base: SessionCap = toml::from_str(
+        r#"required = false
+accepts = [{ header = "x-session-affinity" }]"#,
+    )
+    .unwrap();
+    assert_eq!(base.accepts.as_deref(), Some(&[SessionSink::Header("x-session-affinity".into())][..]));
+    assert!(base.required.is_no());
+    assert_eq!(base.primary_sink(), Some(&SessionSink::Header("x-session-affinity".into())));
+
+    let mut c = Capabilities::unknown();
+    c.session = base;
+    let overlay: Capabilities = toml::from_str(
+        r#"[session]
+required = true
+accepts = [{ field = "prompt_cache_key" }, { header = "x-session-id" }]"#,
+    )
+    .unwrap();
+    c.overlay(&overlay);
+    // Lists replace whole; `required` (a Tri) is set by the overlay.
+    assert_eq!(
+        c.session.accepts.as_deref(),
+        Some(&[
+            SessionSink::Field("prompt_cache_key".into()),
+            SessionSink::Header("x-session-id".into()),
+        ][..])
+    );
+    assert!(c.session.required.is_yes());
+    assert_eq!(c.session.primary_sink(), Some(&SessionSink::Field("prompt_cache_key".into())));
+}
+
+#[test]
+fn session_sink_rejects_ambiguous_toml() {
+    use crate::caps::SessionSink;
+    assert!(toml::from_str::<SessionSink>(r#"field = "a"
+header = "b""#)
+        .is_err());
+    assert!(toml::from_str::<SessionSink>("").is_err());
+}
+
+#[test]
+fn shipped_caps_declare_no_session_sink() {
+    // The shipped registry is conservative: no backend accepts a session id until a
+    // deployment opts in via config/overlay (so emission is inert by default).
+    for (family, model) in [
+        (ProviderFamily::OpenAI, "gpt-4o"),
+        (ProviderFamily::Anthropic, "claude-opus-5"),
+        (ProviderFamily::Other("openai-compatible".into()), "llama-x"),
+    ] {
+        let caps = shipped().resolve(&family, model, None);
+        assert!(caps.session.accepts.is_none(), "{model} must declare no session sink");
+        assert!(caps.session.required.is_no_or_unknown(), "{model} must not require a session id");
+    }
+}
+
+#[test]
 fn tri_helpers() {
     assert!(Tri::Yes.is_yes());
     assert!(!Tri::No.is_yes());

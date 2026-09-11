@@ -18,8 +18,8 @@ pub use common::{CallId, ItemId, JsonText, Protocol, ProviderFamily, ResponseId}
 pub use config::{
     CacheControl, CacheHints, CacheTtl, ClearAt, Effort, Extensions, Instruction,
     InstructionRole, IrRequest, Limits, ModelRef, OutputConfig, OutputFormat, Position,
-    ReasoningConfig, ReasoningExposure, RequestMeta, Sampling, StateConfig, SummaryLevel,
-    ToolChoice, ToolDef, Verbosity,
+    ReasoningConfig, ReasoningExposure, RequestMeta, Sampling, SessionConfig, StateConfig,
+    SummaryLevel, ToolChoice, ToolDef, Verbosity,
 };
 pub use event::{Delta, IrEvent, IrResponse, ItemKind, StopReason, Usage};
 pub use item::{

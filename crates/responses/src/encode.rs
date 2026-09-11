@@ -180,16 +180,26 @@ pub(crate) fn encode_request(
     // ext writeback: responses.* keys not already present (image_detail is synthetic).
     ext_writeback(&mut top, &req.ext);
 
-    let body = canon::to_bytes(&top.build());
+    let mut headers = HeaderMap::new();
+    headers.insert("content-type", "application/json".parse().unwrap());
+
+    // session affinity: emit the captured id into the first accepted place (field or header).
+    let mut body_map = top.into_map();
+    llm_xlate_core::session::apply_session(
+        caps,
+        req.session.id.as_deref(),
+        req.cache.prompt_cache_key.as_deref(),
+        &mut body_map,
+        &mut headers,
+        &mut degr,
+    );
+    let body = canon::to_bytes(&Value::Object(body_map));
 
     let mut out_ctx = ctx.clone();
     out_ctx.store = store_value;
     out_ctx.include = include;
     out_ctx.expose = req.reasoning.expose.clone();
     out_ctx.stream = req.stream;
-
-    let mut headers = HeaderMap::new();
-    headers.insert("content-type", "application/json".parse().unwrap());
 
     Ok(EncodedRequest {
         body,

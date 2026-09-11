@@ -24,7 +24,8 @@
 //! 7. [`sampling`] — `n>1`, stop-sequence cap, service tier.
 //! 8. [`instructions`] — mid-conversation placement policy; effort/`clear_at` clearing.
 //! 9. [`state`] — store/chain/conversation/background/include support; ZDR.
-//! 10. [`ext`] — foreign-protocol `ext` keys reported once.
+//! 10. [`session`] — session-id conflict degradation; required-session-id enforcement.
+//! 11. [`ext`] — foreign-protocol `ext` keys reported once.
 
 mod ext;
 mod instructions;
@@ -34,6 +35,7 @@ mod protocol;
 mod provider_tools;
 mod reasoning;
 mod sampling;
+mod session;
 mod state;
 mod tools;
 
@@ -84,6 +86,7 @@ pub fn lower(
     sampling::run(&mut req, caps, &mut degradations)?;
     instructions::run(&mut req, caps, target, cfg, &mut degradations)?;
     state::run(&mut req, caps, &mut degradations)?;
+    session::run(&mut req, caps, &mut degradations)?;
     ext::run(&mut req, target, &mut degradations)?;
 
     Ok(Lowered { req, degradations })

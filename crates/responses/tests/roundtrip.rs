@@ -199,6 +199,8 @@ fn rt_meta_and_cache() {
     ir.meta.safety_identifier = Some("s".into());
     ir.meta.service_tier = Some("flex".into());
     ir.cache.prompt_cache_key = Some("ck".into());
+    // The decoder re-captures the session id from prompt_cache_key (highest-priority source).
+    ir.session.id = Some("ck".into());
     ir.items.push(Item::user_text("x"));
     rt(ir);
 }

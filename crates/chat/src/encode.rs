@@ -100,13 +100,24 @@ pub fn encode_request(
         // Foreign namespaces are ignored silently (lower() reports them once).
     }
 
+    // ---- session affinity ----
+    let mut headers = HeaderMap::new();
+    llm_xlate_core::session::apply_session(
+        caps,
+        req.session.id.as_deref(),
+        req.cache.prompt_cache_key.as_deref(),
+        &mut out,
+        &mut headers,
+        &mut degr,
+    );
+
     let body = canon::to_bytes(&Value::Object(out));
     let mut ectx = ctx.clone();
     ectx.include_usage = include_usage;
 
     Ok(EncodedRequest {
         body,
-        headers: HeaderMap::new(),
+        headers,
         upstream_streams,
         ctx: ectx,
         degradations: degr,

@@ -72,10 +72,10 @@ impl Codec for ResponsesCodec {
     fn decode_request(
         &self,
         body: &[u8],
-        _hdrs: &HeaderMap,
+        hdrs: &HeaderMap,
         ctx: &DecodeCtx,
     ) -> Result<IrRequest, XlateError> {
-        decode::decode_request(body, ctx)
+        decode::decode_request(body, hdrs, ctx)
     }
 
     fn encode_request(

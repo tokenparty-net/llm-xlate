@@ -58,6 +58,7 @@ pub mod degrade;
 pub mod envelope;
 pub mod error;
 pub mod ir;
+pub mod session;
 pub mod sse;
 pub mod wrap;
 
@@ -72,5 +73,6 @@ pub use degrade::{Degradation, DegradationKind, Degradations};
 pub use envelope::{EnvelopeError, Sealer};
 pub use error::{ErrorKind, XlateError};
 pub use ir::*;
+pub use session::{apply_session, capture_session, session_emit, SessionEmit, SESSION_HEADERS};
 pub use sse::{SseEvent, SseParser, SseWriter};
 pub use wrap::WRAP_VERSION;

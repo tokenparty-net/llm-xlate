@@ -10,7 +10,8 @@ use base64::Engine;
 use serde_json::{Map, Value};
 
 use llm_xlate_core::canon;
-use llm_xlate_core::codec::DecodeCtx;
+use llm_xlate_core::codec::{DecodeCtx, HeaderMap};
+use llm_xlate_core::session::capture_session;
 use llm_xlate_core::ir::{
     CallId, Effort, Instruction, InstructionRole, IrRequest, Item, JsonText, MediaSource, ModelRef,
     OpaqueKind, Part, Position, ProviderFamily, ReasoningExposure, ReasoningItem, Role, ToolChoice,
@@ -21,7 +22,7 @@ use llm_xlate_core::{OpaqueItem, XlateError};
 use crate::common::ns_key;
 
 /// Decode a Chat Completions request body into the IR.
-pub fn decode_request(body: &[u8], ctx: &DecodeCtx) -> Result<IrRequest, XlateError> {
+pub fn decode_request(body: &[u8], hdrs: &HeaderMap, ctx: &DecodeCtx) -> Result<IrRequest, XlateError> {
     let value = canon::parse(body)?;
     let mut obj = match value {
         Value::Object(m) => m,
@@ -196,6 +197,12 @@ pub fn decode_request(body: &[u8], ctx: &DecodeCtx) -> Result<IrRequest, XlateEr
     if !instr_ext.is_empty() {
         req.ext.insert(ns_key("instr_ext"), Value::Object(instr_ext));
     }
+
+    // ---- session affinity (priority: prompt_cache_key, session_id field, then headers) ----
+    // `prompt_cache_key` was consumed into `req.cache`; `session_id` (if any) is still in `obj`
+    // and also round-trips through the `chat.*` ext passthrough below.
+    let session_id_field = obj.get("session_id").and_then(Value::as_str);
+    req.session = capture_session(req.cache.prompt_cache_key.as_deref(), session_id_field, hdrs);
 
     // ---- remaining unknown top-level fields → ext["chat.<field>"] ----
     for (k, v) in obj {

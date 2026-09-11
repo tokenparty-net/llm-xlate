@@ -134,14 +134,24 @@ pub fn encode_request(
     // ---- ext writeback (anthropic.* → top level / output_config) ----
     write_back_ext(req, &mut body, &mut betas);
 
+    // ---- headers ----
+    let mut headers = build_headers(req, caps, &betas);
+
+    // ---- session affinity: emit into the first accepted place (field or header) ----
+    llm_xlate_core::session::apply_session(
+        caps,
+        req.session.id.as_deref(),
+        req.cache.prompt_cache_key.as_deref(),
+        &mut body,
+        &mut headers,
+        &mut degradations,
+    );
+
     // ---- enforce ≤ 4 cache_control breakpoints ----
     let mut body_value = Value::Object(body);
     enforce_cache_breakpoints(&mut body_value, &mut degradations);
 
     let bytes: Bytes = canon::to_bytes(&body_value);
-
-    // ---- headers ----
-    let headers = build_headers(req, caps, &betas);
 
     // ---- streaming decision ----
     let upstream_streams = req.stream && caps.streaming() != llm_xlate_core::caps::Streaming::NonStreamOnly;
