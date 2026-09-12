@@ -22,6 +22,14 @@ expression: resp_rendered
   "usage": {
     "input_tokens": 51,
     "cache_read_input_tokens": 0,
-    "output_tokens": 16
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 16,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    }
   }
 }

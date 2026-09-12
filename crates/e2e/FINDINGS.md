@@ -20,6 +20,9 @@ question.) Evidence: explore1+explore2 ant.cache.* ; re-settled in translate1 (c
 carry request-root cache_control, accepted). Registry: [defaults.cache] auto_request_level=true, max=4,
 ttl=[5m,1h] CONFIRMED, verified_at 2026-09-10. No change.
 
+The zero counters noted above were a probe artefact, not an API fact: the `cacheacct` family
+(2026-09-12, ~3.8k-token prefix) moves them off zero. See §C1.
+
 ### 2. in-array role:system — REFUTED (placement) / CONFIRMED (feature)
 Content-bearing in-array system is accepted (200) on current models iff it satisfies BOTH constraints of a
 CONJUNCTIVE rule; the API enforces them with TWO distinct verbatim messages, and which one you see depends
@@ -161,6 +164,57 @@ pass. §8 Responses event model + sequence_number CONFIRMED.
 [[model]] match=gpt-6* protocols=[responses] CONFIRMED.
 ### 30. errors — CONFIRMED. unknown field -> 400 (unknown_parameter); empty input -> 400 (missing_); decode
 to typed errors. 404 unknown prev id, encrypted-from-another-org, stream error event, bad-key manual.
+
+## Cache accounting (2026-09-12, runs cacheacct + cacheacct2, 22 requests, ~$0.06)
+
+Added because every cache counter in the committed dataset was zero: the older `ant.cache.*` probes
+proved *acceptance* of `cache_control` but their padded prompts sat under the minimum cacheable
+size, so no capture had ever exercised a non-zero cache figure through the crate. The `cacheacct`
+family sends a ~3.8k-token prefix cold, then warm, in one run.
+
+### C1. Anthropic reports the FRESH prompt beside the cache counters — CONFIRMED
+Cold: `input_tokens 15`, `cache_creation_input_tokens 3935`, `ephemeral_5m 3935`, read 0.
+Warm: `input_tokens 15`, `cache_read_input_tokens 3935`, creation 0.
+`input_tokens` stays at 15 across both, so it is the uncached remainder and the gross prompt is
+`15 + 3935 = 3950`. Evidence: cacheacct2 ant.cacheacct.write / ant.cacheacct.read.
+
+### C2. The OpenAI dialects report the GROSS prompt with the cached portion inside it — CONFIRMED
+Chat cold: `prompt_tokens 2860`, `cached_tokens 0`. Chat warm: `prompt_tokens 2860`,
+`cached_tokens 2816` — the prompt count does not move, so the 2816 are counted *within* it.
+Responses behaves identically (`input_tokens 2860`, `cached_tokens 2688`).
+This is the opposite convention to C1 under the same field name, which is exactly the defect
+`llm_xlate_usage_plan.md` D1 describes. Evidence: cacheacct chat.cacheacct.write vs
+cacheacct2 chat.cacheacct.read / resp.cacheacct.read.
+
+### C3. `ttl = "1h"` produces a real 1-hour write — CONFIRMED
+`cache_creation.ephemeral_1h_input_tokens 3975`, `ephemeral_5m 0`, total 3975; the warm twin then
+reads 3975. No beta header was needed on this account.
+**Prefix caveat:** a body identical to the 5-minute probe apart from `ttl` does NOT write a 1-hour
+entry — it reads the existing 5-minute one (observed in run cacheacct, where all four 1h figures
+came back 0). Anthropic matches by prefix, so a 1-hour probe needs its own leading text. The
+`cacheacct` 1h probes carry a distinct policy preamble for this reason.
+Evidence: cacheacct2 ant.cacheacct.ttl_1h_write / ant.cacheacct.ttl_1h_read.
+
+### C4. OpenAI Chat reports no cache-WRITE counter at all — CONFIRMED
+`prompt_tokens_details` carries only `cached_tokens` and `audio_tokens`, cold or warm. A cache-write
+figure on the Chat dialect can therefore only come from a compatible server (an Anthropic bridge's
+`cache_creation_tokens`, vLLM's `created_cache_tokens`). Evidence: cacheacct chat.cacheacct.write.
+
+### C5. OpenAI Responses carries `input_tokens_details.cache_write_tokens`, always 0 — CONFIRMED
+Present on every Responses capture in the dataset, cold and warm, and always zero. OpenAI reports
+the field but never bills a write through it. It is nonetheless OpenAI's own spelling for the
+counter, so llm-xlate decodes it and the Responses encoder emits it.
+Evidence: cacheacct resp.cacheacct.write (cold, 0) and cacheacct2 resp.cacheacct.read (warm, 0).
+
+### C6. Anthropic reports `output_tokens_details.thinking_tokens` — CONFIRMED
+Present on every Anthropic capture. llm-xlate now maps it to `Usage.reasoning`; before
+2026-09-12 it fell into `usage.ext` and was lost on every Anthropic-to-OpenAI route.
+
+### C7. A Chat stream reports NO usage without `stream_options.include_usage` — CONFIRMED
+The run-1 `chat.cacheacct.read` stream twin captured `usage: null`, which silently produced an
+all-zero cross-protocol rendering in `check`. `stream_options` is rejected when `stream` is false,
+so a streaming Chat usage probe has to be a separate probe id — hence `chat.cacheacct.read_stream`.
+Registry: `[defaults.transport] stream_usage_opt_in = true` for Chat CONFIRMED.
 
 ## Runner notes
 - Sequential execution (concurrency reported but one request at a time): ${ref} chaining needs a captured

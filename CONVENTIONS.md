@@ -1,6 +1,5 @@
 # llm-xlate — engineering conventions (read with ../llm_xlate_plan.md)
 
-The plan (`../llm_xlate_plan.md`, i.e. `C:\Users\waltermin\projects\tokenparty\llm_xlate_plan.md`) is the spec.
 This file records the decisions that adapt it to a Cargo workspace so several people can build in parallel.
 
 ## Workspace layout (deviation from the plan's single crate, for parallel development)

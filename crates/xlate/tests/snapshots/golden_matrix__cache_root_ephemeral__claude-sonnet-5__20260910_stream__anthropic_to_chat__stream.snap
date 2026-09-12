@@ -8,6 +8,6 @@ data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,
 
 data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
 
-data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[],"usage":{"prompt_tokens":166,"completion_tokens":5,"total_tokens":171,"prompt_tokens_details":{"cached_tokens":0}}}
+data: {"id":"resp_golden","object":"chat.completion.chunk","created":1700000000,"model":"golden-model","choices":[],"usage":{"prompt_tokens":166,"completion_tokens":5,"total_tokens":171,"prompt_tokens_details":{"cached_tokens":0,"cache_creation_tokens":0,"cache_creation_1h_tokens":0},"completion_tokens_details":{"reasoning_tokens":0}}}
 
 data: [DONE]

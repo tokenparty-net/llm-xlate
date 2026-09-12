@@ -1046,3 +1046,168 @@ fn materialized_chain_equals_stateless_twin() {
         "materialized chain is not byte-identical to its stateless twin"
     );
 }
+
+// ===========================================================================================
+// Law: usage accounting survives every directed protocol pair.
+//
+// `Usage` stores four disjoint prompt-side categories, and the three dialects disagree about
+// whether their own prompt field is the gross total or the fresh remainder. A codec that
+// confuses the two silently mis-bills by the whole cache-hit volume, and the loss is invisible
+// in an items-only round trip — so it gets its own law.
+// ===========================================================================================
+
+const LAW_PROTS: [Protocol; 3] = [Protocol::OaiChat, Protocol::OaiResponses, Protocol::Anthropic];
+
+fn law_caps(p: Protocol) -> Capabilities {
+    match p {
+        Protocol::OaiChat => preset::gpt5_chat(),
+        Protocol::OaiResponses => preset::gpt5_responses(),
+        Protocol::Anthropic => preset::claude_5(),
+    }
+}
+
+fn law_ctx(client: Protocol, stream: bool) -> EncodeCtx {
+    let sealer = llm_xlate::envelope::Sealer::new(&TranslatorConfig::default().envelope_key);
+    let mut ctx = EncodeCtx::new(client, "m", ResponseId::new("resp_usage"), sealer);
+    ctx.created_at = 1_700_000_000;
+    ctx.include_usage = true;
+    ctx.stream = stream;
+    ctx
+}
+
+/// Every counter distinct and non-zero, so a swapped or dropped field cannot coincidentally
+/// pass.
+fn law_usage() -> Usage {
+    Usage {
+        input: 137,
+        output: 41,
+        cache_read: Some(2560),
+        cache_write: Some(256),
+        cache_write_1h: Some(64),
+        reasoning: Some(17),
+        ext: Default::default(),
+    }
+}
+
+fn assert_usage_preserved(got: &Usage, want: &Usage, what: &str) {
+    assert_eq!(got.input, want.input, "{what}: fresh input");
+    assert_eq!(got.output, want.output, "{what}: output");
+    assert_eq!(got.cache_read, want.cache_read, "{what}: cache_read");
+    assert_eq!(got.cache_write, want.cache_write, "{what}: cache_write");
+    assert_eq!(got.cache_write_1h, want.cache_write_1h, "{what}: cache_write_1h");
+    assert_eq!(got.reasoning, want.reasoning, "{what}: reasoning");
+    assert_eq!(got.gross_prompt(), want.gross_prompt(), "{what}: gross prompt");
+}
+
+#[test]
+fn usage_survives_every_directed_pair() {
+    let x = xl();
+    let want = law_usage();
+
+    for provider in LAW_PROTS {
+        // The provider-side event stream carries the usage the upstream reported.
+        let events = [
+            IrEvent::Start {
+                response_id: ResponseId::new("resp_usage"),
+                model: "m".into(),
+                usage_prefill: None,
+            },
+            IrEvent::ItemStart {
+                index: 0,
+                kind: ItemKind::Message,
+                id: None,
+                call: None,
+            },
+            IrEvent::Delta { index: 0, delta: Delta::Text("ok".into()) },
+            IrEvent::ItemStop { index: 0 },
+            IrEvent::Stop {
+                reason: StopReason::EndTurn,
+                usage: want.clone(),
+                ext: Default::default(),
+            },
+        ];
+        let resp = x.aggregate_stream(events.iter().cloned()).expect("aggregate provider");
+
+        for client in LAW_PROTS {
+            let cc = law_caps(client);
+            let pair = format!("{provider:?}_to_{client:?}");
+
+            // Non-streaming: encode for the client, decode it back, aggregate.
+            let body = x.encode_response(client, &resp, &law_ctx(client, false));
+            let nev = x
+                .decode_response(client, &body, &cc)
+                .unwrap_or_else(|e| panic!("{pair}: decode client response: {e}"));
+            let via_resp = x.aggregate_stream(nev).expect("aggregate client response");
+            assert_usage_preserved(&via_resp.usage, &want, &format!("{pair} non-streaming"));
+
+            // Streaming: same, through the client's SSE rendering.
+            let mut enc = x.stream_encoder(client, law_ctx(client, true));
+            let mut frames = Vec::new();
+            for ev in events.iter().cloned() {
+                frames.extend(enc.push(ev));
+            }
+            frames.extend(enc.finish());
+            let joined: Vec<u8> = frames.iter().flat_map(|b| b.iter().copied()).collect();
+            let mut dec = x.stream_decoder(client, &cc);
+            let mut sev = dec.push(&joined);
+            sev.extend(dec.finish());
+            let via_stream = x.aggregate_stream(sev).expect("aggregate client stream");
+            assert_usage_preserved(&via_stream.usage, &want, &format!("{pair} streaming"));
+
+            // Plan §11.8: the two renderings must agree with each other, not just with `want`.
+            assert_eq!(
+                via_stream.usage, via_resp.usage,
+                "{pair}: streamed and non-streamed usage diverge"
+            );
+        }
+    }
+}
+
+#[test]
+fn openai_dialects_report_a_gross_prompt_to_the_client() {
+    // The client-visible number must contain its own cached and written portions: a Chat
+    // client whose `prompt_tokens` excluded them would understate the prompt by the whole
+    // cache volume, and `cached_tokens` could exceed `prompt_tokens`.
+    let x = xl();
+    let want = law_usage();
+    let resp = llm_xlate::ir::IrResponse {
+        id: ResponseId::new("resp_usage"),
+        model: "m".into(),
+        usage: want.clone(),
+        ..Default::default()
+    };
+
+    let chat: Value = serde_json::from_slice(&x.encode_response(
+        Protocol::OaiChat,
+        &resp,
+        &law_ctx(Protocol::OaiChat, false),
+    ))
+    .unwrap();
+    assert_eq!(chat["usage"]["prompt_tokens"], 2953);
+    assert_eq!(chat["usage"]["total_tokens"], 2994);
+    assert_eq!(chat["usage"]["prompt_tokens_details"]["cached_tokens"], 2560);
+    assert_eq!(chat["usage"]["prompt_tokens_details"]["cache_creation_tokens"], 256);
+
+    let responses: Value = serde_json::from_slice(&x.encode_response(
+        Protocol::OaiResponses,
+        &resp,
+        &law_ctx(Protocol::OaiResponses, false),
+    ))
+    .unwrap();
+    assert_eq!(responses["usage"]["input_tokens"], 2953);
+    assert_eq!(responses["usage"]["total_tokens"], 2994);
+    assert_eq!(responses["usage"]["input_tokens_details"]["cache_write_tokens"], 256);
+
+    // Anthropic reports the fresh remainder beside the cache counters, not inside them.
+    let anthropic: Value = serde_json::from_slice(&x.encode_response(
+        Protocol::Anthropic,
+        &resp,
+        &law_ctx(Protocol::Anthropic, false),
+    ))
+    .unwrap();
+    assert_eq!(anthropic["usage"]["input_tokens"], 137);
+    assert_eq!(anthropic["usage"]["cache_read_input_tokens"], 2560);
+    assert_eq!(anthropic["usage"]["cache_creation_input_tokens"], 256);
+    assert_eq!(anthropic["usage"]["cache_creation"]["ephemeral_5m_input_tokens"], 192);
+    assert_eq!(anthropic["usage"]["cache_creation"]["ephemeral_1h_input_tokens"], 64);
+}

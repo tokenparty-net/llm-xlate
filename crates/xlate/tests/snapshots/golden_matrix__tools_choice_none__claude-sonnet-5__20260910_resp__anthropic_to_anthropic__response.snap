@@ -23,6 +23,11 @@ expression: resp_rendered
       "ephemeral_5m_input_tokens": 0,
       "ephemeral_1h_input_tokens": 0
     },
-    "output_tokens": 28
+    "output_tokens": 28,
+    "output_tokens_details": {
+      "thinking_tokens": 25
+    },
+    "inference_geo": "global",
+    "service_tier": "standard"
   }
 }

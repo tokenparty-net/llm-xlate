@@ -9,23 +9,43 @@ use super::config::Extensions;
 use super::item::{Annotation, Item, OpaqueBlob};
 use crate::error::XlateError;
 
-/// Token accounting. `input`/`output` are always present (default 0); the cache and
-/// reasoning counters are optional because not every provider reports them.
+/// Token accounting, normalized to **disjoint** billing categories.
+///
+/// The prompt-side categories never overlap: `input` is the *fresh* (uncached) prompt count,
+/// and the cached and written portions sit beside it rather than inside it. The gross prompt a
+/// provider would call `prompt_tokens` / `input_tokens` is therefore [`Usage::gross_prompt`] =
+/// `input + cache_read + cache_write`.
+///
+/// This is the Anthropic wire convention. The OpenAI dialects report a *gross* prompt with the
+/// cached portion nested as a subset of it, so their codecs normalize on decode (via
+/// [`Usage::from_gross`]) and re-gross on encode (via [`Usage::gross_prompt`]). Every codec
+/// must hold to this: a codec that stores a gross count in `input` double-counts the cached
+/// tokens on any cross-protocol route, and the categories bill at different rates.
+///
+/// `cache_write` counts cache writes at **every** TTL. `cache_write_1h` is the subset of them
+/// written with a 1-hour TTL, which some providers price differently; it is always
+/// `<= cache_write` (see [`Usage::enforce_invariants`]). A provider that reports one unsplit
+/// write total leaves `cache_write_1h` at `None`, which means "TTL not reported", not "no
+/// 1-hour writes".
+///
+/// `input`/`output` are always present (default 0); the cache and reasoning counters are
+/// optional because not every provider reports them.
 ///
 /// Not `Eq`: the `ext` map holds `serde_json::Value`, which is not `Eq` (floats).
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct Usage {
-    /// Input (prompt) tokens.
+    /// Fresh (uncached) prompt tokens. **Not** the gross prompt — see [`Usage::gross_prompt`].
     pub input: u32,
     /// Output (completion) tokens.
     pub output: u32,
     /// Tokens read from cache.
     pub cache_read: Option<u32>,
-    /// Tokens written to the 5-minute cache.
-    pub cache_write_5m: Option<u32>,
-    /// Tokens written to the 1-hour cache.
+    /// Tokens written to cache, at every TTL.
+    pub cache_write: Option<u32>,
+    /// The subset of `cache_write` written with a 1-hour TTL. `None` means the provider did not
+    /// report a TTL split, not that there were no 1-hour writes.
     pub cache_write_1h: Option<u32>,
-    /// Reasoning tokens.
+    /// Reasoning tokens (a subset of `output`, never added on top).
     pub reasoning: Option<u32>,
     /// Provider-specific extra usage fields (kept verbatim).
     pub ext: Extensions,
@@ -39,24 +59,85 @@ fn opt_add(a: Option<u32>, b: Option<u32>) -> Option<u32> {
 }
 
 impl Usage {
-    /// A usage with only input/output set.
+    /// A usage with only input/output set. `input` is the **fresh** prompt count.
     pub fn new(input: u32, output: u32) -> Self {
         Self { input, output, ..Default::default() }
     }
 
-    /// Accumulate `other` into `self` field-by-field (used when a provider reports usage in
-    /// pieces). Optional counters combine as "present if either is present"; `ext` entries
+    /// Build a usage from a **gross** prompt count — the OpenAI dialects' `prompt_tokens` /
+    /// `input_tokens`, which counts the cached and written portions inside it — reducing it to
+    /// the fresh remainder this type stores.
+    ///
+    /// Invariants are enforced *before* the subtraction, so a write total recovered from a
+    /// 1-hour figure is never left billed as fresh input. Saturating: a provider whose subset
+    /// counters exceed its own gross total yields `input = 0` rather than wrapping.
+    pub fn from_gross(
+        gross: u32,
+        output: u32,
+        cache_read: Option<u32>,
+        cache_write: Option<u32>,
+        cache_write_1h: Option<u32>,
+    ) -> Self {
+        let mut u = Usage {
+            input: 0,
+            output,
+            cache_read,
+            cache_write,
+            cache_write_1h,
+            reasoning: None,
+            ext: Extensions::default(),
+        };
+        u.enforce_invariants();
+        u.input = gross
+            .saturating_sub(u.cache_read.unwrap_or(0))
+            .saturating_sub(u.cache_write.unwrap_or(0));
+        u
+    }
+
+    /// The gross prompt count: `input + cache_read + cache_write`. This is what the OpenAI
+    /// dialects spell `prompt_tokens` / `input_tokens`, and what their `total_tokens` adds
+    /// `output` to.
+    pub fn gross_prompt(&self) -> u32 {
+        self.input
+            .saturating_add(self.cache_read.unwrap_or(0))
+            .saturating_add(self.cache_write.unwrap_or(0))
+    }
+
+    /// The portion of `cache_write` **not** reported as 1-hour, for encoders that need an
+    /// explicit short-TTL figure (Anthropic's `cache_creation.ephemeral_5m_input_tokens`).
+    /// `None` when no write total is known. An unsplit total reports itself here, matching the
+    /// convention that writes of unreported TTL bill at the short rate.
+    pub fn cache_write_5m(&self) -> Option<u32> {
+        self.cache_write.map(|w| w.saturating_sub(self.cache_write_1h.unwrap_or(0)))
+    }
+
+    /// Enforce `cache_write_1h <= cache_write`. A shape carrying a 1-hour figure without — or
+    /// above — a write total (a `cache_creation` object with no flat total, or two conventions
+    /// mixed into one object) would otherwise flow downstream as a contradiction that a
+    /// consumer clamps into zero-billed tokens. Raising the total to the known 1-hour floor
+    /// keeps every write token counted.
+    pub fn enforce_invariants(&mut self) {
+        if let Some(w1h) = self.cache_write_1h {
+            if self.cache_write.is_none_or(|w| w < w1h) {
+                self.cache_write = Some(w1h);
+            }
+        }
+    }
+
+    /// Accumulate `other` into `self` field-by-field (used when totalling usage across several
+    /// requests). Optional counters combine as "present if either is present"; `ext` entries
     /// from `other` overwrite on key collision.
     pub fn add(&mut self, other: &Usage) {
         self.input += other.input;
         self.output += other.output;
         self.cache_read = opt_add(self.cache_read, other.cache_read);
-        self.cache_write_5m = opt_add(self.cache_write_5m, other.cache_write_5m);
+        self.cache_write = opt_add(self.cache_write, other.cache_write);
         self.cache_write_1h = opt_add(self.cache_write_1h, other.cache_write_1h);
         self.reasoning = opt_add(self.reasoning, other.reasoning);
         for (k, v) in other.ext.iter() {
             self.ext.insert(k.clone(), v.clone());
         }
+        self.enforce_invariants();
     }
 }
 

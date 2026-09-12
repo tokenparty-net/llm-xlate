@@ -99,7 +99,7 @@ compaction = "context_management"
 [defaults.cache]
 auto_request_level = true
 prompt_cache_key = false
-usage_fields = ["cache_read", "cache_write_5m", "cache_write_1h", "reasoning"]
+usage_fields = ["cache_read", "cache_write", "cache_write_1h", "reasoning"]
 
 [defaults.cache.explicit_breakpoints]
 max = 4

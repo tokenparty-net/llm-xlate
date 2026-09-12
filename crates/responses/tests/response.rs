@@ -112,16 +112,79 @@ fn decode_failed_is_error() {
     assert!(matches!(&events[0], IrEvent::Error(e) if e.message == "boom"));
 }
 
-#[test]
-fn decode_cached_tokens() {
-    let events = decode_resp(
-        r#"{"id":"r","object":"response","status":"completed","model":"m","output":[],
-            "usage":{"input_tokens":100,"input_tokens_details":{"cached_tokens":80},"output_tokens":5,"total_tokens":105}}"#,
+fn usage_of(usage: &str) -> Usage {
+    let body = format!(
+        r#"{{"id":"r","object":"response","status":"completed","model":"m","output":[],
+            "usage":{usage}}}"#
     );
-    match events.last().unwrap() {
-        IrEvent::Stop { usage, .. } => assert_eq!(usage.cache_read, Some(80)),
+    match decode_resp(&body).pop().unwrap() {
+        IrEvent::Stop { usage, .. } => usage,
         other => panic!("{other:?}"),
     }
+}
+
+#[test]
+fn decode_cached_tokens() {
+    // `input_tokens` is the gross prompt, with the cached portion counted inside it.
+    let u = usage_of(
+        r#"{"input_tokens":100,"input_tokens_details":{"cached_tokens":80},"output_tokens":5,"total_tokens":105}"#,
+    );
+    assert_eq!(u.cache_read, Some(80));
+    assert_eq!(u.input, 20);
+    assert_eq!(u.gross_prompt(), 100);
+}
+
+#[test]
+fn decode_openai_cache_write_tokens() {
+    // OpenAI's own spelling on this dialect, captured live from gpt-4o-mini on 2026-09-10.
+    let u = usage_of(
+        r#"{"input_tokens":1000,"input_tokens_details":{"cache_write_tokens":300,"cached_tokens":600},
+            "output_tokens":11,"output_tokens_details":{"reasoning_tokens":4},"total_tokens":1011}"#,
+    );
+    assert_eq!(u.cache_read, Some(600));
+    assert_eq!(u.cache_write, Some(300));
+    assert_eq!(u.reasoning, Some(4));
+    assert_eq!(u.input, 100);
+    // The mapped counter is not also duplicated into ext.
+    assert_eq!(u.ext.get("responses.input_tokens_details.cache_write_tokens"), None);
+}
+
+#[test]
+fn decode_one_hour_figure_without_a_total_raises_the_total() {
+    let u = usage_of(
+        r#"{"input_tokens":1000,"input_tokens_details":{"cache_write_1h_tokens":40},"output_tokens":1}"#,
+    );
+    assert_eq!(u.cache_write, Some(40));
+    assert_eq!(u.cache_write_1h, Some(40));
+    assert_eq!(u.input, 960);
+}
+
+#[test]
+fn unmodelled_usage_counters_are_preserved_into_ext() {
+    let u = usage_of(
+        r#"{"input_tokens":10,"input_tokens_details":{"cached_tokens":0,"image_tokens":3},
+            "output_tokens":2,"output_tokens_details":{"reasoning_tokens":1,"audio_tokens":9},
+            "total_tokens":12,"cost_usd":0.5}"#,
+    );
+    assert_eq!(u.ext.get("responses.cost_usd"), Some(&serde_json::json!(0.5)));
+    assert_eq!(
+        u.ext.get("responses.input_tokens_details.image_tokens"),
+        Some(&serde_json::json!(3)),
+    );
+    assert_eq!(
+        u.ext.get("responses.output_tokens_details.audio_tokens"),
+        Some(&serde_json::json!(9)),
+    );
+}
+
+#[test]
+fn usage_round_trips_through_the_ir() {
+    let original = r#"{"input_tokens":1000,"input_tokens_details":{"cached_tokens":600,"cache_write_tokens":300},
+        "output_tokens":11,"output_tokens_details":{"reasoning_tokens":4},"total_tokens":1011}"#;
+    let ir = IrResponse { usage: usage_of(original), ..Default::default() };
+    let rendered = json(&codec().encode_response(&ir, &ectx()));
+    let expected: serde_json::Value = serde_json::from_str(original).unwrap();
+    assert_eq!(rendered["usage"], expected);
 }
 
 #[test]

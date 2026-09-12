@@ -1,6 +1,5 @@
 ---
 source: crates/xlate/tests/golden_matrix.rs
-assertion_line: 223
 expression: resp_rendered
 ---
 {
@@ -26,8 +25,11 @@ expression: resp_rendered
   "stop_reason": "tool_use",
   "stop_sequence": null,
   "usage": {
-    "input_tokens": 50,
+    "input_tokens": 40,
     "cache_read_input_tokens": 10,
-    "output_tokens": 20
+    "output_tokens": 20,
+    "output_tokens_details": {
+      "thinking_tokens": 12
+    }
   }
 }

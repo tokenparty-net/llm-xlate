@@ -13,7 +13,7 @@ expression: events
                 input: 10,
                 output: 1,
                 cache_read: None,
-                cache_write_5m: None,
+                cache_write: None,
                 cache_write_1h: None,
                 reasoning: None,
                 ext: Extensions(
@@ -80,7 +80,7 @@ expression: events
             input: 10,
             output: 25,
             cache_read: None,
-            cache_write_5m: None,
+            cache_write: None,
             cache_write_1h: None,
             reasoning: None,
             ext: Extensions(

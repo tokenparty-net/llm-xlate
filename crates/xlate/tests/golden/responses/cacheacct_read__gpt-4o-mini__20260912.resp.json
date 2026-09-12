@@ -1,0 +1,92 @@
+{
+  "id": "resp_0b4ed96c1045292a006aa5368812ac87d2943ee3899667cb52",
+  "object": "response",
+  "created_at": 1789212296,
+  "status": "completed",
+  "background": false,
+  "billing": {
+    "payer": "developer"
+  },
+  "completed_at": 1789212296,
+  "error": null,
+  "frequency_penalty": 0.0,
+  "incomplete_details": null,
+  "instructions": "You are a compliance assistant operating under the following standing policy. Apply it to every answer. Clause 001 (retention). The reviewing analyst records every determination made under this clause, states the retention basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 002 (redaction). The reviewing analyst reviews every determination made under this clause, states the redaction basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 003 (escalation). The reviewing analyst documents every determination made under this clause, states the escalation basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 004 (attribution). The reviewing analyst verifies every determination made under this clause, states the attribution basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 005 (provenance). The reviewing analyst annotates every determination made under this clause, states the provenance basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 006 (consent). The reviewing analyst summarises every determination made under this clause, states the consent basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 007 (minimisation). The reviewing analyst cross-checks every determination made under this clause, states the minimisation basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 008 (portability). The reviewing analyst timestamps every determination made under this clause, states the portability basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 009 (rectification). The reviewing analyst countersigns every determination made under this clause, states the rectification basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 010 (erasure). The reviewing analyst archives every determination made under this clause, states the erasure basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 011 (accuracy). The reviewing analyst records every determination made under this clause, states the accuracy basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 012 (integrity). The reviewing analyst reviews every determination made under this clause, states the integrity basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 013 (availability). The reviewing analyst documents every determination made under this clause, states the availability basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 014 (confidentiality). The reviewing analyst verifies every determination made under this clause, states the confidentiality basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 015 (accountability). The reviewing analyst annotates every determination made under this clause, states the accountability basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 016 (proportionality). The reviewing analyst summarises every determination made under this clause, states the proportionality basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 017 (retention). The reviewing analyst cross-checks every determination made under this clause, states the retention basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 018 (redaction). The reviewing analyst timestamps every determination made under this clause, states the redaction basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 019 (escalation). The reviewing analyst countersigns every determination made under this clause, states the escalation basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 020 (attribution). The reviewing analyst archives every determination made under this clause, states the attribution basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 021 (provenance). The reviewing analyst records every determination made under this clause, states the provenance basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 022 (consent). The reviewing analyst reviews every determination made under this clause, states the consent basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 023 (minimisation). The reviewing analyst documents every determination made under this clause, states the minimisation basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 024 (portability). The reviewing analyst verifies every determination made under this clause, states the portability basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 025 (rectification). The reviewing analyst annotates every determination made under this clause, states the rectification basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 026 (erasure). The reviewing analyst summarises every determination made under this clause, states the erasure basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 027 (accuracy). The reviewing analyst cross-checks every determination made under this clause, states the accuracy basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 028 (integrity). The reviewing analyst timestamps every determination made under this clause, states the integrity basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 029 (availability). The reviewing analyst countersigns every determination made under this clause, states the availability basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 030 (confidentiality). The reviewing analyst archives every determination made under this clause, states the confidentiality basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 031 (accountability). The reviewing analyst records every determination made under this clause, states the accountability basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 032 (proportionality). The reviewing analyst reviews every determination made under this clause, states the proportionality basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 033 (retention). The reviewing analyst documents every determination made under this clause, states the retention basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 034 (redaction). The reviewing analyst verifies every determination made under this clause, states the redaction basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 035 (escalation). The reviewing analyst annotates every determination made under this clause, states the escalation basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 036 (attribution). The reviewing analyst summarises every determination made under this clause, states the attribution basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 037 (provenance). The reviewing analyst cross-checks every determination made under this clause, states the provenance basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 038 (consent). The reviewing analyst timestamps every determination made under this clause, states the consent basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 039 (minimisation). The reviewing analyst countersigns every determination made under this clause, states the minimisation basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 040 (portability). The reviewing analyst archives every determination made under this clause, states the portability basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 041 (rectification). The reviewing analyst records every determination made under this clause, states the rectification basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 042 (erasure). The reviewing analyst reviews every determination made under this clause, states the erasure basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 043 (accuracy). The reviewing analyst documents every determination made under this clause, states the accuracy basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 044 (integrity). The reviewing analyst verifies every determination made under this clause, states the integrity basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 045 (availability). The reviewing analyst annotates every determination made under this clause, states the availability basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 046 (confidentiality). The reviewing analyst summarises every determination made under this clause, states the confidentiality basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 047 (accountability). The reviewing analyst cross-checks every determination made under this clause, states the accountability basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 048 (proportionality). The reviewing analyst timestamps every determination made under this clause, states the proportionality basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 049 (retention). The reviewing analyst countersigns every determination made under this clause, states the retention basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 050 (redaction). The reviewing analyst archives every determination made under this clause, states the redaction basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 051 (escalation). The reviewing analyst records every determination made under this clause, states the escalation basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 052 (attribution). The reviewing analyst reviews every determination made under this clause, states the attribution basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 053 (provenance). The reviewing analyst documents every determination made under this clause, states the provenance basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 054 (consent). The reviewing analyst verifies every determination made under this clause, states the consent basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 055 (minimisation). The reviewing analyst annotates every determination made under this clause, states the minimisation basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 056 (portability). The reviewing analyst summarises every determination made under this clause, states the portability basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 057 (rectification). The reviewing analyst cross-checks every determination made under this clause, states the rectification basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 058 (erasure). The reviewing analyst timestamps every determination made under this clause, states the erasure basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 059 (accuracy). The reviewing analyst countersigns every determination made under this clause, states the accuracy basis relied upon, and files the result in the register before the close of the working day on which the determination was made. Clause 060 (integrity). The reviewing analyst archives every determination made under this clause, states the integrity basis relied upon, and files the result in the register before the close of the working day on which the determination was made.",
+  "max_output_tokens": 32,
+  "max_tool_calls": null,
+  "model": "gpt-4o-mini-2024-07-18",
+  "moderation": null,
+  "output": [
+    {
+      "id": "msg_0b4ed96c1045292a006aa53688603487d2adbad5a85b76af48",
+      "type": "message",
+      "status": "completed",
+      "content": [
+        {
+          "type": "output_text",
+          "annotations": [],
+          "logprobs": [],
+          "text": "ok"
+        }
+      ],
+      "role": "assistant"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "presence_penalty": 0.0,
+  "previous_response_id": null,
+  "prompt_cache_key": "llm-xlate-e2e-cache-accounting",
+  "prompt_cache_retention": "in_memory",
+  "reasoning": {
+    "context": null,
+    "effort": null,
+    "summary": null
+  },
+  "safety_identifier": null,
+  "service_tier": "default",
+  "store": true,
+  "temperature": 1.0,
+  "text": {
+    "format": {
+      "type": "text"
+    },
+    "verbosity": "medium"
+  },
+  "tool_choice": "auto",
+  "tool_usage": {
+    "image_gen": {
+      "input_tokens": 0,
+      "input_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 0
+      },
+      "output_tokens": 0,
+      "output_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 0
+      },
+      "total_tokens": 0
+    },
+    "web_search": {
+      "num_requests": 0
+    }
+  },
+  "tools": [],
+  "top_logprobs": 0,
+  "top_p": 1.0,
+  "truncation": "disabled",
+  "usage": {
+    "input_tokens": 2860,
+    "input_tokens_details": {
+      "cache_write_tokens": 0,
+      "cached_tokens": 2688
+    },
+    "output_tokens": 2,
+    "output_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "total_tokens": 2862
+  },
+  "user": null,
+  "metadata": {}
+}

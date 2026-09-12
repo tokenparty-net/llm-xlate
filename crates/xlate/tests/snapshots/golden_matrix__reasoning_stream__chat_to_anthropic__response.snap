@@ -22,6 +22,9 @@ expression: resp_rendered
   "stop_sequence": null,
   "usage": {
     "input_tokens": 25,
-    "output_tokens": 40
+    "output_tokens": 40,
+    "output_tokens_details": {
+      "thinking_tokens": 30
+    }
   }
 }

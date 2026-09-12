@@ -209,13 +209,69 @@ fn effort_ant_effort_token() {
 #[test]
 fn usage_add_combines() {
     let mut a = Usage { input: 1, output: 2, cache_read: Some(3), ..Default::default() };
-    let b = Usage { input: 10, output: 20, cache_write_5m: Some(5), reasoning: Some(7), ..Default::default() };
+    let b = Usage { input: 10, output: 20, cache_write: Some(5), reasoning: Some(7), ..Default::default() };
     a.add(&b);
     assert_eq!(a.input, 11);
     assert_eq!(a.output, 22);
     assert_eq!(a.cache_read, Some(3));
-    assert_eq!(a.cache_write_5m, Some(5));
+    assert_eq!(a.cache_write, Some(5));
     assert_eq!(a.reasoning, Some(7));
+}
+
+#[test]
+fn usage_gross_prompt_is_the_sum_of_the_disjoint_prompt_counters() {
+    let u = Usage {
+        input: 100,
+        output: 7,
+        cache_read: Some(2000),
+        cache_write: Some(300),
+        ..Default::default()
+    };
+    assert_eq!(u.gross_prompt(), 2400);
+}
+
+#[test]
+fn usage_from_gross_reduces_to_the_fresh_remainder() {
+    // The trigger payload: prompt_tokens counts the cached and written portions inside it.
+    let u = Usage::from_gross(5000, 11, Some(2560), Some(256), None);
+    assert_eq!(u.input, 2184);
+    assert_eq!(u.cache_read, Some(2560));
+    assert_eq!(u.cache_write, Some(256));
+    assert_eq!(u.gross_prompt(), 5000);
+}
+
+#[test]
+fn usage_from_gross_saturates_rather_than_wrapping() {
+    // A provider whose subset counters exceed its own gross total.
+    let u = Usage::from_gross(100, 0, Some(200), Some(50), None);
+    assert_eq!(u.input, 0);
+}
+
+#[test]
+fn usage_enforces_the_one_hour_subset_invariant() {
+    // A 1h figure with no write total (Anthropic's `cache_creation` split without the flat
+    // total) raises the total to the 1h floor instead of leaving a contradiction.
+    let mut u = Usage { cache_write_1h: Some(40), ..Default::default() };
+    u.enforce_invariants();
+    assert_eq!(u.cache_write, Some(40));
+
+    // The invariant runs before from_gross subtracts, so the recovered write is not billed
+    // as fresh input.
+    let g = Usage::from_gross(1000, 0, None, None, Some(40));
+    assert_eq!(g.cache_write, Some(40));
+    assert_eq!(g.input, 960);
+}
+
+#[test]
+fn usage_cache_write_5m_is_the_non_one_hour_remainder() {
+    let split = Usage { cache_write: Some(100), cache_write_1h: Some(30), ..Default::default() };
+    assert_eq!(split.cache_write_5m(), Some(70));
+
+    // An unsplit total reports itself: writes of unreported TTL bill at the short rate.
+    let unsplit = Usage { cache_write: Some(100), ..Default::default() };
+    assert_eq!(unsplit.cache_write_5m(), Some(100));
+
+    assert_eq!(Usage::default().cache_write_5m(), None);
 }
 
 #[test]

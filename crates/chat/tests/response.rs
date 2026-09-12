@@ -224,3 +224,130 @@ fn stream_and_response_twin_agree_toolcalls() {
     assert_eq!(a.usage.input, b.usage.input);
     assert_eq!(a.usage.output, b.usage.output);
 }
+
+// ---------------------------------------------------------------- cache accounting
+
+/// Build a Chat response body carrying `usage`.
+fn resp_with_usage(usage: &str) -> String {
+    format!(
+        r#"{{"id":"chatcmpl-1","object":"chat.completion","created":1,"model":"gpt-4o",
+        "choices":[{{"index":0,"message":{{"role":"assistant","content":"ok"}},"finish_reason":"stop"}}],
+        "usage":{usage}}}"#
+    )
+}
+
+fn usage_of(body: &str) -> Usage {
+    aggregate(decode_response(body, &gpt4o())).usage
+}
+
+#[test]
+fn decode_cached_and_created_cache_tokens() {
+    // The vLLM / Kimi K3 shape: a cache read and a cache write, both counted inside
+    // `prompt_tokens`.
+    let u = usage_of(&resp_with_usage(
+        r#"{"prompt_tokens":5000,"completion_tokens":11,"total_tokens":5011,
+        "prompt_tokens_details":{"cached_tokens":2560,"created_cache_tokens":256}}"#,
+    ));
+    assert_eq!(u.cache_read, Some(2560));
+    assert_eq!(u.cache_write, Some(256));
+    assert_eq!(u.input, 2184);
+    assert_eq!(u.gross_prompt(), 5000);
+}
+
+#[test]
+fn decode_anthropic_bridge_cache_spellings() {
+    let u = usage_of(&resp_with_usage(
+        r#"{"prompt_tokens":1000,"completion_tokens":10,"total_tokens":1010,
+        "prompt_tokens_details":{"cached_tokens":600,"cache_creation_tokens":300,
+        "cache_creation_1h_tokens":120},"completion_tokens_details":{"reasoning_tokens":4}}"#,
+    ));
+    assert_eq!(u.cache_read, Some(600));
+    assert_eq!(u.cache_write, Some(300));
+    assert_eq!(u.cache_write_1h, Some(120));
+    assert_eq!(u.cache_write_5m(), Some(180));
+    assert_eq!(u.reasoning, Some(4));
+    assert_eq!(u.input, 100);
+}
+
+#[test]
+fn decode_treats_prompt_tokens_as_gross_even_beside_anthropic_keys() {
+    // Some OpenAI-compatible servers emit both conventions at once. Only the OpenAI spelling
+    // says which meaning the prompt count carries, and it always means gross.
+    let u = usage_of(&resp_with_usage(
+        r#"{"prompt_tokens":1000,"completion_tokens":10,
+        "cache_read_input_tokens":700,"cache_creation_input_tokens":200}"#,
+    ));
+    assert_eq!(u.cache_read, Some(700));
+    assert_eq!(u.cache_write, Some(200));
+    assert_eq!(u.input, 100);
+}
+
+#[test]
+fn decode_one_hour_figure_without_a_total_raises_the_total() {
+    let u = usage_of(&resp_with_usage(
+        r#"{"prompt_tokens":1000,"completion_tokens":10,
+        "prompt_tokens_details":{"cache_creation_1h_tokens":40}}"#,
+    ));
+    assert_eq!(u.cache_write, Some(40));
+    assert_eq!(u.cache_write_1h, Some(40));
+    // The recovered write is removed from the fresh input, not billed twice.
+    assert_eq!(u.input, 960);
+}
+
+#[test]
+fn encode_regrosses_the_prompt_and_total() {
+    let u = Usage {
+        input: 100,
+        output: 10,
+        cache_read: Some(600),
+        cache_write: Some(300),
+        cache_write_1h: Some(120),
+        reasoning: Some(4),
+        ..Default::default()
+    };
+    let ir = llm_xlate_core::IrResponse { usage:u, ..Default::default() };
+    let body: Value = serde_json::from_str(&encode_response(&ir, &ctx())).unwrap();
+    let usage = &body["usage"];
+    assert_eq!(usage["prompt_tokens"], 1000);
+    assert_eq!(usage["completion_tokens"], 10);
+    assert_eq!(usage["total_tokens"], 1010);
+    assert_eq!(usage["prompt_tokens_details"]["cached_tokens"], 600);
+    assert_eq!(usage["prompt_tokens_details"]["cache_creation_tokens"], 300);
+    assert_eq!(usage["prompt_tokens_details"]["cache_creation_1h_tokens"], 120);
+    assert_eq!(usage["completion_tokens_details"]["reasoning_tokens"], 4);
+}
+
+#[test]
+fn usage_round_trips_through_the_ir() {
+    // The full shape an Anthropic bridge emits, including a root-level `cost_usd` this codec
+    // does not model.
+    let original = r#"{"prompt_tokens":1000,"completion_tokens":10,"total_tokens":1010,
+        "prompt_tokens_details":{"cached_tokens":600,"cache_creation_tokens":300,
+        "cache_creation_1h_tokens":120,"audio_tokens":0},
+        "completion_tokens_details":{"reasoning_tokens":4,"accepted_prediction_tokens":2},
+        "cost_usd":0.0123}"#;
+    let ir = llm_xlate_core::IrResponse { usage:usage_of(&resp_with_usage(original)), ..Default::default() };
+    let body: Value = serde_json::from_str(&encode_response(&ir, &ctx())).unwrap();
+    let expected: Value = serde_json::from_str(original).unwrap();
+    assert_eq!(body["usage"], expected);
+}
+
+#[test]
+fn unmodelled_usage_counters_are_preserved_into_ext() {
+    let u = usage_of(&resp_with_usage(
+        r#"{"prompt_tokens":10,"completion_tokens":2,"cost_usd":0.5,
+        "prompt_tokens_details":{"cached_tokens":0,"audio_tokens":3},
+        "completion_tokens_details":{"reasoning_tokens":1,"rejected_prediction_tokens":7}}"#,
+    ));
+    assert_eq!(u.ext.get("chat.cost_usd"), Some(&serde_json::json!(0.5)));
+    assert_eq!(
+        u.ext.get("chat.prompt_tokens_details.audio_tokens"),
+        Some(&serde_json::json!(3)),
+    );
+    assert_eq!(
+        u.ext.get("chat.completion_tokens_details.rejected_prediction_tokens"),
+        Some(&serde_json::json!(7)),
+    );
+    // Mapped counters are not also duplicated into ext.
+    assert_eq!(u.ext.get("chat.prompt_tokens_details.cached_tokens"), None);
+}

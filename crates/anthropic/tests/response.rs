@@ -126,8 +126,45 @@ fn cache_usage_fields_decoded() {
         "cache_creation":{"ephemeral_5m_input_tokens":20,"ephemeral_1h_input_tokens":30}}}"#,
     );
     assert_eq!(r.usage.cache_read, Some(100));
-    assert_eq!(r.usage.cache_write_5m, Some(20));
+    // The IR stores one all-TTL write total plus the 1-hour subset, so the two ephemeral
+    // buckets sum; the 5m figure is derived back out for the wire.
+    assert_eq!(r.usage.cache_write, Some(50));
     assert_eq!(r.usage.cache_write_1h, Some(30));
+    assert_eq!(r.usage.cache_write_5m(), Some(20));
+    // `input_tokens` is already the fresh count on this dialect.
+    assert_eq!(r.usage.input, 5);
+    assert_eq!(r.usage.gross_prompt(), 155);
+}
+
+#[test]
+fn flat_cache_creation_total_has_no_ttl_split() {
+    let r = decode(
+        r#"{"id":"m","type":"message","role":"assistant","model":"claude-opus-5",
+        "content":[{"type":"text","text":"x"}],"stop_reason":"end_turn",
+        "usage":{"input_tokens":5,"output_tokens":3,"cache_creation_input_tokens":40}}"#,
+    );
+    assert_eq!(r.usage.cache_write, Some(40));
+    assert_eq!(r.usage.cache_write_1h, None);
+    // Writes of unreported TTL bill at the short rate.
+    assert_eq!(r.usage.cache_write_5m(), Some(40));
+}
+
+#[test]
+fn thinking_tokens_decode_into_reasoning() {
+    let r = decode(
+        r#"{"id":"m","type":"message","role":"assistant","model":"claude-opus-5",
+        "content":[{"type":"text","text":"x"}],"stop_reason":"end_turn",
+        "usage":{"input_tokens":5,"output_tokens":30,
+        "output_tokens_details":{"thinking_tokens":12,"other_tokens":4}}}"#,
+    );
+    assert_eq!(r.usage.reasoning, Some(12));
+    // A sibling of the mapped counter is preserved under its dotted path, not dropped, and
+    // the mapped one is not also duplicated into ext.
+    assert_eq!(
+        r.usage.ext.get("anthropic.output_tokens_details.other_tokens"),
+        Some(&serde_json::json!(4)),
+    );
+    assert_eq!(r.usage.ext.get("anthropic.output_tokens_details"), None);
 }
 
 #[test]
@@ -281,4 +318,27 @@ fn encode_response_determinism() {
     let a = AnthropicCodec.encode_response(&r, &ectx(llm_xlate_core::Protocol::Anthropic));
     let b = AnthropicCodec.encode_response(&r, &ectx(llm_xlate_core::Protocol::Anthropic));
     assert_eq!(a, b);
+}
+
+#[test]
+fn usage_round_trips_through_the_ir() {
+    // A full Anthropic usage object, including the TTL split and the extras this codec does
+    // not model, must survive decode and re-encode unchanged.
+    let original = serde_json::json!({
+        "input_tokens": 120,
+        "cache_read_input_tokens": 5000,
+        "cache_creation_input_tokens": 50,
+        "cache_creation": {"ephemeral_5m_input_tokens": 20, "ephemeral_1h_input_tokens": 30},
+        "output_tokens": 40,
+        "output_tokens_details": {"thinking_tokens": 12},
+        "service_tier": "standard",
+        "inference_geo": "global"
+    });
+    let r = decode(&format!(
+        r#"{{"id":"m","type":"message","role":"assistant","model":"claude-opus-5",
+        "content":[{{"type":"text","text":"x"}}],"stop_reason":"end_turn","usage":{original}}}"#
+    ));
+    let body = AnthropicCodec.encode_response(&r, &ectx(llm_xlate_core::Protocol::Anthropic));
+    let v: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(v["usage"], original);
 }

@@ -145,14 +145,112 @@ fn decode_output_item(item: &Value, index: u32, model: &str, events: &mut Vec<Ir
     }
 }
 
+/// The `input_tokens_details` key naming the **cache-write** counter, in precedence order.
+/// Only spellings observed in real traffic are listed (plan L4).
+///
+/// - `cache_write_tokens` — OpenAI's own spelling on this dialect, and the one
+///   [`render_usage`] emits. Captured live from `gpt-4o-mini` and `gpt-6-astra` on 2026-09-10
+///   (`crates/e2e/dataset/responses/*/response.json`).
+/// - `cache_creation_tokens` — the Anthropic-bridge spelling, carried over from the Chat surface.
+/// - `created_cache_tokens` — vLLM (observed on Kimi K3 behind vLLM 0.27.x).
+///
+/// [`render_usage`]: crate::render::render_usage
+pub(crate) const CACHE_WRITE_KEYS: &[&str] =
+    &["cache_write_tokens", "cache_creation_tokens", "created_cache_tokens"];
+
+/// The `input_tokens_details` key naming the 1-hour-TTL subset of the cache writes. OpenAI has
+/// no spelling for this — it reports no TTL split at all — so [`render_usage`] emits
+/// `cache_write_1h_tokens`, which reads as the subset of the `cache_write_tokens` beside it.
+/// The Anthropic-bridge spelling `cache_creation_1h_tokens` is accepted on decode as well.
+///
+/// [`render_usage`]: crate::render::render_usage
+pub(crate) const CACHE_WRITE_1H_KEYS: &[&str] =
+    &["cache_write_1h_tokens", "cache_creation_1h_tokens"];
+
+/// `usage` root keys this codec maps to typed counters or recomputes; everything else at the
+/// root is preserved verbatim into `usage.ext` under `responses.<key>`.
+const KNOWN_ROOT_KEYS: &[&str] = &[
+    "input_tokens",
+    "output_tokens",
+    "total_tokens",
+    "input_tokens_details",
+    "output_tokens_details",
+    // Anthropic-shaped cache keys, which some compatible servers emit alongside the OpenAI
+    // ones. Read as a fallback, so never also duplicated into `ext`.
+    "cache_read_input_tokens",
+    "cache_creation_input_tokens",
+    "cache_creation",
+];
+
+/// Ext-key prefix for a counter preserved out of `input_tokens_details`.
+pub(crate) const INPUT_DETAILS_NS: &str = "responses.input_tokens_details.";
+/// Ext-key prefix for a counter preserved out of `output_tokens_details`.
+pub(crate) const OUTPUT_DETAILS_NS: &str = "responses.output_tokens_details.";
+
+/// First present key out of `keys`, read as a `u32`.
+fn first_u32(v: Option<&Value>, keys: &[&str]) -> Option<u32> {
+    let v = v?;
+    keys.iter().find_map(|k| get_u32(v, k))
+}
+
 /// Decode the `usage` block.
+///
+/// `input_tokens` is the **gross** prompt (it counts the cached and written portions inside
+/// it), so it is reduced to the IR's fresh `input` via [`Usage::from_gross`]. Every key this
+/// codec does not map — at the root or in either details object — is preserved into
+/// `usage.ext` under its dotted path.
 pub(crate) fn decode_usage(v: Option<&Value>) -> Usage {
     let Some(v) = v else { return Usage::default() };
-    let input = get_u32(v, "input_tokens").unwrap_or(0);
-    let output = get_u32(v, "output_tokens").unwrap_or(0);
-    let cache_read = v.get("input_tokens_details").and_then(|d| get_u32(d, "cached_tokens"));
-    let reasoning = v.get("output_tokens_details").and_then(|d| get_u32(d, "reasoning_tokens"));
-    Usage { input, output, cache_read, reasoning, ..Default::default() }
+    let itd = v.get("input_tokens_details");
+    let otd = v.get("output_tokens_details");
+
+    let cache_read = itd
+        .and_then(|d| get_u32(d, "cached_tokens"))
+        .or_else(|| get_u32(v, "cache_read_input_tokens"));
+    let cache_write = first_u32(itd, CACHE_WRITE_KEYS)
+        .or_else(|| get_u32(v, "cache_creation_input_tokens"));
+    let cache_write_1h = first_u32(itd, CACHE_WRITE_1H_KEYS).or_else(|| {
+        v.get("cache_creation").and_then(|c| get_u32(c, "ephemeral_1h_input_tokens"))
+    });
+
+    let mut usage = Usage::from_gross(
+        get_u32(v, "input_tokens").unwrap_or(0),
+        get_u32(v, "output_tokens").unwrap_or(0),
+        cache_read,
+        cache_write,
+        cache_write_1h,
+    );
+    usage.reasoning = otd.and_then(|d| get_u32(d, "reasoning_tokens"));
+
+    // Preserve everything this codec did not map, keyed by its path within the usage object.
+    if let Some(obj) = v.as_object() {
+        for (k, val) in obj {
+            if !KNOWN_ROOT_KEYS.contains(&k.as_str()) && !val.is_null() {
+                usage.ext.insert(format!("responses.{k}"), val.clone());
+            }
+        }
+    }
+    let consumed_input = |k: &str| {
+        k == "cached_tokens" || CACHE_WRITE_KEYS.contains(&k) || CACHE_WRITE_1H_KEYS.contains(&k)
+    };
+    preserve_details(&mut usage, itd, INPUT_DETAILS_NS, &consumed_input);
+    preserve_details(&mut usage, otd, OUTPUT_DETAILS_NS, &|k| k == "reasoning_tokens");
+    usage
+}
+
+/// Copy the unmapped entries of a `*_tokens_details` object into `usage.ext` under `ns`.
+fn preserve_details(
+    usage: &mut Usage,
+    details: Option<&Value>,
+    ns: &str,
+    consumed: &dyn Fn(&str) -> bool,
+) {
+    let Some(obj) = details.and_then(Value::as_object) else { return };
+    for (k, val) in obj {
+        if !consumed(k) && !val.is_null() {
+            usage.ext.insert(format!("{ns}{k}"), val.clone());
+        }
+    }
 }
 
 /// Derive the stop reason from a completed/incomplete response.

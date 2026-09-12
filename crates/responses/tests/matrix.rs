@@ -113,8 +113,11 @@ fn fixture_response_decodes() {
     let resp = aggregate(&events);
     assert_eq!(resp.items.len(), 2);
     assert_eq!(resp.stop, llm_xlate_core::StopReason::ToolUse);
-    assert_eq!(resp.usage.input, 50);
+    // The fixture's `input_tokens: 50` is the gross prompt, with the 10 cached tokens counted
+    // inside it; the IR stores the fresh remainder beside them.
+    assert_eq!(resp.usage.input, 40);
     assert_eq!(resp.usage.cache_read, Some(10));
+    assert_eq!(resp.usage.gross_prompt(), 50);
     assert_eq!(resp.usage.reasoning, Some(12));
     match &resp.items[0] {
         Item::Reasoning(ri) => assert_eq!(ri.opaque.as_ref().unwrap().data, "ENCBLOB"),

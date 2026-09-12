@@ -1,0 +1,33 @@
+{
+  "label": "chat.cacheacct.read_stream/gpt-4o-mini",
+  "protocol": "chat",
+  "model": "gpt-4o-mini",
+  "caps_known": true,
+  "items": [
+    {
+      "name": "request_decode",
+      "pass": true,
+      "detail": "decoded"
+    },
+    {
+      "name": "request_reencode",
+      "pass": true,
+      "detail": "byte/structure identical"
+    },
+    {
+      "name": "response_decode_stream",
+      "pass": true,
+      "detail": "decoded 5 event(s)"
+    },
+    {
+      "name": "chunk_fuzz",
+      "pass": true,
+      "detail": "25 splits identical to baseline"
+    },
+    {
+      "name": "cross_client",
+      "pass": true,
+      "detail": "rendered 2 target dialect(s)"
+    }
+  ]
+}

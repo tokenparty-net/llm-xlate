@@ -107,19 +107,67 @@ pub(crate) fn status_for(stop: &StopReason) -> (&'static str, Option<Value>) {
 }
 
 /// Render the `usage` block in the Responses shape.
+///
+/// `input_tokens` is re-grossed from the IR's disjoint counters ([`Usage::gross_prompt`]) and
+/// `total_tokens` is that plus `output`, so a client's prompt count contains its own cached and
+/// written portions — the OpenAI dialects' convention.
+///
+/// `input_tokens_details` also carries the cache-write counters when the upstream reported
+/// them: `cache_write_tokens`, which is OpenAI's own spelling on this dialect, and the
+/// non-standard `cache_write_1h_tokens` for the 1-hour subset, which has no native
+/// spelling. Cache writes are billed prompt tokens, so surfacing the TTL split under a
+/// non-standard key beats dropping it, and OpenAI SDKs ignore unknown fields. Counters that
+/// `decode_usage` preserved into `usage.ext` are re-emitted into the object they came from.
 pub(crate) fn render_usage(u: &Usage) -> Value {
-    let cached = u.cache_read.unwrap_or(0);
-    let reasoning = u.reasoning.unwrap_or(0);
-    Ob::new()
-        .set("input_tokens", Value::from(u.input))
-        .set("input_tokens_details", Ob::new().set("cached_tokens", Value::from(cached)).build())
+    use crate::response::{INPUT_DETAILS_NS, OUTPUT_DETAILS_NS};
+
+    let gross = u.gross_prompt();
+
+    let mut itd = Map::new();
+    itd.insert("cached_tokens".into(), Value::from(u.cache_read.unwrap_or(0)));
+    if let Some(w) = u.cache_write {
+        itd.insert("cache_write_tokens".into(), Value::from(w));
+    }
+    if let Some(w) = u.cache_write_1h {
+        itd.insert("cache_write_1h_tokens".into(), Value::from(w));
+    }
+    merge_preserved(&mut itd, u, INPUT_DETAILS_NS);
+
+    let mut otd = Map::new();
+    otd.insert("reasoning_tokens".into(), Value::from(u.reasoning.unwrap_or(0)));
+    merge_preserved(&mut otd, u, OUTPUT_DETAILS_NS);
+
+    let mut obj = Ob::new()
+        .set("input_tokens", Value::from(gross))
+        .set("input_tokens_details", Value::Object(itd))
         .set("output_tokens", Value::from(u.output))
-        .set(
-            "output_tokens_details",
-            Ob::new().set("reasoning_tokens", Value::from(reasoning)).build(),
-        )
-        .set("total_tokens", Value::from(u.input + u.output))
-        .build()
+        .set("output_tokens_details", Value::Object(otd))
+        .set("total_tokens", Value::from(gross + u.output))
+        .build();
+
+    // Root-level counters this codec does not model, re-emitted after the standard fields.
+    // Nested namespaces are excluded by the `.` in their prefixes, which a bare root key never
+    // contains.
+    if let Some(map) = obj.as_object_mut() {
+        for (k, val) in u.ext.iter() {
+            if let Some(name) = k.strip_prefix("responses.") {
+                if !name.contains('.') {
+                    map.entry(name.to_string()).or_insert_with(|| val.clone());
+                }
+            }
+        }
+    }
+    obj
+}
+
+/// Copy the `usage.ext` entries under `ns` back into the details object they were decoded
+/// from, without overwriting a counter this codec already wrote.
+fn merge_preserved(dst: &mut Map<String, Value>, u: &Usage, ns: &str) {
+    for (k, val) in u.ext.iter() {
+        if let Some(name) = k.strip_prefix(ns) {
+            dst.entry(name.to_string()).or_insert_with(|| val.clone());
+        }
+    }
 }
 
 /// Render one image/document/audio media source into an input content part body (without the

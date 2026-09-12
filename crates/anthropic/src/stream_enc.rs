@@ -388,12 +388,29 @@ impl AnthropicStreamEncoder {
             if let Some(cr) = usage.cache_read {
                 u.insert("cache_read_input_tokens".into(), Value::from(cr));
             }
-            let creation = usage.cache_write_5m.unwrap_or(0) + usage.cache_write_1h.unwrap_or(0);
-            if usage.cache_write_5m.is_some() || usage.cache_write_1h.is_some() {
-                u.insert("cache_creation_input_tokens".into(), Value::from(creation));
+            if let Some(total) = usage.cache_write {
+                // The `cache_creation` split has to appear here too, not just the flat total:
+                // the non-streaming encoder emits both, and the crate's law is that a stream
+                // and its non-streaming twin aggregate to the same response.
+                u.insert("cache_creation_input_tokens".into(), Value::from(total));
+                let mut cc = omap();
+                cc.insert(
+                    "ephemeral_5m_input_tokens".into(),
+                    Value::from(usage.cache_write_5m().unwrap_or(0)),
+                );
+                cc.insert(
+                    "ephemeral_1h_input_tokens".into(),
+                    Value::from(usage.cache_write_1h.unwrap_or(0)),
+                );
+                u.insert("cache_creation".into(), Value::Object(cc));
             }
         }
         u.insert("output_tokens".into(), Value::from(usage.output));
+        if let Some(r) = usage.reasoning {
+            let mut otd = omap();
+            otd.insert("thinking_tokens".into(), Value::from(r));
+            u.insert("output_tokens_details".into(), Value::Object(otd));
+        }
 
         let mut root = omap();
         root.insert("type".into(), Value::from("message_delta"));

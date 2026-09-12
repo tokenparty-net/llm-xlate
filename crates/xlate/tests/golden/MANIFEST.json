@@ -204,6 +204,122 @@
       "verdict": "pass"
     },
     {
+      "name": "cacheacct_read__claude-sonnet-5__20260912",
+      "protocol": "anthropic",
+      "probe_id": "ant.cacheacct.read",
+      "model": "claude-sonnet-5",
+      "date": "20260912",
+      "source_run": "20260912-072453",
+      "files": {
+        "req": {
+          "file": "cacheacct_read__claude-sonnet-5__20260912.req.json",
+          "sha256": "79ff4482dfa3047cb1c981fa9769a2dc49edf183efae5a97212bf201a5ebd54c"
+        },
+        "stream": {
+          "file": "cacheacct_read__claude-sonnet-5__20260912.stream.sse",
+          "sha256": "b640d993e77a0729fc15503c4711fbdc740ec2b56e6ebba9e927ef69ea513a1b"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "pass"
+    },
+    {
+      "name": "cacheacct_ttl_1h_read__claude-sonnet-5__20260912",
+      "protocol": "anthropic",
+      "probe_id": "ant.cacheacct.ttl_1h_read",
+      "model": "claude-sonnet-5",
+      "date": "20260912",
+      "source_run": "20260912-072453",
+      "files": {
+        "req": {
+          "file": "cacheacct_ttl_1h_read__claude-sonnet-5__20260912.req.json",
+          "sha256": "c54e52015b4120efda59bcfeefc48c82592471167a691e8d57657c8a9b0d2ecd"
+        },
+        "resp": {
+          "file": "cacheacct_ttl_1h_read__claude-sonnet-5__20260912.resp.json",
+          "sha256": "dae11d45f13058d44791b70775e69c7f41045f1b4fd301ffe6cdc5d8c5901ebb"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "pass"
+    },
+    {
+      "name": "cacheacct_ttl_1h_write__claude-sonnet-5__20260912",
+      "protocol": "anthropic",
+      "probe_id": "ant.cacheacct.ttl_1h_write",
+      "model": "claude-sonnet-5",
+      "date": "20260912",
+      "source_run": "20260912-072453",
+      "files": {
+        "req": {
+          "file": "cacheacct_ttl_1h_write__claude-sonnet-5__20260912.req.json",
+          "sha256": "c54e52015b4120efda59bcfeefc48c82592471167a691e8d57657c8a9b0d2ecd"
+        },
+        "resp": {
+          "file": "cacheacct_ttl_1h_write__claude-sonnet-5__20260912.resp.json",
+          "sha256": "e83e40eeb40d0fb45493eb30102a3dc82a8aaf04cc4a81c2e6f6b56d8028a60e"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "pass"
+    },
+    {
+      "name": "cacheacct_write__claude-sonnet-5__20260912",
+      "protocol": "anthropic",
+      "probe_id": "ant.cacheacct.write",
+      "model": "claude-sonnet-5",
+      "date": "20260912",
+      "source_run": "20260912-072453",
+      "files": {
+        "req": {
+          "file": "cacheacct_write__claude-sonnet-5__20260912.req.json",
+          "sha256": "8dc211d3cf4042756111f058c3ea221b8fbac04ac5e2296e7de697669eb9a321"
+        },
+        "resp": {
+          "file": "cacheacct_write__claude-sonnet-5__20260912.resp.json",
+          "sha256": "71baa4ebb7a33d0f76709ce086aa864c4d84d3c5384a0c5a2f9eff6306d4bf2f"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "pass"
+    },
+    {
       "name": "err_max_tokens_too_large__claude-sonnet-5__20260910",
       "protocol": "anthropic",
       "probe_id": "ant.err.max_tokens_too_large",
@@ -2002,20 +2118,20 @@
       "verdict": "na"
     },
     {
-      "name": "err_temperature_out_of_range__gpt-4o-mini__20260910",
+      "name": "cacheacct_read__gpt-4o-mini__20260912",
       "protocol": "chat",
-      "probe_id": "chat.err.temperature_out_of_range",
+      "probe_id": "chat.cacheacct.read",
       "model": "gpt-4o-mini",
-      "date": "20260910",
-      "source_run": "20260910-042135",
+      "date": "20260912",
+      "source_run": "20260912-072453",
       "files": {
-        "err": {
-          "file": "err_temperature_out_of_range__gpt-4o-mini__20260910.err.json",
-          "sha256": "39c1c55d8352a3675086f29d1527a1ac25f66470f82e0a2e951c65364468b01f"
-        },
         "req": {
-          "file": "err_temperature_out_of_range__gpt-4o-mini__20260910.req.json",
-          "sha256": "ae0f19dfcd575bae7ccd4a093431e1f9450879ac895e0a562509777d753e2e2b"
+          "file": "cacheacct_read__gpt-4o-mini__20260912.req.json",
+          "sha256": "09787d5ba22790d4756653047222248b48d58911f970d019992eb9b52b520e64"
+        },
+        "resp": {
+          "file": "cacheacct_read__gpt-4o-mini__20260912.resp.json",
+          "sha256": "8713eb90de2f6bf0a44efffbd1c3f13b58d65cf1a84b72217ef6ed1010839db8"
         }
       },
       "redactions": [
@@ -2027,7 +2143,65 @@
         "anthropic-organization-id",
         "anthropic-workspace-id"
       ],
-      "status": 400,
+      "status": 200,
+      "verdict": "pass"
+    },
+    {
+      "name": "cacheacct_read_stream__gpt-4o-mini__20260912",
+      "protocol": "chat",
+      "probe_id": "chat.cacheacct.read_stream",
+      "model": "gpt-4o-mini",
+      "date": "20260912",
+      "source_run": "20260912-072453",
+      "files": {
+        "req": {
+          "file": "cacheacct_read_stream__gpt-4o-mini__20260912.req.json",
+          "sha256": "db6e0f59fff8995f39f357fe2f4b39e3204b77ab30a7836c7f25d05857f0a700"
+        },
+        "stream": {
+          "file": "cacheacct_read_stream__gpt-4o-mini__20260912.stream.sse",
+          "sha256": "d91bced30c46cbc6233f51655ca2954cac2f981be831be3390e586538e8dc4c5"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "pass"
+    },
+    {
+      "name": "cacheacct_write__gpt-4o-mini__20260912",
+      "protocol": "chat",
+      "probe_id": "chat.cacheacct.write",
+      "model": "gpt-4o-mini",
+      "date": "20260912",
+      "source_run": "20260912-071653",
+      "files": {
+        "req": {
+          "file": "cacheacct_write__gpt-4o-mini__20260912.req.json",
+          "sha256": "09787d5ba22790d4756653047222248b48d58911f970d019992eb9b52b520e64"
+        },
+        "resp": {
+          "file": "cacheacct_write__gpt-4o-mini__20260912.resp.json",
+          "sha256": "2159761328dba09319d4d69d9256a1d2590c3f5f7c4258cc169ad41109f22266"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
       "verdict": "pass"
     },
     {
@@ -2058,6 +2232,122 @@
       ],
       "status": 400,
       "verdict": "na"
+    },
+    {
+      "name": "chat__output_non_strict__gpt-4o-mini__20260910",
+      "protocol": "chat",
+      "probe_id": "chat.output.non_strict",
+      "model": "gpt-4o-mini",
+      "date": "20260910",
+      "source_run": "20260910-042135",
+      "files": {
+        "req": {
+          "file": "chat__output_non_strict__gpt-4o-mini__20260910.req.json",
+          "sha256": "22fa356572666c50790dd364a503cf816cfc10f34aef81164fafea927b9c5d6f"
+        },
+        "resp": {
+          "file": "chat__output_non_strict__gpt-4o-mini__20260910.resp.json",
+          "sha256": "6fa5bb626e14b00bc1b5c1b6631e0ea9e3a978e6a257de5f5b14898beb244ef2"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "pass"
+    },
+    {
+      "name": "chat__output_strict_unsupported_keywords__gpt-4o-mini__20260910",
+      "protocol": "chat",
+      "probe_id": "chat.output.strict_unsupported_keywords",
+      "model": "gpt-4o-mini",
+      "date": "20260910",
+      "source_run": "20260910-042135",
+      "files": {
+        "req": {
+          "file": "chat__output_strict_unsupported_keywords__gpt-4o-mini__20260910.req.json",
+          "sha256": "0f8e549962a8a8694da861488993f878b69d870ff6222012025017e07cc70a01"
+        },
+        "resp": {
+          "file": "chat__output_strict_unsupported_keywords__gpt-4o-mini__20260910.resp.json",
+          "sha256": "da84df03fae28906b8106bb2ae957653697567dbb1c3d3c64015a14187edbaf7"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "na"
+    },
+    {
+      "name": "chat__reason_effort_high__o4-mini__20260910",
+      "protocol": "chat",
+      "probe_id": "chat.reason.effort_high",
+      "model": "o4-mini",
+      "date": "20260910",
+      "source_run": "20260910-042135",
+      "files": {
+        "req": {
+          "file": "chat__reason_effort_high__o4-mini__20260910.req.json",
+          "sha256": "e022135046fc6e8ee6c2954d82bb664300ce9ac71471b33e28ea24550a0769f7"
+        },
+        "resp": {
+          "file": "chat__reason_effort_high__o4-mini__20260910.resp.json",
+          "sha256": "dda1fde7c71ac54dca93ef5b4040239dc7fac306dc12d211c26413a7133fbe7f"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "pass"
+    },
+    {
+      "name": "err_temperature_out_of_range__gpt-4o-mini__20260910",
+      "protocol": "chat",
+      "probe_id": "chat.err.temperature_out_of_range",
+      "model": "gpt-4o-mini",
+      "date": "20260910",
+      "source_run": "20260910-042135",
+      "files": {
+        "err": {
+          "file": "err_temperature_out_of_range__gpt-4o-mini__20260910.err.json",
+          "sha256": "39c1c55d8352a3675086f29d1527a1ac25f66470f82e0a2e951c65364468b01f"
+        },
+        "req": {
+          "file": "err_temperature_out_of_range__gpt-4o-mini__20260910.req.json",
+          "sha256": "ae0f19dfcd575bae7ccd4a093431e1f9450879ac895e0a562509777d753e2e2b"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 400,
+      "verdict": "pass"
     },
     {
       "name": "gpt6_tools_rejected__gpt-6-astra__20260910",
@@ -2640,35 +2930,6 @@
       "verdict": "pass"
     },
     {
-      "name": "chat__output_non_strict__gpt-4o-mini__20260910",
-      "protocol": "chat",
-      "probe_id": "chat.output.non_strict",
-      "model": "gpt-4o-mini",
-      "date": "20260910",
-      "source_run": "20260910-042135",
-      "files": {
-        "req": {
-          "file": "chat__output_non_strict__gpt-4o-mini__20260910.req.json",
-          "sha256": "22fa356572666c50790dd364a503cf816cfc10f34aef81164fafea927b9c5d6f"
-        },
-        "resp": {
-          "file": "chat__output_non_strict__gpt-4o-mini__20260910.resp.json",
-          "sha256": "6fa5bb626e14b00bc1b5c1b6631e0ea9e3a978e6a257de5f5b14898beb244ef2"
-        }
-      },
-      "redactions": [
-        "authorization",
-        "x-api-key",
-        "openai-organization",
-        "openai-project",
-        "cookie",
-        "anthropic-organization-id",
-        "anthropic-workspace-id"
-      ],
-      "status": 200,
-      "verdict": "pass"
-    },
-    {
       "name": "output_strict_missing_additional_properties__gpt-4o-mini__20260910",
       "protocol": "chat",
       "probe_id": "chat.output.strict_missing_additional_properties",
@@ -2696,64 +2957,6 @@
       ],
       "status": 400,
       "verdict": "na"
-    },
-    {
-      "name": "chat__output_strict_unsupported_keywords__gpt-4o-mini__20260910",
-      "protocol": "chat",
-      "probe_id": "chat.output.strict_unsupported_keywords",
-      "model": "gpt-4o-mini",
-      "date": "20260910",
-      "source_run": "20260910-042135",
-      "files": {
-        "req": {
-          "file": "chat__output_strict_unsupported_keywords__gpt-4o-mini__20260910.req.json",
-          "sha256": "0f8e549962a8a8694da861488993f878b69d870ff6222012025017e07cc70a01"
-        },
-        "resp": {
-          "file": "chat__output_strict_unsupported_keywords__gpt-4o-mini__20260910.resp.json",
-          "sha256": "da84df03fae28906b8106bb2ae957653697567dbb1c3d3c64015a14187edbaf7"
-        }
-      },
-      "redactions": [
-        "authorization",
-        "x-api-key",
-        "openai-organization",
-        "openai-project",
-        "cookie",
-        "anthropic-organization-id",
-        "anthropic-workspace-id"
-      ],
-      "status": 200,
-      "verdict": "na"
-    },
-    {
-      "name": "chat__reason_effort_high__o4-mini__20260910",
-      "protocol": "chat",
-      "probe_id": "chat.reason.effort_high",
-      "model": "o4-mini",
-      "date": "20260910",
-      "source_run": "20260910-042135",
-      "files": {
-        "req": {
-          "file": "chat__reason_effort_high__o4-mini__20260910.req.json",
-          "sha256": "e022135046fc6e8ee6c2954d82bb664300ce9ac71471b33e28ea24550a0769f7"
-        },
-        "resp": {
-          "file": "chat__reason_effort_high__o4-mini__20260910.resp.json",
-          "sha256": "dda1fde7c71ac54dca93ef5b4040239dc7fac306dc12d211c26413a7133fbe7f"
-        }
-      },
-      "redactions": [
-        "authorization",
-        "x-api-key",
-        "openai-organization",
-        "openai-project",
-        "cookie",
-        "anthropic-organization-id",
-        "anthropic-workspace-id"
-      ],
-      "status": 200,
-      "verdict": "pass"
     },
     {
       "name": "reason_effort_minimal__o4-mini__20260910",
@@ -3220,6 +3423,64 @@
       "verdict": "na"
     },
     {
+      "name": "cacheacct_read__gpt-4o-mini__20260912",
+      "protocol": "responses",
+      "probe_id": "resp.cacheacct.read",
+      "model": "gpt-4o-mini",
+      "date": "20260912",
+      "source_run": "20260912-072453",
+      "files": {
+        "req": {
+          "file": "cacheacct_read__gpt-4o-mini__20260912.req.json",
+          "sha256": "6dfc91a7109a2873d8628dd332401799c2f6e8f686ce45728fbb406d122b9ebc"
+        },
+        "stream": {
+          "file": "cacheacct_read__gpt-4o-mini__20260912.stream.sse",
+          "sha256": "3a881288890f3b0ee6e6c6982fbede428f0d9dc97dbbed63101a95b61998ff40"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "pass"
+    },
+    {
+      "name": "cacheacct_write__gpt-4o-mini__20260912",
+      "protocol": "responses",
+      "probe_id": "resp.cacheacct.write",
+      "model": "gpt-4o-mini",
+      "date": "20260912",
+      "source_run": "20260912-071653",
+      "files": {
+        "req": {
+          "file": "cacheacct_write__gpt-4o-mini__20260912.req.json",
+          "sha256": "321e3b0b51fb127e548f36bf1590b38b3f19f3153911bc0de666381da96880ab"
+        },
+        "resp": {
+          "file": "cacheacct_write__gpt-4o-mini__20260912.resp.json",
+          "sha256": "f7c96da7b790cbf779021611055691c74f9ca97c9df9b30fde34f698e600accc"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "pass"
+    },
+    {
       "name": "err_empty_input__gpt-4o-mini__20260910",
       "protocol": "responses",
       "probe_id": "resp.err.empty_input",
@@ -3234,35 +3495,6 @@
         "req": {
           "file": "err_empty_input__gpt-4o-mini__20260910.req.json",
           "sha256": "1391985717aa724b70a8df6e41277f4253d4cfc70774b3e4685a9009acce7da3"
-        }
-      },
-      "redactions": [
-        "authorization",
-        "x-api-key",
-        "openai-organization",
-        "openai-project",
-        "cookie",
-        "anthropic-organization-id",
-        "anthropic-workspace-id"
-      ],
-      "status": 400,
-      "verdict": "na"
-    },
-    {
-      "name": "responses__err_unknown_field__gpt-4o-mini__20260910",
-      "protocol": "responses",
-      "probe_id": "resp.err.unknown_field",
-      "model": "gpt-4o-mini",
-      "date": "20260910",
-      "source_run": "20260910-042135",
-      "files": {
-        "err": {
-          "file": "responses__err_unknown_field__gpt-4o-mini__20260910.err.json",
-          "sha256": "441642b60ca1b5d399012b4f2d568155a9fa15e73e951621287e51d644f87717"
-        },
-        "req": {
-          "file": "responses__err_unknown_field__gpt-4o-mini__20260910.req.json",
-          "sha256": "519381ab966b682f7cba2499b48c63705867945b47992b940d066f295b1ac540"
         }
       },
       "redactions": [
@@ -3597,64 +3829,6 @@
       "verdict": "pass"
     },
     {
-      "name": "responses__output_non_strict__gpt-4o-mini__20260910",
-      "protocol": "responses",
-      "probe_id": "resp.output.non_strict",
-      "model": "gpt-4o-mini",
-      "date": "20260910",
-      "source_run": "20260910-042135",
-      "files": {
-        "req": {
-          "file": "responses__output_non_strict__gpt-4o-mini__20260910.req.json",
-          "sha256": "0cfc4546209fd964c7b47e41e3e575f6973d923d6b70f6c5482c13745b4e7027"
-        },
-        "resp": {
-          "file": "responses__output_non_strict__gpt-4o-mini__20260910.resp.json",
-          "sha256": "41671a8a63fec7cf2b384f50986da4cd0600728a757b5fa1d800c7042f7714bc"
-        }
-      },
-      "redactions": [
-        "authorization",
-        "x-api-key",
-        "openai-organization",
-        "openai-project",
-        "cookie",
-        "anthropic-organization-id",
-        "anthropic-workspace-id"
-      ],
-      "status": 200,
-      "verdict": "pass"
-    },
-    {
-      "name": "responses__output_strict_unsupported_keywords__gpt-4o-mini__20260910",
-      "protocol": "responses",
-      "probe_id": "resp.output.strict_unsupported_keywords",
-      "model": "gpt-4o-mini",
-      "date": "20260910",
-      "source_run": "20260910-042135",
-      "files": {
-        "req": {
-          "file": "responses__output_strict_unsupported_keywords__gpt-4o-mini__20260910.req.json",
-          "sha256": "fa86e8a611732aef5dfa3ba68d60dc6888e96ed4dbd7ec371a866fcb77e20327"
-        },
-        "resp": {
-          "file": "responses__output_strict_unsupported_keywords__gpt-4o-mini__20260910.resp.json",
-          "sha256": "f9cb70e8bc98f0a53c1fdcad8207d5bde26ee3476757f952f633c578e73fc43c"
-        }
-      },
-      "redactions": [
-        "authorization",
-        "x-api-key",
-        "openai-organization",
-        "openai-project",
-        "cookie",
-        "anthropic-organization-id",
-        "anthropic-workspace-id"
-      ],
-      "status": 200,
-      "verdict": "na"
-    },
-    {
       "name": "output_verbosity__gpt-4o-mini__20260910",
       "protocol": "responses",
       "probe_id": "resp.output.verbosity",
@@ -3682,35 +3856,6 @@
       ],
       "status": 400,
       "verdict": "na"
-    },
-    {
-      "name": "responses__reason_effort_high__o4-mini__20260910",
-      "protocol": "responses",
-      "probe_id": "resp.reason.effort_high",
-      "model": "o4-mini",
-      "date": "20260910",
-      "source_run": "20260910-042135",
-      "files": {
-        "req": {
-          "file": "responses__reason_effort_high__o4-mini__20260910.req.json",
-          "sha256": "a614f8a8d7e41870bb2af1638c41dd552ccc8671875527f31a1f8ba536756f54"
-        },
-        "stream": {
-          "file": "responses__reason_effort_high__o4-mini__20260910.stream.sse",
-          "sha256": "d0efc4ed46fcdfc6b3c47afadaf92b0351372c021f05f3c677f6ae6d7d2f1879"
-        }
-      },
-      "redactions": [
-        "authorization",
-        "x-api-key",
-        "openai-organization",
-        "openai-project",
-        "cookie",
-        "anthropic-organization-id",
-        "anthropic-workspace-id"
-      ],
-      "status": 200,
-      "verdict": "pass"
     },
     {
       "name": "reason_effort_invalid__o4-mini__20260910",
@@ -3885,6 +4030,122 @@
       ],
       "status": 200,
       "verdict": "na"
+    },
+    {
+      "name": "responses__err_unknown_field__gpt-4o-mini__20260910",
+      "protocol": "responses",
+      "probe_id": "resp.err.unknown_field",
+      "model": "gpt-4o-mini",
+      "date": "20260910",
+      "source_run": "20260910-042135",
+      "files": {
+        "err": {
+          "file": "responses__err_unknown_field__gpt-4o-mini__20260910.err.json",
+          "sha256": "441642b60ca1b5d399012b4f2d568155a9fa15e73e951621287e51d644f87717"
+        },
+        "req": {
+          "file": "responses__err_unknown_field__gpt-4o-mini__20260910.req.json",
+          "sha256": "519381ab966b682f7cba2499b48c63705867945b47992b940d066f295b1ac540"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 400,
+      "verdict": "na"
+    },
+    {
+      "name": "responses__output_non_strict__gpt-4o-mini__20260910",
+      "protocol": "responses",
+      "probe_id": "resp.output.non_strict",
+      "model": "gpt-4o-mini",
+      "date": "20260910",
+      "source_run": "20260910-042135",
+      "files": {
+        "req": {
+          "file": "responses__output_non_strict__gpt-4o-mini__20260910.req.json",
+          "sha256": "0cfc4546209fd964c7b47e41e3e575f6973d923d6b70f6c5482c13745b4e7027"
+        },
+        "resp": {
+          "file": "responses__output_non_strict__gpt-4o-mini__20260910.resp.json",
+          "sha256": "41671a8a63fec7cf2b384f50986da4cd0600728a757b5fa1d800c7042f7714bc"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "pass"
+    },
+    {
+      "name": "responses__output_strict_unsupported_keywords__gpt-4o-mini__20260910",
+      "protocol": "responses",
+      "probe_id": "resp.output.strict_unsupported_keywords",
+      "model": "gpt-4o-mini",
+      "date": "20260910",
+      "source_run": "20260910-042135",
+      "files": {
+        "req": {
+          "file": "responses__output_strict_unsupported_keywords__gpt-4o-mini__20260910.req.json",
+          "sha256": "fa86e8a611732aef5dfa3ba68d60dc6888e96ed4dbd7ec371a866fcb77e20327"
+        },
+        "resp": {
+          "file": "responses__output_strict_unsupported_keywords__gpt-4o-mini__20260910.resp.json",
+          "sha256": "f9cb70e8bc98f0a53c1fdcad8207d5bde26ee3476757f952f633c578e73fc43c"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "na"
+    },
+    {
+      "name": "responses__reason_effort_high__o4-mini__20260910",
+      "protocol": "responses",
+      "probe_id": "resp.reason.effort_high",
+      "model": "o4-mini",
+      "date": "20260910",
+      "source_run": "20260910-042135",
+      "files": {
+        "req": {
+          "file": "responses__reason_effort_high__o4-mini__20260910.req.json",
+          "sha256": "a614f8a8d7e41870bb2af1638c41dd552ccc8671875527f31a1f8ba536756f54"
+        },
+        "stream": {
+          "file": "responses__reason_effort_high__o4-mini__20260910.stream.sse",
+          "sha256": "d0efc4ed46fcdfc6b3c47afadaf92b0351372c021f05f3c677f6ae6d7d2f1879"
+        }
+      },
+      "redactions": [
+        "authorization",
+        "x-api-key",
+        "openai-organization",
+        "openai-project",
+        "cookie",
+        "anthropic-organization-id",
+        "anthropic-workspace-id"
+      ],
+      "status": 200,
+      "verdict": "pass"
     },
     {
       "name": "state_encrypted_capture__o4-mini__20260910",

@@ -250,16 +250,20 @@ impl AnthropicStreamDecoder {
             if md.cache_read.is_some() {
                 usage.cache_read = md.cache_read;
             }
-            if md.cache_write_5m.is_some() {
-                usage.cache_write_5m = md.cache_write_5m;
+            if md.cache_write.is_some() {
+                usage.cache_write = md.cache_write;
             }
             if md.cache_write_1h.is_some() {
                 usage.cache_write_1h = md.cache_write_1h;
+            }
+            if md.reasoning.is_some() {
+                usage.reasoning = md.reasoning;
             }
             // Carry any preserved extra usage fields (e.g. `service_tier`, `server_tool_use`).
             for (k, v) in md.ext.iter() {
                 usage.ext.insert(k.clone(), v.clone());
             }
+            usage.enforce_invariants();
         }
 
         let mut ext = Extensions::new();

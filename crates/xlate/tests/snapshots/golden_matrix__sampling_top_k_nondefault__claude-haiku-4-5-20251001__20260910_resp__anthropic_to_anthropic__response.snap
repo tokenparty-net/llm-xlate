@@ -23,6 +23,8 @@ expression: resp_rendered
       "ephemeral_5m_input_tokens": 0,
       "ephemeral_1h_input_tokens": 0
     },
-    "output_tokens": 4
+    "output_tokens": 4,
+    "inference_geo": "not_available",
+    "service_tier": "standard"
   }
 }

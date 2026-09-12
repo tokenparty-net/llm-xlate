@@ -250,10 +250,27 @@ impl Aggregator {
             if usage.input == 0 {
                 usage.input = prefill.input;
             }
+            // Every prompt-side counter can arrive at message start and be omitted at stop
+            // (Anthropic reports the whole breakdown in `message_start`), so each one falls
+            // back to the prefill independently.
             if usage.cache_read.is_none() {
                 usage.cache_read = prefill.cache_read;
             }
+            if usage.cache_write.is_none() {
+                usage.cache_write = prefill.cache_write;
+            }
+            if usage.cache_write_1h.is_none() {
+                usage.cache_write_1h = prefill.cache_write_1h;
+            }
+            if usage.reasoning.is_none() {
+                usage.reasoning = prefill.reasoning;
+            }
         }
+        usage.enforce_invariants();
+        debug_assert!(
+            usage.cache_write_1h.unwrap_or(0) <= usage.cache_write.unwrap_or(0),
+            "Usage invariant broken: cache_write_1h > cache_write ({usage:?})"
+        );
 
         let items = self.items.into_iter().map(|(_, b)| build_item(b)).collect();
 

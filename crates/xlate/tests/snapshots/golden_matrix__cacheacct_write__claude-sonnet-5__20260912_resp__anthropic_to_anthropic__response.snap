@@ -1,0 +1,33 @@
+---
+source: crates/xlate/tests/golden_matrix.rs
+expression: resp_rendered
+---
+{
+  "id": "resp_golden",
+  "type": "message",
+  "role": "assistant",
+  "model": "golden-model",
+  "content": [
+    {
+      "type": "text",
+      "text": "ok"
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 15,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 3935,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 3935,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 4,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "inference_geo": "global",
+    "service_tier": "standard"
+  }
+}

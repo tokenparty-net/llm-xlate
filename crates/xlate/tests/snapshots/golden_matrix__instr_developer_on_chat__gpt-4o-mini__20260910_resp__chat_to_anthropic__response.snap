@@ -18,6 +18,9 @@ expression: resp_rendered
   "usage": {
     "input_tokens": 20,
     "cache_read_input_tokens": 0,
-    "output_tokens": 9
+    "output_tokens": 9,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    }
   }
 }

@@ -1,0 +1,30 @@
+{
+  "status": 200,
+  "headers": {
+    "access-control-expose-headers": "CF-Ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a39e8c84e9ac1526-EWR",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream; charset=utf-8",
+    "date": "Sat, 12 Sep 2026 11:24:59 GMT",
+    "openai-organization": "<redacted>",
+    "openai-processing-ms": "257",
+    "openai-project": "<redacted>",
+    "openai-version": "2020-10-01",
+    "server": "cloudflare",
+    "set-cookie": "<redacted>",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-openai-proxy-wasm": "v0.1",
+    "x-ratelimit-limit-requests": "10000",
+    "x-ratelimit-limit-tokens": "200000",
+    "x-ratelimit-remaining-requests": "9995",
+    "x-ratelimit-remaining-tokens": "196164",
+    "x-ratelimit-reset-requests": "39.139s",
+    "x-ratelimit-reset-tokens": "1.15s",
+    "x-request-id": "req_e7f3d498189d42c0b2015d7dfbb4a87a"
+  },
+  "elapsed_ms": 916
+}

@@ -24,7 +24,9 @@ expression: resp_rendered
     "completion_tokens": 5,
     "total_tokens": 54,
     "prompt_tokens_details": {
-      "cached_tokens": 0
+      "cached_tokens": 0,
+      "cache_creation_tokens": 0,
+      "cache_creation_1h_tokens": 0
     }
   }
 }
