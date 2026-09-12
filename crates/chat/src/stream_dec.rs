@@ -40,10 +40,11 @@ pub struct ChatStreamDecoder {
     has_refusal: bool,
     finish_reason: Option<StopReason>,
     service_tier: Option<String>,
-    /// Usage carried on a content chunk (vLLM and some gateways attach a running `usage` to
-    /// EVERY chunk, `completion_tokens: 0` on the first). It is only terminal when the chunk has
-    /// no choices (OpenAI's final usage-only chunk) or a `finish_reason` was already seen;
-    /// otherwise the latest value is kept and applied at `[DONE]` / end of stream.
+    /// The most recent `usage` object seen on any chunk. Providers differ in where they put it —
+    /// OpenAI sends one final choices-empty chunk, vLLM attaches a running total to EVERY chunk
+    /// (`completion_tokens: 0` on the first) *and* sends a final choices-empty chunk that is the
+    /// only one carrying `prompt_tokens_details`. The last object seen always wins, and it is
+    /// applied at `[DONE]` / end of stream rather than when `finish_reason` arrives.
     last_usage: Option<Usage>,
 }
 
@@ -134,14 +135,15 @@ impl ChatStreamDecoder {
         }
 
         if let Some(u) = &chunk.usage {
-            let usage = decode_usage(u);
-            if chunk.choices.is_empty() || self.finish_reason.is_some() {
-                // OpenAI's final usage-only chunk, or usage riding on the finish chunk.
-                self.finalize(out, usage);
-            } else {
-                // Per-chunk running usage (vLLM): remember it, keep streaming.
-                self.last_usage = Some(usage);
-            }
+            // Never finalize from inside a usage chunk: the *last* usage object a provider
+            // sends is the authoritative one, and it can arrive after the chunk that carried
+            // `finish_reason`. vLLM attaches a running usage to every chunk and then sends one
+            // final choices-empty chunk that is the only one carrying
+            // `prompt_tokens_details` — finalizing on the finish chunk discarded exactly the
+            // cache counters this codec exists to preserve. Stop is emitted at `[DONE]` or at
+            // end of stream instead; items already closed at `finish_reason`, so nothing else
+            // moves.
+            self.last_usage = Some(decode_usage(u));
         }
     }
 

@@ -419,3 +419,34 @@ fn decode_per_chunk_usage_without_final_usage_chunk_uses_last_seen() {
     assert_eq!(r.items[0].as_text_opt(), Some("pong".to_string()));
     assert_eq!(r.usage.output, 3);
 }
+
+/// Regression: a vLLM-style stream where the chunk carrying `finish_reason` also carries a
+/// usage object, and the cache counters arrive only on the *following* choices-empty chunk.
+///
+/// The decoder used to finalize on the finish chunk, which set `stopped` and made the trailing
+/// chunk unreachable — silently dropping `prompt_tokens_details` and with it every cache
+/// counter. This is the verbatim upstream stream from a live capture: Kimi K3 behind vLLM,
+/// request `01a09585-ca71-7732-8f35-9493fe379812`, 2026-09-12, where `created_cache_tokens:
+/// 9216` on a 9414-token prompt reached the IR as nothing at all.
+const STREAM_VLLM_CACHE_AFTER_FINISH: &str =
+    include_str!("fixtures/stream_vllm_cache_after_finish.txt");
+
+#[test]
+fn cache_counters_on_the_chunk_after_finish_reason_are_not_dropped() {
+    let r = aggregate(decode_stream(STREAM_VLLM_CACHE_AFTER_FINISH, &gpt4o()));
+    assert_eq!(r.stop, StopReason::EndTurn);
+    assert_eq!(r.usage.cache_write, Some(9216), "cache write dropped");
+    assert_eq!(r.usage.cache_read, Some(0));
+    assert_eq!(r.usage.output, 46);
+    // 9414 gross - 0 read - 9216 written = 198 genuinely fresh prompt tokens.
+    assert_eq!(r.usage.input, 198);
+    assert_eq!(r.usage.gross_prompt(), 9414);
+}
+
+#[test]
+fn cache_counters_after_finish_survive_arbitrary_chunk_boundaries() {
+    // The same stream fed one byte at a time must produce the identical usage.
+    let whole = aggregate(decode_stream(STREAM_VLLM_CACHE_AFTER_FINISH, &gpt4o()));
+    let split = aggregate(decode_stream_split(STREAM_VLLM_CACHE_AFTER_FINISH, &gpt4o()));
+    assert_eq!(whole.usage, split.usage);
+}
