@@ -281,10 +281,17 @@ fn build_messages(
         }
     }
 
-    // Classify mid instructions: native system messages (before a group) vs inline-wrap blocks
-    // (prepended to a user group, or appended at the end).
+    // Classify mid instructions: native system messages (before a group) vs inline-wrap blocks.
+    // An inline-wrap block goes into a user message at the position closest to its anchor that
+    // keeps the wire valid: appended to the END of the preceding user group when there is one
+    // (exactly where it was in the conversation), otherwise into the next user group AFTER its
+    // `tool_result` blocks — Anthropic rejects a user message whose tool results do not come
+    // first, so a wrap must never be placed in front of them. Anchors past the last group go to
+    // a trailing user message.
     let mut native_before: Vec<Vec<&Instruction>> = vec![Vec::new(); groups.len() + 1];
-    let mut wrap_for_group: Vec<Vec<Value>> = vec![Vec::new(); groups.len() + 1]; // last slot = trailing
+    let mut wrap_append: Vec<Vec<Value>> = vec![Vec::new(); groups.len()];
+    let mut wrap_after_results: Vec<Vec<Value>> = vec![Vec::new(); groups.len()];
+    let mut wrap_trailing: Vec<Value> = Vec::new();
 
     let native_supported =
         caps.instructions.mid_conversation_system == Some(MidConversationSystem::Native);
@@ -300,13 +307,18 @@ fn build_messages(
         if native_supported && prev_user && target_group >= 1 && target_group < groups.len() {
             native_before[target_group].push(instr);
         } else {
-            // Inline-wrap: find next user group at/after target_group; else trailing.
             let text = instr.text();
             let block = wrap_system_block(&text);
-            let slot = (target_group..groups.len())
-                .find(|&gi| groups[gi].side == Side::User)
-                .unwrap_or(groups.len());
-            wrap_for_group[slot].push(block);
+            if target_group >= groups.len() {
+                wrap_trailing.push(block);
+            } else if prev_user {
+                wrap_append[target_group - 1].push(block);
+            } else {
+                match (target_group..groups.len()).find(|&gi| groups[gi].side == Side::User) {
+                    Some(gi) => wrap_after_results[gi].push(block),
+                    None => wrap_trailing.push(block),
+                }
+            }
             degradations.wrapped(
                 "instructions",
                 "mid-context system inline-wrapped into a user message",
@@ -327,17 +339,22 @@ fn build_messages(
         for instr in &native_before[gi] {
             out.push(build_native_system(instr, caps, degradations, betas));
         }
-        // Build the group's blocks (prepending any inline-wrap blocks for a user group).
-        let mut blocks = Vec::new();
+        // Build the group's blocks, splicing in its inline-wrap blocks (user groups only): after
+        // the leading tool_result blocks, and at the end.
+        let mut blocks = build_group_blocks(req, g, ctx, caps, degradations);
         if g.side == Side::User {
-            blocks.extend(wrap_for_group[gi].iter().cloned());
+            let n_results = blocks
+                .iter()
+                .take_while(|b| b.get("type").and_then(Value::as_str) == Some("tool_result"))
+                .count();
+            blocks.splice(n_results..n_results, wrap_after_results[gi].iter().cloned());
+            blocks.extend(wrap_append[gi].iter().cloned());
         }
-        blocks.extend(build_group_blocks(req, g, ctx, caps, degradations));
 
         // Re-merge into the previous message when it is the same role and no native system was
         // emitted between them (an instruction boundary split a run of same-side items but the
-        // instruction was inline-wrapped, not made native). This keeps roles alternating and
-        // lets an inline-wrap block land between the two turns rather than at the front.
+        // instruction was inline-wrapped, not made native). This keeps roles alternating; the
+        // wrap block (appended to the first half) then sits between the two turns.
         let role = g.side.role();
         if native_before[gi].is_empty() {
             if let Some(Value::Object(prev)) = out.last_mut() {
@@ -362,8 +379,8 @@ fn build_messages(
     }
 
     // Trailing inline-wrap blocks → a final user message.
-    if !wrap_for_group[groups.len()].is_empty() {
-        out.push(message_object("user", wrap_for_group[groups.len()].clone()));
+    if !wrap_trailing.is_empty() {
+        out.push(message_object("user", wrap_trailing));
     }
 
     Ok(out)

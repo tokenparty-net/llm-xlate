@@ -477,3 +477,85 @@ fn long_user_identifier_is_digested_to_anthropic_limit() {
     let v: serde_json::Value = serde_json::from_slice(&out.body).unwrap();
     assert_eq!(v["metadata"]["user_id"].as_str().unwrap().len(), 256);
 }
+
+fn mid_system(at: usize, text: &str) -> Instruction {
+    Instruction {
+        role: InstructionRole::System,
+        position: Position::Before(at),
+        content: vec![Part::text(text)],
+        cache_control: None,
+        effort: None,
+        clear_at: None,
+    }
+}
+
+/// `(role, [block type or wrapped-text marker])` per wire message.
+fn shape(out: &EncodedRequest) -> Vec<(String, Vec<String>)> {
+    let v: serde_json::Value = serde_json::from_slice(&out.body).unwrap();
+    v["messages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|m| {
+            let blocks = m["content"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|b| match b["type"].as_str().unwrap() {
+                    "text" => format!("text:{}", b["text"].as_str().unwrap().replace('\n', " ")),
+                    t => t.to_string(),
+                })
+                .collect();
+            (m["role"].as_str().unwrap().to_string(), blocks)
+        })
+        .collect()
+}
+
+#[test]
+fn mid_system_before_tool_call_turn_stays_before_it_inline_wrap() {
+    // Regression (Claude Code via connector-claude): the `# Environment` system message sits
+    // between the first user turn and the assistant tool call, and a `<total_tokens>` system
+    // message trails the tool result. The first wrap was pushed forward into the tool_result
+    // message and prepended IN FRONT of the tool_result — out of order, and a 400 on the wire.
+    let mut req = base(vec![
+        Item::user_text("explore"),
+        Item::assistant_text("looking"),
+        Item::ToolCall { call_id: "toolu_1".into(), name: "Bash".into(), arguments: JsonText::new(r#"{"command":"pwd"}"#), id: None },
+        Item::ToolResult { call_id: "toolu_1".into(), content: vec![Part::text("/w")], is_error: false, id: None },
+    ]);
+    req.instructions = vec![mid_system(1, "env"), mid_system(4, "tokens")];
+    let out = enc(&req, &claude_46());
+    let s = |v: &[&str]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>();
+    assert_eq!(
+        shape(&out),
+        vec![
+            ("user".into(), s(&["text:explore", "text:<system_message> env </system_message>"])),
+            ("assistant".into(), s(&["text:looking", "tool_use"])),
+            ("user".into(), s(&["tool_result"])),
+            ("user".into(), s(&["text:<system_message> tokens </system_message>"])),
+        ]
+    );
+}
+
+#[test]
+fn mid_system_after_assistant_goes_after_tool_results_inline_wrap() {
+    // Anchored right after an assistant turn (no preceding user group to append to): the wrap
+    // lands in the following user message, but AFTER its tool_result blocks.
+    let mut req = base(vec![
+        Item::user_text("go"),
+        Item::ToolCall { call_id: "toolu_1".into(), name: "Bash".into(), arguments: JsonText::new("{}"), id: None },
+        Item::ToolResult { call_id: "toolu_1".into(), content: vec![Part::text("ok")], is_error: false, id: None },
+        Item::user_text("next"),
+    ]);
+    req.instructions = vec![mid_system(2, "rule")];
+    let out = enc(&req, &claude_46());
+    let s = |v: &[&str]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>();
+    assert_eq!(
+        shape(&out),
+        vec![
+            ("user".into(), s(&["text:go"])),
+            ("assistant".into(), s(&["tool_use"])),
+            ("user".into(), s(&["tool_result", "text:<system_message> rule </system_message>", "text:next"])),
+        ]
+    );
+}
