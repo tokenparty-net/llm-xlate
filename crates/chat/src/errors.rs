@@ -13,7 +13,7 @@ use bytes::Bytes;
 use serde_json::{Map, Value};
 
 use llm_xlate_core::{
-    canon, Capabilities, EncodedError, ErrorKind, HeaderMap, ProviderFamily, SseWriter, XlateError,
+    canon, upstream_error_message, Capabilities, EncodedError, ErrorKind, HeaderMap, ProviderFamily, SseWriter, XlateError,
 };
 
 /// Decode a provider error body + status into the unified error.
@@ -23,8 +23,9 @@ pub fn decode_error(status: u16, body: &[u8], hdrs: &HeaderMap, _caps: &Capabili
 
     let message = str_field(err_obj, "message")
         .or_else(|| str_field(&root, "message"))
-        .unwrap_or("upstream error")
-        .to_string();
+        .map(str::to_string)
+        .or_else(|| upstream_error_message(body))
+        .unwrap_or_else(|| "upstream error".to_string());
     let ptype = str_field(err_obj, "type").map(str::to_string);
     let pcode = str_field(err_obj, "code").map(str::to_string);
     let param = str_field(err_obj, "param").map(str::to_string);
@@ -113,7 +114,8 @@ fn kind_from(status: u16, ptype: Option<&str>, pcode: Option<&str>) -> ErrorKind
             Some("authentication_error") => ErrorKind::Authentication,
             Some("rate_limit_error") => ErrorKind::RateLimited,
             Some("server_error") => ErrorKind::ServerError,
-            _ => ErrorKind::ServerError,
+            // Untyped and unlisted (e.g. a framework 422): classify by status class.
+            _ => ErrorKind::from_status(status),
         },
     }
 }

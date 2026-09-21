@@ -81,6 +81,37 @@ fn malformed_error_body_defaults_to_server_error() {
 }
 
 #[test]
+fn non_envelope_4xx_keeps_status_class_and_message() {
+    // A FastAPI validation 422 from a connector: a client error with its real reason, not a
+    // retryable "upstream error" 500.
+    let body = br#"{"detail":[{"type":"literal_error","loc":["body","thinking","type"],"msg":"Input should be 'enabled' or 'disabled'","input":"adaptive"}]}"#;
+    let e = AnthropicCodec.decode_error(422, body, &no_headers(), &claude_5());
+    assert_eq!(e.kind, ErrorKind::InvalidRequest);
+    assert!(!e.retryable);
+    assert_eq!(e.message, "body.thinking.type: Input should be 'enabled' or 'disabled'");
+    assert_eq!(e.provider_type, None);
+
+    let enc = AnthropicCodec.encode_error(&e, false, false);
+    assert_eq!(enc.status, 400);
+    let v: serde_json::Value = serde_json::from_slice(&enc.body).unwrap();
+    assert_eq!(v["error"]["type"], serde_json::json!("invalid_request_error"));
+    assert_eq!(
+        v["error"]["message"],
+        serde_json::json!("body.thinking.type: Input should be 'enabled' or 'disabled'")
+    );
+}
+
+#[test]
+fn non_envelope_body_surfaces_raw_text() {
+    let e = AnthropicCodec.decode_error(502, b"<html>bad gateway</html>", &no_headers(), &claude_5());
+    assert_eq!(e.kind, ErrorKind::ServerError);
+    assert_eq!(e.message, "<html>bad gateway</html>");
+    let e = AnthropicCodec.decode_error(401, b"", &no_headers(), &claude_5());
+    assert_eq!(e.kind, ErrorKind::Authentication);
+    assert_eq!(e.message, "upstream error");
+}
+
+#[test]
 fn encode_error_nonstreaming_body_and_status() {
     let e = XlateError::new(ErrorKind::Overloaded, "overloaded");
     let enc = AnthropicCodec.encode_error(&e, false, false);

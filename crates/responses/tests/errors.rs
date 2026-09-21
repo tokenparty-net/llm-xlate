@@ -152,3 +152,11 @@ fn foreign_billing_status_becomes_429() {
     let enc = codec().encode_error(&e, false, false);
     assert_eq!(enc.status, 429);
 }
+
+#[test]
+fn non_envelope_422_is_invalid_request_with_body_message() {
+    let body = r#"{"detail":[{"loc":["body","model"],"msg":"field required","type":"missing"}]}"#;
+    let e = decode(422, body, &HeaderMap::new());
+    assert_eq!(e.kind, ErrorKind::InvalidRequest);
+    assert_eq!(e.message, "body.model: field required");
+}

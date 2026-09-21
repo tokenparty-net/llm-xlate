@@ -6,7 +6,7 @@ use bytes::Bytes;
 use serde_json::Value;
 
 use llm_xlate_core::{
-    canon, Capabilities, EncodedError, ErrorKind, HeaderMap, ProviderFamily, SseWriter, XlateError,
+    canon, upstream_error_message, Capabilities, EncodedError, ErrorKind, HeaderMap, ProviderFamily, SseWriter, XlateError,
 };
 
 use crate::util::{get_str, Ob};
@@ -23,8 +23,9 @@ pub(crate) fn decode_error(
 
     let message = get_str(err_obj, "message")
         .or_else(|| get_str(&root, "message"))
-        .unwrap_or("upstream error")
-        .to_string();
+        .map(str::to_string)
+        .or_else(|| upstream_error_message(body))
+        .unwrap_or_else(|| "upstream error".to_string());
     let ptype = get_str(err_obj, "type").map(str::to_string);
     let pcode = get_str(err_obj, "code").map(str::to_string);
     let param = get_str(err_obj, "param").map(str::to_string);
@@ -96,7 +97,8 @@ fn kind_from(status: u16, ptype: Option<&str>, pcode: Option<&str>) -> ErrorKind
             Some("invalid_request_error") => ErrorKind::InvalidRequest,
             Some("authentication_error") => ErrorKind::Authentication,
             Some("rate_limit_error") => ErrorKind::RateLimited,
-            _ => ErrorKind::ServerError,
+            // Untyped and unlisted (e.g. a framework 422): classify by status class.
+            _ => ErrorKind::from_status(status),
         },
     }
 }

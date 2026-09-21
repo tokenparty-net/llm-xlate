@@ -188,3 +188,12 @@ fn error_round_trip_kind_preserved() {
         assert_eq!(e2.kind, kind, "round trip changed kind for status {status}");
     }
 }
+
+#[test]
+fn non_envelope_422_is_invalid_request_with_body_message() {
+    let body = r#"{"detail":[{"loc":["body","model"],"msg":"field required","type":"missing"}]}"#;
+    let e = decode_simple(422, body);
+    assert_eq!(e.kind, ErrorKind::InvalidRequest);
+    assert!(!e.retryable);
+    assert_eq!(e.message, "body.model: field required");
+}

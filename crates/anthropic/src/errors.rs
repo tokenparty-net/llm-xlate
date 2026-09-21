@@ -13,7 +13,8 @@ use bytes::Bytes;
 use serde_json::Value;
 
 use llm_xlate_core::{
-    canon, Capabilities, EncodedError, ErrorKind, HeaderMap, SseWriter, XlateError,
+    canon, upstream_error_message, Capabilities, EncodedError, ErrorKind, HeaderMap, SseWriter,
+    XlateError,
 };
 
 use crate::wire::{omap, FAMILY};
@@ -88,18 +89,21 @@ pub fn error_from_wire(err: &Value) -> XlateError {
 pub fn decode_error(status: u16, body: &[u8], hdrs: &HeaderMap, caps: &Capabilities) -> XlateError {
     let value = canon::parse_upstream(body).unwrap_or(Value::Null);
     let err = value.get("error");
-    let ty = err
-        .and_then(|e| e.get("type"))
-        .and_then(Value::as_str)
-        .unwrap_or("api_error")
-        .to_string();
+    // A body outside the Anthropic envelope (a connector's framework error, a proxy page)
+    // carries no `error.type`: classify it by status, and surface whatever message the body
+    // does hold, so a 4xx stays a non-retryable client error instead of a generic 500.
+    let ty = err.and_then(|e| e.get("type")).and_then(Value::as_str).map(str::to_string);
     let message = err
         .and_then(|e| e.get("message"))
         .and_then(Value::as_str)
-        .unwrap_or("upstream error")
-        .to_string();
+        .map(str::to_string)
+        .or_else(|| upstream_error_message(body))
+        .unwrap_or_else(|| "upstream error".to_string());
 
-    let mut kind = kind_from_type(&ty);
+    let mut kind = match &ty {
+        Some(t) => kind_from_type(t),
+        None => ErrorKind::from_status(status),
+    };
 
     // Context-length detection: an invalid_request_error whose message matches a configured
     // pattern is reclassified as ContextLengthExceeded.
@@ -122,8 +126,10 @@ pub fn decode_error(status: u16, body: &[u8], hdrs: &HeaderMap, caps: &Capabilit
     let mut e = XlateError::new(kind, message)
         .with_status(status)
         .with_provider(FAMILY)
-        .with_provider_type(ty)
         .with_retryable(retryable);
+    if let Some(t) = ty {
+        e = e.with_provider_type(t);
+    }
 
     // request id: body `request_id` or the `request-id` header.
     let request_id = value
