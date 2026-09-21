@@ -116,7 +116,11 @@ pub fn encode_request(
 
     build_sampling(req, caps, drop_temperature, &mut body, &mut degradations);
 
-    if req.stream {
+    // The backend's streaming mode decides, not the client's: a stream-only backend must be
+    // sent `stream: true` even for a non-streaming client (the router aggregates the SSE
+    // back into one response), and a non-streaming-only backend must not be sent it at all.
+    let upstream_streams = caps.upstream_streams(req.stream);
+    if upstream_streams {
         body.insert("stream".into(), Value::Bool(true));
     }
 
@@ -153,11 +157,14 @@ pub fn encode_request(
 
     let bytes: Bytes = canon::to_bytes(&body_value);
 
-    // ---- streaming decision ----
-    let upstream_streams = req.stream && caps.streaming() != llm_xlate_core::caps::Streaming::NonStreamOnly;
-
     let mut out_ctx = ctx.clone();
-    out_ctx.stream = upstream_streams;
+    // `EncodeCtx::stream` is the *client's* intent — the router reads it back to decide whether
+    // to stream the response to the caller — so it must not be overwritten with the upstream
+    // decision. How the upstream is read is carried separately by `EncodedRequest::
+    // upstream_streams`. Conflating the two made a stream-only backend force SSE onto a client
+    // that asked for a single JSON body (and a non-streaming-only backend swallow a client's
+    // stream).
+    out_ctx.stream = req.stream;
 
     Ok(EncodedRequest {
         body: bytes,

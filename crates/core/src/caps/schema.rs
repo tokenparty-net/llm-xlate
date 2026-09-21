@@ -903,6 +903,26 @@ impl Capabilities {
     pub fn streaming(&self) -> Streaming {
         self.transport.streaming.unwrap_or(Streaming::Both)
     }
+
+    /// Whether the request should be sent to the backend as a stream, given what the client
+    /// asked for.
+    ///
+    /// When the backend does not accept both modes, the backend decides and the router bridges
+    /// the difference: a [`Streaming::StreamOnly`] backend is sent a streaming request even for
+    /// a non-streaming client (the response is aggregated back into one body), and a
+    /// [`Streaming::NonStreamOnly`] backend is sent a plain request even for a streaming client
+    /// (the client's stream is synthesized from the response). Only under [`Streaming::Both`]
+    /// does the client's own choice carry through.
+    ///
+    /// Encoders must derive the request's `stream` flag from this rather than from the client's
+    /// intent alone, or a stream-only backend receives a non-streaming request and rejects it.
+    pub fn upstream_streams(&self, client_wants_stream: bool) -> bool {
+        match self.streaming() {
+            Streaming::StreamOnly => true,
+            Streaming::NonStreamOnly => false,
+            Streaming::Both => client_wants_stream,
+        }
+    }
 }
 
 /// serde (de)serialization for the `protocols` field: TOML short tokens

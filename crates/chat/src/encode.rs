@@ -77,7 +77,7 @@ pub fn encode_request(
     encode_meta(req, caps, &mut degr, &mut out);
 
     // ---- streaming ----
-    let upstream_streams = req.stream && caps.streaming() != llm_xlate_core::caps::Streaming::NonStreamOnly;
+    let upstream_streams = caps.upstream_streams(req.stream);
     let mut include_usage = false;
     if upstream_streams {
         out.insert("stream".into(), Value::Bool(true));

@@ -173,7 +173,11 @@ pub(crate) fn encode_request(
         }
     }
 
-    if req.stream {
+    // The backend's streaming mode decides, not the client's (see `Capabilities::
+    // upstream_streams`): a stream-only backend is sent `stream: true` even for a
+    // non-streaming client, and the router aggregates the SSE back into one response.
+    let upstream_streams = caps.upstream_streams(req.stream);
+    if upstream_streams {
         top = top.set("stream", Value::Bool(true));
     }
 
@@ -204,7 +208,7 @@ pub(crate) fn encode_request(
     Ok(EncodedRequest {
         body,
         headers,
-        upstream_streams: req.stream,
+        upstream_streams,
         ctx: out_ctx,
         degradations: degr,
     })
