@@ -408,14 +408,26 @@ fn decode_tool_result(b: &Value) -> Item {
 }
 
 /// Decode a `thinking` block into [`Item::Reasoning`] with a native/opened signature carrier.
+///
+/// An absent or empty `signature` means there is **no** opaque carrier, not a native Anthropic
+/// one: that is the shape the client-facing encoders emit for reasoning that arrived as plain
+/// text from a Chat backend (`build_reasoning_block`, and the streaming encoder, both attach a
+/// signature only when a blob exists). Fabricating a carrier here made `lower()` see an
+/// Anthropic-family blob on the way back and drop it as foreign, so plain-text reasoning was
+/// destroyed on every turn of an Anthropic-client conversation with a `replay = "text_field"`
+/// backend — even though that backend can replay it. A real Anthropic thinking block always
+/// carries a signature, so it still decodes to `Some`.
 fn decode_thinking_block(b: &Value, ctx: &DecodeCtx) -> Item {
     let text = b.get("thinking").and_then(Value::as_str).unwrap_or("").to_string();
-    let signature = b.get("signature").and_then(Value::as_str).unwrap_or("");
-    let opaque = ctx.sealer.open_or_native(signature, FAMILY, OpaqueKind::Signature);
+    let opaque = b
+        .get("signature")
+        .and_then(Value::as_str)
+        .filter(|s| !s.is_empty())
+        .map(|s| ctx.sealer.open_or_native(s, FAMILY, OpaqueKind::Signature));
     Item::Reasoning(llm_xlate_core::ReasoningItem {
         text: Some(text),
         summary: Vec::new(),
-        opaque: Some(opaque),
+        opaque,
         id: None,
     })
 }
@@ -427,13 +439,21 @@ fn decode_thinking_block(b: &Value, ctx: &DecodeCtx) -> Item {
 /// client. It must be opened here so the blob keeps its true family/kind and can be replayed to
 /// that provider; treating it as a native Anthropic blob made `lower()` drop it as foreign on
 /// every multi-turn GPT conversation through the Anthropic surface.
+///
+/// An absent or empty `data` carries nothing, so it yields no opaque carrier — the same rule
+/// [`decode_thinking_block`] applies to `signature`. The resulting item holds no text, summary
+/// or blob, which the encoders and `lower()` each report accurately; claiming a native
+/// Anthropic blob instead made every downstream message describe a carrier that was never there.
 fn decode_redacted_thinking(b: &Value, ctx: &DecodeCtx) -> Item {
-    let data = b.get("data").and_then(Value::as_str).unwrap_or("");
-    let opaque = ctx.sealer.open_or_native(data, FAMILY, OpaqueKind::Redacted);
+    let opaque = b
+        .get("data")
+        .and_then(Value::as_str)
+        .filter(|s| !s.is_empty())
+        .map(|s| ctx.sealer.open_or_native(s, FAMILY, OpaqueKind::Redacted));
     Item::Reasoning(llm_xlate_core::ReasoningItem {
         text: None,
         summary: Vec::new(),
-        opaque: Some(opaque),
+        opaque,
         id: None,
     })
 }
