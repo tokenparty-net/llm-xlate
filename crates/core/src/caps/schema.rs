@@ -250,12 +250,17 @@ pub struct InstructionsCap {
     pub system_clear_at: Tri,
     /// Whether a mid-conversation effort override on a system message is supported.
     pub system_effort_override: Tri,
+    /// Client `x-anthropic-<name>:` system header blocks (e.g. Claude Code's
+    /// `x-anthropic-billing-header`) the backend accepts, by `<name>` (`["billing-header"]`).
+    /// A captured header whose name is not listed is dropped rather than forwarded as prompt
+    /// text. `None` forwards none.
+    pub system_headers: Option<Vec<String>>,
 }
 
 impl InstructionsCap {
     fn overlay(&mut self, o: &InstructionsCap) {
         overlay_fields!(self, o;
-            opt: top_level_system, mid_conversation_system, mid_system_placement;
+            opt: top_level_system, mid_conversation_system, mid_system_placement, system_headers;
             tri: developer_role, system_clear_at, system_effort_override);
     }
 }
@@ -897,6 +902,12 @@ impl Capabilities {
                 None => true,
             },
         }
+    }
+
+    /// Whether a captured client `x-anthropic-<name>:` system header block may be forwarded
+    /// (conservative: `false` unless `instructions.system_headers` lists `name`).
+    pub fn forwards_system_header(&self, name: &str) -> bool {
+        self.instructions.system_headers.as_ref().is_some_and(|l| l.iter().any(|n| n == name))
     }
 
     /// The effective streaming mode (default [`Streaming::Both`] when unset).

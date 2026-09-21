@@ -16,8 +16,8 @@ use llm_xlate_core::{
 use llm_xlate_core::session::capture_session;
 
 use crate::wire::{
-    ext_key, is_provider_tool_result_type, is_server_tool_use_type, tool_is_provider,
-    AntMessageWire, AntRequestWire, FAMILY,
+    ext_key, is_provider_tool_result_type, is_server_tool_use_type, system_header_name,
+    tool_is_provider, AntMessageWire, AntRequestWire, FAMILY, SYSTEM_HEADERS_EXT,
 };
 
 /// Decode an Anthropic request body (+ headers) into the IR.
@@ -45,8 +45,16 @@ pub fn decode_request(
     req.reasoning.expose = ReasoningExposure::Full;
 
     // ---- top-level system ----
+    // Client `x-anthropic-<name>:` header blocks are metadata, not prompt text: they are
+    // captured into ext and re-emitted only for a backend that accepts them.
     if let Some(system) = &wire.system {
-        req.instructions.push(decode_top_level_system(system));
+        let (instr, headers) = decode_top_level_system(system);
+        if !instr.content.is_empty() {
+            req.instructions.push(instr);
+        }
+        if !headers.is_empty() {
+            req.ext.insert(ext_key(SYSTEM_HEADERS_EXT), Value::Array(headers));
+        }
     }
 
     // ---- messages (also produce mid-context system instructions) ----
@@ -141,14 +149,26 @@ fn beta_header(hdrs: &HeaderMap) -> Option<Vec<String>> {
 }
 
 /// Decode the top-level `system` (string or array of text blocks) into one leading
-/// [`Instruction`], preserving `cache_control` on each block 1:1.
-fn decode_top_level_system(system: &Value) -> Instruction {
+/// [`Instruction`], preserving `cache_control` on each block 1:1, plus the client header blocks
+/// ([`system_header_name`]) lifted out of it, as `anthropic.system_headers` entries.
+fn decode_top_level_system(system: &Value) -> (Instruction, Vec<Value>) {
     let mut content = Vec::new();
+    let mut headers = Vec::new();
     match system {
         Value::String(s) => content.push(Part::text(s.clone())),
         Value::Array(blocks) => {
             for b in blocks {
                 let text = b.get("text").and_then(Value::as_str).unwrap_or("").to_string();
+                if let Some(name) = system_header_name(&text) {
+                    let mut h = Map::new();
+                    h.insert("name".into(), Value::from(name));
+                    h.insert("text".into(), Value::from(text.clone()));
+                    if let Some(cc) = b.get("cache_control") {
+                        h.insert("cache_control".into(), cc.clone());
+                    }
+                    headers.push(Value::Object(h));
+                    continue;
+                }
                 let cc = decode_cache_control(b.get("cache_control"));
                 content.push(Part::Text { text, annotations: Vec::new(), cache_control: cc });
             }
@@ -158,14 +178,15 @@ fn decode_top_level_system(system: &Value) -> Instruction {
     // Each block's `cache_control` round-trips on its own `Part`; the instruction-level slot is
     // left `None` so re-encoding does not fabricate an extra breakpoint on the trailing block
     // (a multi-block system with a cached preamble + uncached tail must not gain a marker).
-    Instruction {
+    let instr = Instruction {
         role: InstructionRole::System,
         position: Position::Leading,
         content,
         cache_control: None,
         effort: None,
         clear_at: None,
-    }
+    };
+    (instr, headers)
 }
 
 /// Decode a `cache_control` value into an IR [`CacheControl`].

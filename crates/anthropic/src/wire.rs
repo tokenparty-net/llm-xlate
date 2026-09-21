@@ -27,6 +27,23 @@ pub fn ext_key(field: &str) -> String {
     format!("{EXT_PREFIX}{field}")
 }
 
+/// The `ext` field (`anthropic.system_headers`) carrying captured client `x-anthropic-<name>:`
+/// system header blocks, in order: `[{"name", "text", "cache_control"?}]`. The encoder re-emits
+/// a block only when `instructions.system_headers` lists its name.
+pub const SYSTEM_HEADERS_EXT: &str = "system_headers";
+
+/// The `<name>` of a system text block that is a client header line
+/// (`x-anthropic-<name>: <value>`, a single line, `<name>` in `[a-z0-9-]`), else `None`. Only a
+/// whole single-line block qualifies, so a real prompt that merely starts with the prefix is
+/// never mistaken for one.
+pub fn system_header_name(text: &str) -> Option<&str> {
+    let rest = text.strip_prefix("x-anthropic-")?;
+    let (name, _) = rest.split_once(':')?;
+    let valid = !name.is_empty()
+        && name.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-');
+    (valid && !text.contains('\n')).then_some(name)
+}
+
 /// A fresh ordered JSON object.
 pub fn omap() -> Map<String, Value> {
     Map::new()

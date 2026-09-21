@@ -258,3 +258,21 @@ fn merge_keeps_first_registry_model_rules_ahead() {
     // a's rule wins the tie.
     assert_eq!(c.reasoning.mode, Some(ReasoningMode::Adaptive));
 }
+
+#[test]
+fn system_headers_resolve_and_overlay() {
+    // The first-party Anthropic family forwards Claude Code's billing header.
+    let c = preset::claude_5();
+    assert!(c.forwards_system_header("billing-header"));
+    assert!(!c.forwards_system_header("other-header"));
+
+    // Unset is conservative.
+    assert!(!Capabilities::unknown().forwards_system_header("billing-header"));
+
+    // A later layer's list replaces the earlier one (an empty list turns forwarding off).
+    let overlay: Capabilities =
+        serde_json::from_value(serde_json::json!({"instructions": {"system_headers": []}})).unwrap();
+    let mut resolved = c.clone();
+    resolved.overlay(&overlay);
+    assert!(!resolved.forwards_system_header("billing-header"));
+}

@@ -17,7 +17,7 @@ use llm_xlate_core::{
 };
 
 use crate::shared::seal_or_native;
-use crate::wire::{omap, DEFAULT_API_VERSION, EXT_PREFIX, FAMILY};
+use crate::wire::{omap, DEFAULT_API_VERSION, EXT_PREFIX, FAMILY, SYSTEM_HEADERS_EXT};
 
 /// The side of the conversation an item belongs to when regrouping into Anthropic turns.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -79,7 +79,7 @@ pub fn encode_request(
     }
 
     // ---- system (leading instructions) ----
-    let system = build_system(req, &mut degradations);
+    let system = build_system(req, caps, &mut degradations);
 
     // ---- messages (regroup + mid instructions) ----
     let messages = build_messages(req, caps, ctx, &mut degradations, &mut betas)?;
@@ -180,9 +180,14 @@ pub fn encode_request(
 // ---------------------------------------------------------------------------
 
 /// Build the top-level `system` from leading instructions (System + Developer, original
-/// order; Developer text emitted as-is).
-fn build_system(req: &IrRequest, degradations: &mut Degradations) -> Option<Value> {
-    let mut blocks: Vec<Value> = Vec::new();
+/// order; Developer text emitted as-is), preceded by the captured client header blocks the
+/// backend accepts.
+fn build_system(
+    req: &IrRequest,
+    caps: &Capabilities,
+    degradations: &mut Degradations,
+) -> Option<Value> {
+    let mut blocks = build_system_headers(req, caps, degradations);
     for instr in &req.instructions {
         if !matches!(instr.position, Position::Leading) {
             continue;
@@ -216,6 +221,41 @@ fn build_system(req: &IrRequest, degradations: &mut Degradations) -> Option<Valu
     } else {
         Some(Value::Array(blocks))
     }
+}
+
+/// Re-emit the captured `anthropic.system_headers` blocks whose name the backend lists in
+/// `instructions.system_headers`, verbatim and in captured order; drop (and report) the rest.
+/// A header such as Claude Code's billing line changes every request, so forwarding it to a
+/// backend that treats it as prompt text would defeat prefix caching.
+fn build_system_headers(
+    req: &IrRequest,
+    caps: &Capabilities,
+    degradations: &mut Degradations,
+) -> Vec<Value> {
+    let mut blocks = Vec::new();
+    let Some(Value::Array(headers)) = req.ext.get(&format!("{EXT_PREFIX}{SYSTEM_HEADERS_EXT}"))
+    else {
+        return blocks;
+    };
+    for h in headers {
+        let name = h.get("name").and_then(Value::as_str).unwrap_or("");
+        let Some(text) = h.get("text").and_then(Value::as_str) else { continue };
+        if !caps.forwards_system_header(name) {
+            degradations.dropped(
+                format!("ext.{EXT_PREFIX}{SYSTEM_HEADERS_EXT}.{name}"),
+                "backend does not accept this system header (instructions.system_headers)",
+            );
+            continue;
+        }
+        let mut b = omap();
+        b.insert("type".into(), Value::from("text"));
+        b.insert("text".into(), Value::from(text));
+        if let Some(cc) = h.get("cache_control") {
+            b.insert("cache_control".into(), cc.clone());
+        }
+        blocks.push(Value::Object(b));
+    }
+    blocks
 }
 
 // ---------------------------------------------------------------------------
@@ -1138,6 +1178,9 @@ fn write_back_ext(req: &IrRequest, body: &mut Map<String, Value>, _betas: &mut B
         };
         if field == "betas" {
             continue; // becomes a header
+        }
+        if field == SYSTEM_HEADERS_EXT {
+            continue; // re-emitted into `system` by build_system
         }
         if field.starts_with("output_config.") {
             continue; // merged into output_config already

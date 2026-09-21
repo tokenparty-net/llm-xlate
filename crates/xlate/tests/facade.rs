@@ -311,3 +311,34 @@ fn encode_stored_response_unsupported_for_non_responses() {
         assert_eq!(err.kind, ErrorKind::Unsupported, "{p:?} should be Unsupported");
     }
 }
+
+/// Claude Code's per-request `x-anthropic-billing-header:` system block is metadata, not prompt
+/// text. Translated to a non-Anthropic target it must not become the first line of the
+/// instructions (it changes every request, so it would defeat prefix caching); the drop is
+/// reported once as a foreign ext key.
+#[test]
+fn claude_code_billing_header_never_reaches_a_chat_backend() {
+    let body = br#"{
+        "model": "claude-opus-5",
+        "max_tokens": 1024,
+        "system": [
+            {"type": "text", "text": "x-anthropic-billing-header: cc_version=2.1.278.a6d; cch=27699;"},
+            {"type": "text", "text": "You are Claude Code."}
+        ],
+        "messages": [{"role": "user", "content": "hi"}]
+    }"#;
+    let (enc, _) = xl()
+        .translate_request(
+            Protocol::Anthropic,
+            body,
+            &HeaderMap::new(),
+            Protocol::OaiChat,
+            &preset::gpt4o(),
+            &Resolutions::new(),
+        )
+        .unwrap();
+    let out = String::from_utf8(enc.body.to_vec()).unwrap();
+    assert!(!out.contains("x-anthropic-billing-header"), "header leaked: {out}");
+    assert!(out.contains("You are Claude Code."), "prompt lost: {out}");
+    assert!(enc.degradations.iter().any(|d| d.field == "ext.anthropic.system_headers"));
+}

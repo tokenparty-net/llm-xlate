@@ -23,6 +23,9 @@ mid_conversation_system = "none"
 developer_role = false
 system_clear_at = false
 system_effort_override = false
+# Claude Code's per-request `x-anthropic-billing-header:` system block. The first-party API
+# accepts it; any other backend gets it dropped instead of as volatile prompt text.
+system_headers = ["billing-header"]
 
 [defaults.reasoning]
 exposure = "full_text"
