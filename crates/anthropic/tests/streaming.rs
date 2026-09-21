@@ -508,3 +508,59 @@ fn encode_response_consistent_with_stream() {
     assert_eq!(v["usage"]["input_tokens"], serde_json::json!(10));
     assert_eq!(v["usage"]["output_tokens"], serde_json::json!(25));
 }
+
+// A tool_use whose `content_block_start` carries the full `input` and no `input_json_delta`
+// follows (connector-claude's synthesized client tool call). The real API always sends `{}`
+// there and streams the arguments; both shapes must decode to the same arguments.
+const TOOL_INPUT_ON_START: &str = "\
+event: message_start
+data: {\"type\":\"message_start\",\"message\":{\"id\":\"msg_1\",\"type\":\"message\",\"role\":\"assistant\",\"model\":\"claude-opus-5\",\"content\":[],\"stop_reason\":null,\"stop_sequence\":null,\"usage\":{\"input_tokens\":10,\"output_tokens\":1}}}
+
+event: content_block_start
+data: {\"type\":\"content_block_start\",\"index\":0,\"content_block\":{\"type\":\"tool_use\",\"id\":\"toolu_1\",\"name\":\"Bash\",\"input\":{\"command\":\"pwd\",\"description\":\"cwd\"}}}
+
+event: content_block_stop
+data: {\"type\":\"content_block_stop\",\"index\":0}
+
+event: message_delta
+data: {\"type\":\"message_delta\",\"delta\":{\"stop_reason\":\"tool_use\",\"stop_sequence\":null},\"usage\":{\"output_tokens\":5}}
+
+event: message_stop
+data: {\"type\":\"message_stop\"}
+
+";
+
+fn tool_args(r: &IrResponse) -> String {
+    r.items
+        .iter()
+        .find_map(|i| match i {
+            llm_xlate_core::Item::ToolCall { arguments, .. } => Some(arguments.to_string()),
+            _ => None,
+        })
+        .expect("a tool call")
+}
+
+#[test]
+fn tool_input_on_block_start_is_kept() {
+    let r = aggregate(decode_stream(TOOL_INPUT_ON_START));
+    let args: serde_json::Value = serde_json::from_str(&tool_args(&r)).unwrap();
+    assert_eq!(args, serde_json::json!({"command": "pwd", "description": "cwd"}));
+}
+
+#[test]
+fn tool_input_on_block_start_survives_chunking() {
+    assert_chunk_invariant(TOOL_INPUT_ON_START);
+}
+
+#[test]
+fn tool_input_deltas_override_start_input() {
+    // If an upstream sends both, the streamed fragments are authoritative (no duplication).
+    let sse = TOOL_INPUT_ON_START.replace(
+        "event: content_block_stop\ndata: {\"type\":\"content_block_stop\",\"index\":0}",
+        "event: content_block_delta\ndata: {\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"input_json_delta\",\"partial_json\":\"{\\\"command\\\":\\\"ls\\\"}\"}}\n\nevent: content_block_stop\ndata: {\"type\":\"content_block_stop\",\"index\":0}",
+    );
+    assert!(sse.contains("input_json_delta"), "fixture rewrite failed");
+    let r = aggregate(decode_stream(&sse));
+    let args: serde_json::Value = serde_json::from_str(&tool_args(&r)).unwrap();
+    assert_eq!(args, serde_json::json!({"command": "ls"}));
+}

@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use serde_json::Value;
 
 use llm_xlate_core::{
-    Annotation, Delta, Extensions, IrEvent, ItemKind, OpaqueBlob, OpaqueKind, ResponseId,
+    canon, Annotation, Delta, Extensions, IrEvent, ItemKind, OpaqueBlob, OpaqueKind, ResponseId,
     SseParser, StreamDecoder, Usage, XlateError,
 };
 
@@ -38,6 +38,11 @@ struct BlockState {
     raw: Value,
     /// Accumulated `input_json_delta` fragments for a provider block's `input`.
     json_buf: String,
+    /// A client `tool_use` whose `content_block_start` already carried a non-empty `input`
+    /// (the real API always sends `{}` there, but some Anthropic-compatible upstreams send the
+    /// whole input up front and no deltas). Emitted as the arguments at block stop unless
+    /// `input_json_delta` fragments arrive, which are then authoritative.
+    tool_seed: Option<String>,
 }
 
 /// A push-based Anthropic SSE decoder.
@@ -146,7 +151,15 @@ impl AnthropicStreamDecoder {
             });
         }
 
-        self.blocks.insert(index, BlockState { kind, raw: block, json_buf: String::new() });
+        let tool_seed = match kind {
+            BlockKind::ToolCall => block
+                .get("input")
+                .filter(|v| !v.as_object().is_some_and(|o| o.is_empty()) && !v.is_null())
+                .map(canon::to_string),
+            _ => None,
+        };
+
+        self.blocks.insert(index, BlockState { kind, raw: block, json_buf: String::new(), tool_seed });
     }
 
     fn on_block_delta(&mut self, value: &Value, out: &mut Vec<IrEvent>) {
@@ -167,6 +180,9 @@ impl AnthropicStreamDecoder {
                 let pj = delta.get("partial_json").and_then(Value::as_str).unwrap_or("");
                 match kind {
                     Some(BlockKind::ToolCall) => {
+                        if let Some(b) = self.blocks.get_mut(&index) {
+                            b.tool_seed = None;
+                        }
                         out.push(IrEvent::Delta { index, delta: Delta::ToolArgs(pj.to_string()) });
                     }
                     _ => {
@@ -225,10 +241,12 @@ impl AnthropicStreamDecoder {
                     let blob = self.native_blob(OpaqueKind::Compaction, state.raw.to_string());
                     out.push(IrEvent::Delta { index, delta: Delta::Opaque(blob) });
                 }
-                BlockKind::Text
-                | BlockKind::Thinking
-                | BlockKind::Redacted
-                | BlockKind::ToolCall => {}
+                BlockKind::ToolCall => {
+                    if let Some(seed) = state.tool_seed {
+                        out.push(IrEvent::Delta { index, delta: Delta::ToolArgs(seed) });
+                    }
+                }
+                BlockKind::Text | BlockKind::Thinking | BlockKind::Redacted => {}
             }
         }
         out.push(IrEvent::ItemStop { index });
