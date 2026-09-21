@@ -25,30 +25,42 @@ pub(crate) fn run(
     let text_replay = caps.reasoning.replay == Some(ReplayMode::TextField);
 
     // (a) Replay policy for every existing Reasoning item (§7.2 lowering).
-    req.items.retain(|item| {
-        let Item::Reasoning(r) = item else { return true };
-        match &r.opaque {
-            // Opaque of the target family → keep for native replay.
-            Some(blob) if blob.family == target_family => true,
-            // Opaque of a foreign family → never replay foreign reasoning as text; drop it.
-            Some(_) => {
-                degr.dropped("reasoning", "foreign-family reasoning blob dropped (not replayable)");
-                false
-            }
-            // No opaque carrier → keep only where a text replay slot exists (Chat providers).
-            None => {
-                if text_replay {
-                    true
-                } else {
+    //
+    // Built as a keep mask and applied through `retain_items` so mid-context instruction
+    // anchors are re-mapped in the same step (a bare `Vec::retain` silently shifts every
+    // later anchor, which splits assistant runs on the wire).
+    let keep_replay: Vec<bool> = req
+        .items
+        .iter()
+        .map(|item| {
+            let Item::Reasoning(r) = item else { return true };
+            match &r.opaque {
+                // Opaque of the target family → keep for native replay.
+                Some(blob) if blob.family == target_family => true,
+                // Opaque of a foreign family → never replay foreign reasoning as text; drop it.
+                Some(_) => {
                     degr.dropped(
                         "reasoning",
-                        "reasoning without an opaque carrier dropped (no text replay slot)",
+                        "foreign-family reasoning blob dropped (not replayable)",
                     );
                     false
                 }
+                // No opaque carrier → keep only where a text replay slot exists (Chat providers).
+                None => {
+                    if text_replay {
+                        true
+                    } else {
+                        degr.dropped(
+                            "reasoning",
+                            "reasoning without an opaque carrier dropped (no text replay slot)",
+                        );
+                        false
+                    }
+                }
             }
-        }
-    });
+        })
+        .collect();
+    crate::lower::retain_items(req, &keep_replay);
 
     // (b) Reasoning required on the last tool-bearing turn (§7.2).
     //
@@ -113,18 +125,15 @@ pub(crate) fn run(
                 }
             })
             .collect();
-        let mut idx = 0;
-        req.items.retain(|_| {
-            let k = keep[idx];
+        for k in &keep {
             if !k {
                 degr.dropped(
                     "reasoning",
                     "Responses reasoning item is not followed by its paired call/message; dropped",
                 );
             }
-            idx += 1;
-            k
-        });
+        }
+        crate::lower::retain_items(req, &keep);
     }
 
     // (d) Effort snapping to supported levels (§7.2).
@@ -202,6 +211,9 @@ fn insert_resolved_reasoning(
     res: &crate::requirements::Resolutions,
 ) {
     let old = std::mem::take(&mut req.items);
+    // `inserted_before[i]` counts the reasoning items spliced in ahead of old item `i`, so the
+    // mid-context instruction anchors can be shifted by the same amount (see `retain_items`).
+    let mut inserted_before = vec![0usize; old.len()];
     let mut out = Vec::with_capacity(old.len() + range.len());
     for (i, item) in old.into_iter().enumerate() {
         if range.contains(&i) {
@@ -213,10 +225,12 @@ fn insert_resolved_reasoning(
                         opaque: Some(blob.clone()),
                         id: None,
                     }));
+                    inserted_before[i] += 1;
                 }
             }
         }
         out.push(item);
     }
     req.items = out;
+    crate::lower::remap_after_inserts(req, &inserted_before);
 }

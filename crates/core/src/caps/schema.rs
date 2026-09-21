@@ -427,6 +427,16 @@ pub struct ToolsCap {
     pub max_tools: Option<u32>,
     /// Whether tools may change mid-conversation.
     pub mid_conversation_tool_changes: Tri,
+    /// Whether a tool-result message should carry the tool's `name` alongside its call id.
+    ///
+    /// Some OpenAI-compatible backends resolve a tool result's name positionally — by pairing
+    /// each `tool` message with the preceding assistant `tool_calls` entry in order — and reject
+    /// the request outright when that pairing is ambiguous. A client is free to return results
+    /// in a different order from the calls, so ordering alone is not always enough; declaring
+    /// this makes the Chat encoder name each result explicitly instead. Left `Unknown` (the
+    /// conservative default) the field is omitted, since a strict server may reject an
+    /// unexpected key.
+    pub result_name: Tri,
 }
 
 impl ToolsCap {
@@ -440,7 +450,7 @@ impl ToolsCap {
         overlay_fields!(self, o;
             opt: tool_choice, result_content, id_pattern, hosted, schema_unsupported_keywords,
                  max_tools;
-            tri: function_tools, parallel_control, mid_conversation_tool_changes);
+            tri: function_tools, parallel_control, mid_conversation_tool_changes, result_name);
     }
 }
 

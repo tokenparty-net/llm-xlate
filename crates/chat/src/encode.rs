@@ -15,7 +15,7 @@ use llm_xlate_core::caps::{Capabilities, ReplayMode, SamplingRule, ToolChoiceKin
 use llm_xlate_core::codec::{EncodeCtx, EncodedRequest, HeaderMap};
 use llm_xlate_core::degrade::Degradations;
 use llm_xlate_core::ir::{
-    Effort, Instruction, InstructionRole, IrRequest, Item, MediaSource, OutputFormat,
+    CallId, Effort, Instruction, InstructionRole, IrRequest, Item, MediaSource, OutputFormat,
     Part, Position, ToolChoice, ToolDef, Verbosity,
 };
 use llm_xlate_core::{wrap, XlateError};
@@ -200,10 +200,12 @@ fn build_messages(
     flush_run(&mut run, req, caps, degr, &mut messages)?;
     flush_tool_attachments(&mut tool_attachments, &mut messages);
 
-    // Trailing Before(len) instructions.
+    // Trailing instructions: anchored at the end, or past it. An out-of-range anchor can only
+    // reach a codec on a hand-built request (`lower` clamps and reports one), but it is placed
+    // here rather than dropped so no instruction can vanish from the wire.
     let len = req.items.len();
     for instr in &req.instructions {
-        if instr.position == Position::Before(len) {
+        if matches!(instr.position, Position::Before(i) if i >= len) {
             messages.push(encode_instruction(instr, caps, degr));
         }
     }
@@ -410,6 +412,14 @@ fn emit_user_side(
     Ok(())
 }
 
+/// The name of the `ToolCall` that `call_id` answers, if it is present in the transcript.
+fn tool_call_name<'a>(req: &'a IrRequest, call_id: &CallId) -> Option<&'a str> {
+    req.items.iter().find_map(|it| match it {
+        Item::ToolCall { call_id: c, name, .. } if c == call_id => Some(name.as_str()),
+        _ => None,
+    })
+}
+
 /// Emit a `ToolResult` as a `tool` message; any non-text (media) parts are folded and their
 /// content parts buffered into `tool_attachments` for a single trailing `user` message so the
 /// block of `tool` messages stays contiguous after the assistant `tool_calls` turn.
@@ -441,6 +451,15 @@ fn emit_tool_result(
     let mut obj = Map::new();
     obj.insert("role".into(), Value::from("tool"));
     obj.insert("tool_call_id".into(), Value::from(call_id.as_str()));
+    // Name the tool explicitly where the backend wants it, so the result does not have to be
+    // matched to its call by position (`tools.result_name`). The name is recovered from the
+    // `ToolCall` this result answers; if that call is not in the window there is nothing
+    // truthful to emit, so the key is omitted rather than guessed.
+    if caps.tools.result_name.is_yes() {
+        if let Some(name) = tool_call_name(req, call_id) {
+            obj.insert("name".into(), Value::from(name));
+        }
+    }
     obj.insert("content".into(), Value::from(text));
     splice_extras(&mut obj, req, &format!("{NS}msg_ext"), index);
     messages.push(Value::Object(obj));

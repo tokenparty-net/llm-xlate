@@ -258,7 +258,16 @@ fn build_input(
                 input.push(encode_instruction_item(ins, degr));
             }
         }
-        if let Some(list) = plan.before.get(&idx) {
+        // At the final slot, also flush any anchor pointing past the end. `lower` clamps and
+        // reports such an anchor; placing it here keeps a hand-built request from silently
+        // losing the instruction.
+        if idx == n {
+            for (_, list) in plan.before.range(idx..) {
+                for ins in list {
+                    input.push(encode_instruction_item(ins, degr));
+                }
+            }
+        } else if let Some(list) = plan.before.get(&idx) {
             for ins in list {
                 input.push(encode_instruction_item(ins, degr));
             }

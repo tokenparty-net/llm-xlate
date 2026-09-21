@@ -30,6 +30,14 @@ replay = "none"
 # Tools left Unknown: no `function_tools`, `tool_choice`, `parallel_control`, or
 # `result_content`. An arbitrary OpenAI-compatible endpoint may not support tool calling; a
 # concrete backend opts in via BackendOverrides. `strict = off/unsupported` is a safe negative.
+#
+# `result_name` is left Unknown for the same reason, and because it is a positive assertion
+# about an extra key: some servers resolve a tool result's name by pairing `tool` messages with
+# the preceding assistant `tool_calls` in order, and reject the request when that pairing is
+# ambiguous — which it is whenever a client returns results in a different order from the calls.
+# Such a backend sets `tools.result_name = true` (via BackendOverrides / the control-plane
+# chat-config overlay) and each `tool` message then carries the tool's `name`. It stays off by
+# default because a server validating its message schema strictly may reject the extra key.
 [defaults.tools.strict]
 supported = false
 default = "off"
