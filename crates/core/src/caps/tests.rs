@@ -244,6 +244,39 @@ fn backend_override_precedence() {
 }
 
 #[test]
+fn system_role_parses_and_defaults_to_unknown() {
+    // Unset everywhere in the shipped registry => Unknown, which the codecs treat as "leave the
+    // role alone" (the pre-existing behaviour).
+    assert!(preset::gpt5_responses().instructions.system_role.is_unknown());
+    assert!(preset::claude_5().instructions.system_role.is_unknown());
+
+    let reg = Registry::from_toml(
+        "family = \"openai\"\n[defaults.instructions]\nsystem_role = false\ndeveloper_role = true\n",
+    )
+    .unwrap();
+    let c = reg.resolve(&ProviderFamily::OpenAI, "anything", None);
+    assert!(c.instructions.system_role.is_no());
+    assert!(c.instructions.developer_role.is_yes());
+}
+
+#[test]
+fn system_role_backend_overlay_wins() {
+    // The real deployment path: a per-backend overlay turns it off for one endpoint only.
+    let overlay = Capabilities {
+        instructions: crate::caps::schema::InstructionsCap {
+            system_role: Tri::No,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let resolved = shipped().resolve(&ProviderFamily::OpenAI, "gpt-6-astra", Some(&overlay));
+    assert!(resolved.instructions.system_role.is_no());
+    // The overlay leaves the rest of the instruction table alone.
+    assert_eq!(resolved.instructions.top_level_system, Some(TopLevelSystem::Plain));
+    assert!(resolved.instructions.developer_role.is_yes());
+}
+
+#[test]
 fn merge_keeps_first_registry_model_rules_ahead() {
     let mut a = Registry::from_toml(
         "family = \"anthropic\"\n[[model]]\nmatch = \"claude-x\"\n[model.reasoning]\nmode = \"adaptive\"\n",

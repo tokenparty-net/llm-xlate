@@ -268,7 +268,7 @@ fn build_input(
     for idx in 0..=n {
         if idx == 0 && !plan.use_string {
             for ins in &plan.leading {
-                input.push(encode_instruction_item(ins, degr));
+                input.push(encode_instruction_item(ins, caps, degr));
             }
         }
         // At the final slot, also flush any anchor pointing past the end. `lower` clamps and
@@ -277,12 +277,12 @@ fn build_input(
         if idx == n {
             for (_, list) in plan.before.range(idx..) {
                 for ins in list {
-                    input.push(encode_instruction_item(ins, degr));
+                    input.push(encode_instruction_item(ins, caps, degr));
                 }
             }
         } else if let Some(list) = plan.before.get(&idx) {
             for ins in list {
-                input.push(encode_instruction_item(ins, degr));
+                input.push(encode_instruction_item(ins, caps, degr));
             }
         }
         if idx < n {
@@ -295,7 +295,7 @@ fn build_input(
 }
 
 /// Encode a leading/mid instruction as a `message` item.
-fn encode_instruction_item(ins: &Instruction, degr: &mut Degradations) -> Value {
+fn encode_instruction_item(ins: &Instruction, caps: &Capabilities, degr: &mut Degradations) -> Value {
     if ins.effort.is_some() {
         degr.dropped("instructions.effort", "Responses has no mid-conversation effort override");
     }
@@ -304,6 +304,19 @@ fn encode_instruction_item(ins: &Instruction, degr: &mut Degradations) -> Value 
     }
     let role = match ins.role {
         InstructionRole::Developer => "developer",
+        // A backend may accept the top-level system prompt yet reject a `role:"system"` item in
+        // `input`. Only a definite `No` remaps, and only when `developer` is known to exist —
+        // otherwise there is no better role to use and the item goes out as-is.
+        InstructionRole::System
+            if caps.instructions.system_role.is_no()
+                && caps.instructions.developer_role.is_yes() =>
+        {
+            degr.downgraded(
+                "instructions.system",
+                "system-role input items unsupported; sent as developer",
+            );
+            "developer"
+        }
         InstructionRole::System => "system",
     };
     let content: Vec<Value> = ins

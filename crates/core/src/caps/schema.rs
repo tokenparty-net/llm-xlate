@@ -246,6 +246,12 @@ pub struct InstructionsCap {
     pub mid_system_placement: Option<String>,
     /// Whether a distinct `developer` role exists.
     pub developer_role: Tri,
+    /// Whether a `system`-role *message item* is accepted in the transcript (Chat `messages`,
+    /// Responses `input`). Some backends reject one with a 400 while still accepting the
+    /// top-level system prompt, so this is distinct from [`Self::top_level_system`]. Only a
+    /// definite `No` changes behaviour: it remaps such an item to `developer` when
+    /// [`Self::developer_role`] is `Yes`. `Unknown` keeps the role as-is.
+    pub system_role: Tri,
     /// Whether `system_clear_at` is supported.
     pub system_clear_at: Tri,
     /// Whether a mid-conversation effort override on a system message is supported.
@@ -261,7 +267,7 @@ impl InstructionsCap {
     fn overlay(&mut self, o: &InstructionsCap) {
         overlay_fields!(self, o;
             opt: top_level_system, mid_conversation_system, mid_system_placement, system_headers;
-            tri: developer_role, system_clear_at, system_effort_override);
+            tri: developer_role, system_role, system_clear_at, system_effort_override);
     }
 }
 

@@ -217,7 +217,17 @@ fn build_messages(
 fn encode_instruction(instr: &Instruction, caps: &Capabilities, degr: &mut Degradations) -> Value {
     let mut obj = Map::new();
     let role = match instr.role {
-        InstructionRole::System => "system",
+        // Mirror of the developer→system downgrade below: a backend that rejects a `system`
+        // message outright still takes `developer`. Only a definite `No` remaps, and only when
+        // `developer` is known to exist — otherwise there is no better role to use.
+        InstructionRole::System => {
+            if caps.instructions.system_role.is_no() && caps.instructions.developer_role.is_yes() {
+                degr.downgraded("instructions.system", "system role unsupported; sent as developer");
+                "developer"
+            } else {
+                "system"
+            }
+        }
         InstructionRole::Developer => {
             if caps.instructions.developer_role.is_yes() {
                 "developer"

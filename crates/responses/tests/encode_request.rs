@@ -4,7 +4,7 @@
 mod common;
 use common::*;
 
-use llm_xlate_core::caps::preset;
+use llm_xlate_core::caps::{preset, Tri};
 use llm_xlate_core::{
     CallId, Codec, DegradationKind, Effort, Instruction, InstructionRole, IrRequest, Item, JsonText,
     MediaSource, OpaqueBlob, OpaqueKind, OutputConfig, OutputFormat, Part, Position, ProviderFamily,
@@ -63,6 +63,85 @@ fn two_leading_instructions_become_items() {
     let input = b.get("input").unwrap().as_array().unwrap();
     assert_eq!(input.len(), 3);
     assert_eq!(input[0].get("role").unwrap(), "system");
+    assert_eq!(input[1].get("role").unwrap(), "developer");
+    assert_eq!(input[2].get("role").unwrap(), "user");
+}
+
+/// Caps whose backend takes the top-level system prompt but rejects a `system`-role item.
+fn caps_no_system_role() -> llm_xlate_core::Capabilities {
+    let mut c = caps();
+    c.instructions.system_role = Tri::No;
+    c.instructions.developer_role = Tri::Yes;
+    c
+}
+
+/// A leading system instruction plus one anchored after the only item (the shape a
+/// mid-conversation system turn decodes to).
+fn ir_with_mid_system() -> IrRequest {
+    let mut ir = IrRequest::default();
+    ir.model = llm_xlate_core::ModelRef::new("gpt-5.4");
+    ir.instructions.push(Instruction::system_text("lead"));
+    ir.instructions.push(Instruction {
+        role: InstructionRole::System,
+        position: Position::Before(1),
+        content: vec![Part::text("env")],
+        cache_control: None,
+        effort: None,
+        clear_at: None,
+    });
+    ir.items.push(Item::user_text("hi"));
+    ir
+}
+
+#[test]
+fn system_role_rejected_remaps_item_to_developer() {
+    // The top-level string is unaffected — only the `input` item changes role.
+    let enc = encode(&ir_with_mid_system(), &caps_no_system_role());
+    let b = json(&enc.body);
+    assert_eq!(b.get("instructions").unwrap(), "lead");
+    let input = b.get("input").unwrap().as_array().unwrap();
+    assert_eq!(input.len(), 2);
+    assert_eq!(input[0].get("role").unwrap(), "user");
+    assert_eq!(input[1].get("role").unwrap(), "developer");
+    assert!(enc
+        .degradations
+        .iter()
+        .any(|d| d.field == "instructions.system" && d.kind == DegradationKind::Downgraded));
+}
+
+#[test]
+fn system_role_unknown_keeps_system_item() {
+    // `Unknown` is the default for every backend that has not been probed; it must not remap.
+    let enc = encode(&ir_with_mid_system(), &caps());
+    let b = json(&enc.body);
+    let input = b.get("input").unwrap().as_array().unwrap();
+    assert_eq!(input[1].get("role").unwrap(), "system");
+    assert!(!enc.degradations.iter().any(|d| d.field == "instructions.system"));
+}
+
+#[test]
+fn system_role_rejected_without_developer_role_keeps_system() {
+    // No better role to fall back to, so the item goes out unchanged rather than silently
+    // becoming a role the backend does not define either.
+    let mut c = caps_no_system_role();
+    c.instructions.developer_role = Tri::Unknown;
+    let enc = encode(&ir_with_mid_system(), &c);
+    let b = json(&enc.body);
+    let input = b.get("input").unwrap().as_array().unwrap();
+    assert_eq!(input[1].get("role").unwrap(), "system");
+}
+
+#[test]
+fn system_role_rejected_remaps_leading_items_too() {
+    // The bug is not mid-conversation-specific: two leading instructions defeat the string form,
+    // so the leading System becomes an item and must be remapped as well.
+    let ir = decode(
+        r#"{"model":"m","input":[{"role":"system","content":"a"},{"role":"developer","content":"b"},{"role":"user","content":"u"}]}"#,
+    );
+    let b = body(&ir, &caps_no_system_role());
+    let input = b.get("input").unwrap().as_array().unwrap();
+    assert_eq!(input.len(), 3);
+    assert_eq!(input[0].get("role").unwrap(), "developer");
     assert_eq!(input[1].get("role").unwrap(), "developer");
     assert_eq!(input[2].get("role").unwrap(), "user");
 }

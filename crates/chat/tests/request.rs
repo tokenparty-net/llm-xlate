@@ -4,6 +4,7 @@
 mod common;
 
 use common::*;
+use llm_xlate_core::caps::Tri;
 use llm_xlate_core::degrade::DegradationKind;
 use llm_xlate_core::ir::{
     Effort, Instruction, InstructionRole, IrRequest, Item, MediaSource, OutputFormat, Part,
@@ -497,6 +498,40 @@ fn matrix_openai_compatible_drops_strict_and_downgrades_developer() {
     assert!(out.contains("\"role\":\"system\""));
     assert!(enc.degradations.iter().any(|d| d.field == "instructions.developer"));
     assert!(enc.degradations.iter().any(|d| d.field == "tools.strict"));
+}
+
+#[test]
+fn matrix_system_role_rejected_upgrades_to_developer() {
+    // The mirror of the developer→system downgrade above: a backend that takes `developer` but
+    // rejects `system` gets every system message remapped. Chat has no top-level system field,
+    // so this covers the leading instruction too.
+    let mut caps = gpt4o();
+    caps.instructions.system_role = Tri::No;
+    caps.instructions.developer_role = Tri::Yes;
+    let body = r#"{"model":"gpt-4o","messages":[
+        {"role":"system","content":"be terse"},
+        {"role":"user","content":"hi"}]}"#;
+    let ir = decode_request(body);
+    let enc = encode_request(&ir, &caps);
+    let out = String::from_utf8(enc.body.to_vec()).unwrap();
+    assert!(!out.contains("\"role\":\"system\""));
+    assert!(out.contains("\"role\":\"developer\""));
+    assert!(enc
+        .degradations
+        .iter()
+        .any(|d| d.field == "instructions.system" && d.kind == DegradationKind::Downgraded));
+}
+
+#[test]
+fn matrix_system_role_unknown_keeps_system() {
+    let body = r#"{"model":"gpt-4o","messages":[
+        {"role":"system","content":"be terse"},
+        {"role":"user","content":"hi"}]}"#;
+    let ir = decode_request(body);
+    let enc = encode_request(&ir, &gpt4o());
+    let out = String::from_utf8(enc.body.to_vec()).unwrap();
+    assert!(out.contains("\"role\":\"system\""));
+    assert!(!enc.degradations.iter().any(|d| d.field == "instructions.system"));
 }
 
 #[test]
