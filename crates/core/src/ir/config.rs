@@ -396,8 +396,9 @@ pub struct CacheHints {
 ///
 /// `id` is the session id the router uses for sticky routing / affinity, captured from the
 /// first present of (in priority order) the `prompt_cache_key` body field, the `session_id`
-/// body field, the `x-session-affinity` header, the `x-opencode-session` header, and the
-/// `x-session-id` header (see [`crate::session::capture_session`]). On the way out it is
+/// body field, the `x-session-affinity` header, the `x-opencode-session` header, the
+/// `x-claude-code-session-id` header, and the `x-session-id` header (see
+/// [`crate::session::capture_session`]). On the way out it is
 /// emitted to the first place the backend accepts a session id
 /// ([`crate::caps::SessionCap`]).
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]

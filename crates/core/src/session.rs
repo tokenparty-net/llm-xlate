@@ -13,7 +13,8 @@
 //! 2. `session_id` body field
 //! 3. `x-session-affinity` header
 //! 4. `x-opencode-session` header
-//! 5. `x-session-id` header
+//! 5. `x-claude-code-session-id` header
+//! 6. `x-session-id` header
 //!
 //! The first present, non-empty candidate wins. Any *other* present candidate whose value
 //! differs from the winner is recorded in [`SessionConfig::conflicting_sources`] so lowering
@@ -30,7 +31,8 @@ use crate::ir::SessionConfig;
 ///
 /// Kept as a public constant so codecs treat these headers as *consumed* (they must not also
 /// be forwarded verbatim) and so the list has a single source of truth.
-pub const SESSION_HEADERS: [&str; 3] = ["x-session-affinity", "x-opencode-session", "x-session-id"];
+pub const SESSION_HEADERS: [&str; 4] =
+    ["x-session-affinity", "x-opencode-session", "x-claude-code-session-id", "x-session-id"];
 
 /// Capture a session id from a request's candidate slots (see the module docs for priority).
 ///
@@ -192,6 +194,38 @@ mod tests {
         );
         assert_eq!(cfg.id.as_deref(), Some("a"));
         assert_eq!(cfg.conflicting_sources, vec!["x-opencode-session", "x-session-id"]);
+    }
+
+    #[test]
+    fn claude_code_header_is_captured() {
+        let cfg = capture_session(None, None, &hdrs(&[("x-claude-code-session-id", "cc-1")]));
+        assert_eq!(cfg.id.as_deref(), Some("cc-1"));
+        assert!(cfg.conflicting_sources.is_empty());
+    }
+
+    #[test]
+    fn claude_code_header_priority() {
+        // Ranks below the explicit affinity override but above the generic x-session-id.
+        let cfg = capture_session(
+            None,
+            None,
+            &hdrs(&[
+                ("x-session-affinity", "aff"),
+                ("x-claude-code-session-id", "cc"),
+                ("x-session-id", "generic"),
+            ]),
+        );
+        assert_eq!(cfg.id.as_deref(), Some("aff"));
+        assert_eq!(cfg.conflicting_sources, vec!["x-claude-code-session-id", "x-session-id"]);
+
+        // Without the affinity header, the Claude Code id wins over the generic one.
+        let cfg = capture_session(
+            None,
+            None,
+            &hdrs(&[("x-claude-code-session-id", "cc"), ("x-session-id", "generic")]),
+        );
+        assert_eq!(cfg.id.as_deref(), Some("cc"));
+        assert_eq!(cfg.conflicting_sources, vec!["x-session-id"]);
     }
 
     #[test]

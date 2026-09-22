@@ -227,3 +227,28 @@ fn cross_protocol_header_to_field() {
     let out: serde_json::Value = serde_json::from_slice(&enc.body).unwrap();
     assert_eq!(out["prompt_cache_key"], "oc-7", "cross-protocol affinity: {out}");
 }
+
+/// A Claude Code client's `x-claude-code-session-id` header maps onto an OpenAI Responses
+/// backend's `prompt_cache_key` field.
+#[test]
+fn claude_code_session_header_to_field() {
+    let x = xl();
+    let mut caps = preset::gpt5_responses();
+    caps.session = SessionCap {
+        accepts: Some(vec![SessionSink::Field("prompt_cache_key".into())]),
+        required: Tri::Unknown,
+    };
+    let body = br#"{"model":"claude-opus-5","max_tokens":16,"messages":[{"role":"user","content":"hi"}]}"#;
+    let (enc, _) = x
+        .translate_request(
+            Protocol::Anthropic,
+            body,
+            &hdrs(&[("x-claude-code-session-id", "cc-9")]),
+            Protocol::OaiResponses,
+            &caps,
+            &Resolutions::new(),
+        )
+        .unwrap();
+    let out: serde_json::Value = serde_json::from_slice(&enc.body).unwrap();
+    assert_eq!(out["prompt_cache_key"], "cc-9", "claude code affinity: {out}");
+}
