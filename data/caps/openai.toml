@@ -87,6 +87,7 @@ store = true
 previous_response_id = true
 conversation_api = true
 background = false
+end_user_identifier = true
 encrypted_reasoning_include = true
 compaction = "none"
 

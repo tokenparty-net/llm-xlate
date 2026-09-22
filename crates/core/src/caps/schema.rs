@@ -638,6 +638,13 @@ pub struct StateCap {
     pub conversation_api: Tri,
     /// Background mode supported.
     pub background: Tri,
+    /// Whether the backend accepts an OpenAI-style end-user identifier — the top-level
+    /// `user` and `safety_identifier` request fields (Chat and Responses). Standard lossy
+    /// semantics (`Unknown` ⇒ "no"): `Yes` ⇒ forwarded (over-long values still digest-normalized
+    /// to the wire limit); `No`/`Unknown` ⇒ dropped with a `Dropped` degradation. The
+    /// ChatGPT-subscription backend behind a Codex connector rejects `user` outright
+    /// (`400 "Unsupported parameter: user"`), so it must declare this `No`.
+    pub end_user_identifier: Tri,
     /// `include: ["reasoning.encrypted_content"]` supported.
     pub encrypted_reasoning_include: Tri,
     /// Compaction mechanism.
@@ -651,7 +658,7 @@ impl StateCap {
         overlay_fields!(self, o;
             opt: compaction;
             tri: store, previous_response_id, conversation_api, background,
-                 encrypted_reasoning_include, zdr);
+                 end_user_identifier, encrypted_reasoning_include, zdr);
     }
 }
 

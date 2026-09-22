@@ -370,6 +370,30 @@ fn background_supported_and_dropped() {
 }
 
 #[test]
+fn end_user_identifier_supported_and_dropped() {
+    // Regression (Claude Code → codex connector, `connector_codex_fail.json`, 2026-09-22): the
+    // ChatGPT-subscription backend behind the Codex connector rejects the top-level `user` field
+    // with `400 "Unsupported parameter: user"`. `user`/`safety_identifier` must be gated on
+    // `state.end_user_identifier` and dropped (with a degradation) when the target lacks it.
+    let mut ir = IrRequest::default();
+    ir.meta.user = Some("u1".into());
+    ir.meta.safety_identifier = Some("s1".into());
+    ir.items.push(Item::user_text("x"));
+    // gpt5 (openai defaults) supports the end-user identifier: both forwarded.
+    let b = body(&ir, &caps());
+    assert_eq!(b["user"], "u1");
+    assert_eq!(b["safety_identifier"], "s1");
+    // openai_compatible leaves end_user_identifier unset (Unknown ⇒ No), standing in for a codex
+    // backend: both dropped with a degradation, no `user` on the wire.
+    let enc = encode(&ir, &preset::openai_compatible());
+    let b2 = json(&enc.body);
+    assert!(b2.get("user").is_none());
+    assert!(b2.get("safety_identifier").is_none());
+    assert!(enc.degradations.iter().any(|d| d.field == "user"));
+    assert!(enc.degradations.iter().any(|d| d.field == "safety_identifier"));
+}
+
+#[test]
 fn tool_choice_named_and_downgrade() {
     let mut ir = IrRequest::default();
     ir.tool_choice = ToolChoice::Named("f".into());

@@ -1057,11 +1057,20 @@ fn encode_meta(
     if !req.meta.metadata.is_empty() {
         out.insert("metadata".into(), Value::Object(req.meta.metadata.clone()));
     }
-    if let Some(u) = &req.meta.user {
-        out.insert("user".into(), Value::from(fit_identifier(u, "user", degr)));
-    }
-    if let Some(sid) = &req.meta.safety_identifier {
-        out.insert("safety_identifier".into(), Value::from(fit_identifier(sid, "safety_identifier", degr)));
+    if caps.state.end_user_identifier.is_yes() {
+        if let Some(u) = &req.meta.user {
+            out.insert("user".into(), Value::from(fit_identifier(u, "user", degr)));
+        }
+        if let Some(sid) = &req.meta.safety_identifier {
+            out.insert("safety_identifier".into(), Value::from(fit_identifier(sid, "safety_identifier", degr)));
+        }
+    } else {
+        if req.meta.user.is_some() {
+            degr.dropped("user", "target does not support the `user` identifier");
+        }
+        if req.meta.safety_identifier.is_some() {
+            degr.dropped("safety_identifier", "target does not support the `safety_identifier` identifier");
+        }
     }
     if let Some(k) = &req.cache.prompt_cache_key {
         if caps.cache.prompt_cache_key.is_yes() {

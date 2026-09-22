@@ -150,11 +150,20 @@ pub(crate) fn encode_request(
     if !req.meta.metadata.is_empty() {
         top = top.set("metadata", Value::Object(req.meta.metadata.clone()));
     }
-    if let Some(u) = &req.meta.user {
-        top = top.set("user", Value::from(fit_identifier(u, "user", &mut degr)));
-    }
-    if let Some(s) = &req.meta.safety_identifier {
-        top = top.set("safety_identifier", Value::from(fit_identifier(s, "safety_identifier", &mut degr)));
+    if caps.state.end_user_identifier.is_yes() {
+        if let Some(u) = &req.meta.user {
+            top = top.set("user", Value::from(fit_identifier(u, "user", &mut degr)));
+        }
+        if let Some(s) = &req.meta.safety_identifier {
+            top = top.set("safety_identifier", Value::from(fit_identifier(s, "safety_identifier", &mut degr)));
+        }
+    } else {
+        if req.meta.user.is_some() {
+            degr.dropped("user", "target does not support the `user` identifier");
+        }
+        if req.meta.safety_identifier.is_some() {
+            degr.dropped("safety_identifier", "target does not support the `safety_identifier` identifier");
+        }
     }
     if let Some(t) = &req.meta.service_tier {
         if caps.sampling.service_tier.as_ref().is_some_and(|list| list.iter().any(|x| x == t)) {
