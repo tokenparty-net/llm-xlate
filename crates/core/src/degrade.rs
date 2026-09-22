@@ -108,20 +108,80 @@ impl Degradations {
         self.0.iter()
     }
 
-    /// Render the deterministic `x-router-degraded` header value: `field=kind;field=kind`
-    /// in insertion order. Returns an empty string when there are no degradations.
+    /// Render the deterministic `x-router-degraded` header value.
+    ///
+    /// Entries are `field=kind`, separated by `;`, in first-occurrence order. Identical
+    /// `field=kind` pairs are deduplicated and rendered once with a `*N` count suffix when
+    /// they occur more than once (e.g. `instructions=wrapped*177`) — `*` is plaintext ASCII
+    /// and never appears in a field name or kind slug, so the value stays trivially parseable.
+    /// Deduplication is essential: a long conversation can wrap hundreds of mid-context
+    /// system turns, and rendering each one verbatim produces a multi-kilobyte header that
+    /// overflows a downstream proxy's header buffer (nginx `proxy_buffer_size`), turning an
+    /// otherwise-successful response into a 502.
+    ///
+    /// The rendered value is additionally hard-capped at [`Self::MAX_HEADER_LEN`] bytes as a
+    /// belt-and-suspenders guard against any future high-cardinality degradation source; when
+    /// the cap is hit, whole trailing entries are dropped and a final `truncated=N` entry
+    /// records how many distinct entries were omitted.
+    ///
+    /// Returns an empty string when there are no degradations. Full, un-deduplicated detail
+    /// is preserved in the trace record; this is only the header projection.
     pub fn render_header_value(&self) -> String {
+        // Collapse identical field=kind pairs, preserving first-occurrence order.
+        let mut order: Vec<(usize, DegradationKind, u32)> = Vec::new();
+        for d in &self.0 {
+            match order.iter_mut().find(|(fi, k, _)| {
+                *k == d.kind && self.0[*fi].field == d.field
+            }) {
+                Some((_, _, n)) => *n += 1,
+                None => order.push((
+                    self.0.iter().position(|x| x.field == d.field && x.kind == d.kind).unwrap(),
+                    d.kind,
+                    1,
+                )),
+            }
+        }
+
         let mut out = String::new();
-        for (i, d) in self.0.iter().enumerate() {
-            if i > 0 {
+        for (idx, (fi, kind, count)) in order.iter().enumerate() {
+            let entry_len = self.0[*fi].field.len()
+                + 1 // '='
+                + kind.slug().len()
+                + if *count > 1 { 1 + count_digits(*count) } else { 0 }
+                + if idx > 0 { 1 } else { 0 }; // ';'
+            // If appending this entry would overflow the cap, stop and record how many
+            // distinct entries (including this one) were dropped.
+            if !out.is_empty() && out.len() + entry_len > Self::MAX_HEADER_LEN {
+                let omitted = order.len() - idx;
+                out.push_str(&format!(";truncated={omitted}"));
+                break;
+            }
+            if idx > 0 {
                 out.push(';');
             }
-            out.push_str(&d.field);
+            out.push_str(&self.0[*fi].field);
             out.push('=');
-            out.push_str(d.kind.slug());
+            out.push_str(kind.slug());
+            if *count > 1 {
+                out.push('*');
+                out.push_str(&count.to_string());
+            }
         }
         out
     }
+
+    /// Maximum rendered length of the degraded header value, in bytes. Kept well under a
+    /// typical proxy header buffer so the value can never by itself cause a 502.
+    pub const MAX_HEADER_LEN: usize = 1024;
+}
+
+fn count_digits(mut n: u32) -> usize {
+    let mut d = 1;
+    while n >= 10 {
+        n /= 10;
+        d += 1;
+    }
+    d
 }
 
 impl IntoIterator for Degradations {
@@ -137,5 +197,75 @@ impl<'a> IntoIterator for &'a Degradations {
     type IntoIter = std::slice::Iter<'a, Degradation>;
     fn into_iter(self) -> Self::IntoIter {
         self.0.iter()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_renders_empty() {
+        assert_eq!(Degradations::new().render_header_value(), "");
+    }
+
+    #[test]
+    fn single_entries_render_field_equals_kind() {
+        let mut d = Degradations::new();
+        d.dropped("temperature", "");
+        d.wrapped("instructions", "");
+        assert_eq!(d.render_header_value(), "temperature=dropped;instructions=wrapped");
+    }
+
+    #[test]
+    fn identical_pairs_collapse_with_count_suffix() {
+        let mut d = Degradations::new();
+        d.dropped("ext.anthropic.system_headers.billing-header", "");
+        for _ in 0..177 {
+            d.wrapped("instructions", "");
+        }
+        // 178 raw degradations collapse to two entries; length stays tiny regardless of turns.
+        assert_eq!(
+            d.render_header_value(),
+            "ext.anthropic.system_headers.billing-header=dropped;instructions=wrapped*177"
+        );
+        assert!(d.render_header_value().len() < 100);
+    }
+
+    #[test]
+    fn same_field_different_kind_stays_distinct() {
+        let mut d = Degradations::new();
+        d.wrapped("instructions", "");
+        d.dropped("instructions.effort", "");
+        d.wrapped("instructions", "");
+        d.dropped("instructions.effort", "");
+        assert_eq!(
+            d.render_header_value(),
+            "instructions=wrapped*2;instructions.effort=dropped*2"
+        );
+    }
+
+    #[test]
+    fn first_occurrence_order_is_preserved() {
+        let mut d = Degradations::new();
+        d.wrapped("b", "");
+        d.dropped("a", "");
+        d.wrapped("b", "");
+        assert_eq!(d.render_header_value(), "b=wrapped*2;a=dropped");
+    }
+
+    #[test]
+    fn high_cardinality_is_capped_with_truncated_marker() {
+        let mut d = Degradations::new();
+        for i in 0..5000 {
+            // Every field distinct so nothing dedups: this is the pathological case the cap guards.
+            d.dropped(format!("field_{i}"), "");
+        }
+        let v = d.render_header_value();
+        assert!(v.len() <= Degradations::MAX_HEADER_LEN, "len={}", v.len());
+        assert!(v.contains(";truncated="), "expected truncation marker: {v}");
+        // The marker reports a positive count of omitted distinct entries.
+        let n: usize = v.rsplit(";truncated=").next().unwrap().parse().unwrap();
+        assert!(n > 0);
     }
 }

@@ -23,4 +23,4 @@ expression: rendered
 content-type: application/json
 upstream_streams: false
 --- degraded ---
-stop_sequences=dropped;stop_sequences=dropped
+stop_sequences=dropped*2

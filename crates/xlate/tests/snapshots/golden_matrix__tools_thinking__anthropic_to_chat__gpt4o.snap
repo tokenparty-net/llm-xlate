@@ -56,4 +56,4 @@ expression: rendered
 --- headers ---
 upstream_streams: false
 --- degraded ---
-reasoning=dropped;reasoning=dropped
+reasoning=dropped*2
