@@ -342,9 +342,11 @@ fn build_messages(
             Position::Leading => continue,
         };
         let target_group = if i >= req.items.len() { groups.len() } else { item_group[i] };
-        // Native condition: caps Native AND previous group is user-side AND not first.
+        // Native condition: caps Native AND previous group is user-side AND not first. A system
+        // message may also end the array (the placement rule's "ends_array"; Claude Code sends
+        // one after every tool result), so an anchor past the last group is native too.
         let prev_user = target_group >= 1 && groups.get(target_group - 1).map(|g| g.side) == Some(Side::User);
-        if native_supported && prev_user && target_group >= 1 && target_group < groups.len() {
+        if native_supported && prev_user && target_group >= 1 && target_group <= groups.len() {
             native_before[target_group].push(instr);
         } else {
             let text = instr.text();
@@ -418,6 +420,10 @@ fn build_messages(
         out.push(message_object(role, blocks));
     }
 
+    // Trailing native system messages (after a final user group).
+    for instr in &native_before[groups.len()] {
+        out.push(build_native_system(instr, caps, degradations, betas));
+    }
     // Trailing inline-wrap blocks → a final user message.
     if !wrap_trailing.is_empty() {
         out.push(message_object("user", wrap_trailing));

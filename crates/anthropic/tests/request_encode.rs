@@ -538,6 +538,44 @@ fn mid_system_before_tool_call_turn_stays_before_it_inline_wrap() {
 }
 
 #[test]
+fn mid_system_trailing_after_tool_result_native_claude5() {
+    // Claude Code sends a system message after every tool result, so it usually ends the
+    // array. Native support must cover that position too: wrapping only the trailing one would
+    // change the turn's bytes on the next request (wrapped -> native) and break the cache.
+    let mut req = base(vec![
+        Item::user_text("explore"),
+        Item::ToolCall { call_id: "toolu_1".into(), name: "Bash".into(), arguments: JsonText::new("{}"), id: None },
+        Item::ToolResult { call_id: "toolu_1".into(), content: vec![Part::text("/w")], is_error: false, id: None },
+    ]);
+    req.instructions = vec![mid_system(1, "env"), mid_system(3, "tokens")];
+    let out = enc(&req, &claude_5());
+    let s = |v: &[&str]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>();
+    assert_eq!(
+        shape(&out),
+        vec![
+            ("user".into(), s(&["text:explore"])),
+            ("system".into(), s(&["text:env"])),
+            ("assistant".into(), s(&["tool_use"])),
+            ("user".into(), s(&["tool_result"])),
+            ("system".into(), s(&["text:tokens"])),
+        ]
+    );
+    assert!(!degs(&out).iter().any(|d| d.starts_with("instructions=wrapped")));
+}
+
+#[test]
+fn mid_system_after_assistant_still_wraps_claude5() {
+    // A system message may not follow a plain assistant turn, so it still wraps into the next
+    // user message on a native model.
+    let mut req = base(vec![Item::user_text("one"), Item::assistant_text("hi"), Item::user_text("two")]);
+    req.instructions = vec![mid_system(2, "rule")];
+    let out = enc(&req, &claude_5());
+    let roles: Vec<String> = shape(&out).into_iter().map(|(r, _)| r).collect();
+    assert_eq!(roles, vec!["user", "assistant", "user"]);
+    assert!(degs(&out).iter().any(|d| d.starts_with("instructions=wrapped")));
+}
+
+#[test]
 fn mid_system_after_assistant_goes_after_tool_results_inline_wrap() {
     // Anchored right after an assistant turn (no preceding user group to append to): the wrap
     // lands in the following user message, but AFTER its tool_result blocks.
