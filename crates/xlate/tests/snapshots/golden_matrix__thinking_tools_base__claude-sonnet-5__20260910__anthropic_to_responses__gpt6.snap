@@ -37,7 +37,8 @@ expression: rendered
   ],
   "tool_choice": "required",
   "reasoning": {
-    "effort": "medium"
+    "effort": "medium",
+    "summary": "auto"
   },
   "max_output_tokens": 256,
   "stream": true

@@ -17,6 +17,9 @@ expression: rendered
       ]
     }
   ],
+  "reasoning": {
+    "summary": "auto"
+  },
   "max_output_tokens": 64
 }
 --- headers ---

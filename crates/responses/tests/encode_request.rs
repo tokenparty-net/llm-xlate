@@ -4,7 +4,7 @@
 mod common;
 use common::*;
 
-use llm_xlate_core::caps::{preset, Tri};
+use llm_xlate_core::caps::{preset, ExposureMode, Tri};
 use llm_xlate_core::{
     CallId, Codec, DegradationKind, Effort, Instruction, InstructionRole, IrRequest, Item, JsonText,
     MediaSource, OpaqueBlob, OpaqueKind, OutputConfig, OutputFormat, Part, Position, ProviderFamily,
@@ -517,10 +517,11 @@ fn effort_max_downgrades_to_xhigh() {
 }
 
 #[test]
-fn reasoning_full_exposure_emits_no_summary() {
-    // `Full` exposure is the Chat/Anthropic decoder default (a response-rendering preference),
-    // not a request-side summary request. A client sending only `reasoning_effort:"low"` must
-    // NOT be forced into `summary:"detailed"`, and no `reasoning.summary` downgrade may fire.
+fn reasoning_full_exposure_asks_for_an_auto_summary_where_offered() {
+    // `Full` is the Chat/Anthropic decoder default: those clients show reasoning text, and a
+    // Responses backend returns reasoning only as a summary, only when asked. Where the backend
+    // declares summary exposure (gpt-5.4 does), ask for `auto`, never `detailed`, and no
+    // `reasoning.summary` downgrade fires.
     let mut ir = IrRequest::default();
     ir.reasoning = ReasoningConfig {
         effort: Some(Effort::Low),
@@ -531,8 +532,29 @@ fn reasoning_full_exposure_emits_no_summary() {
     let enc = encode(&ir, &caps());
     let b = json(&enc.body);
     assert_eq!(b["reasoning"]["effort"], "low");
-    assert!(b["reasoning"].get("summary").is_none(), "no summary: {}", b["reasoning"]);
+    assert_eq!(b["reasoning"]["summary"], "auto", "{}", b["reasoning"]);
     assert!(!enc.degradations.iter().any(|d| d.field == "reasoning.summary"));
+}
+
+#[test]
+fn reasoning_full_exposure_asks_for_nothing_where_summaries_are_not_offered() {
+    let mut ir = IrRequest::default();
+    ir.reasoning = ReasoningConfig {
+        effort: Some(Effort::Low),
+        budget_tokens: None,
+        enabled: None,
+        expose: ReasoningExposure::Full,
+    };
+    for exposure in [None, Some(ExposureMode::FullText), Some(ExposureMode::None)] {
+        let mut c = caps();
+        c.reasoning.exposure = exposure;
+        let b = json(&encode(&ir, &c).body);
+        assert!(b["reasoning"].get("summary").is_none(), "{exposure:?}: {}", b["reasoning"]);
+    }
+    // And a client that asked for no reasoning gets no reasoning object at all.
+    ir.reasoning.effort = None;
+    let b = json(&encode(&ir, &caps()).body);
+    assert!(b.get("reasoning").is_none(), "{b}");
 }
 
 #[test]

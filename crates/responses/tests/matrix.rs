@@ -57,10 +57,9 @@ fn matrix_gpt5_responses() {
     let enc = encode(&demanding(), &preset::gpt5_responses());
     let b = json(&enc.body);
     assert_eq!(b["reasoning"]["effort"], "xhigh"); // Max → xhigh (not in effort_levels)
-    // `Full` exposure is the Chat/Anthropic decoder default, not a request-side summary request:
-    // it emits no `summary` and no `reasoning.summary` downgrade (a client wanting a summary sends
-    // a `Summary(_)` exposure, exercised in encode_request.rs / roundtrip.rs).
-    assert!(b["reasoning"].get("summary").is_none(), "Full emits no summary: {}", b["reasoning"]);
+    // `Full` exposure (the Chat/Anthropic decoder default) asks for an `auto` summary, since
+    // gpt-5.4 declares summary exposure; never `detailed`, and no `reasoning.summary` downgrade.
+    assert_eq!(b["reasoning"]["summary"], "auto", "{}", b["reasoning"]);
     assert_eq!(b["text"]["format"]["strict"], true);
     assert_eq!(b["text"]["verbosity"], "high");
     assert_eq!(b["tool_choice"]["name"], "f");

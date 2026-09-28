@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 
 use serde_json::{Map, Value};
 
-use llm_xlate_core::caps::SamplingRule;
+use llm_xlate_core::caps::{ExposureMode, SamplingRule};
 use llm_xlate_core::{
     canon, Capabilities, Degradations, EncodeCtx, EncodedRequest, Extensions, HeaderMap, Instruction,
     InstructionRole, IrRequest, Item, MediaSource, OutputConfig, OutputFormat, Part, Position,
@@ -711,10 +711,8 @@ pub(crate) fn build_reasoning_value(
 ) -> Option<Value> {
     let cfg = &req.reasoning;
     // Request-side reasoning is emitted only on genuine client intent (effort / explicit enable /
-    // budget). `expose` is a response-path rendering preference — the Chat and Anthropic decoders
-    // hard-set it to `Full` so their clients always see reasoning text — and must NOT by itself
-    // request reasoning summaries on the Responses request (plan §7.2: "if a client sends no
-    // reasoning config, send nothing").
+    // budget). `expose` alone requests nothing (plan §7.2: "if a client sends no reasoning
+    // config, send nothing").
     let want = cfg.effort.is_some() || cfg.enabled == Some(true) || cfg.budget_tokens.is_some();
     if !want {
         return None;
@@ -733,7 +731,16 @@ pub(crate) fn build_reasoning_value(
         }
         ob = ob.set("effort", Value::from(token));
     }
-    if let Some(s) = summary_token(&cfg.expose) {
+    // A client that shows reasoning in full (Chat, Anthropic: the decoders set `Full`) would see
+    // none from a Responses backend, which never returns raw reasoning, only a summary when asked.
+    // So where the backend declares summary exposure, ask for one: `auto`, since the client asked
+    // for reasoning, not for a detailed summary of it. Not with reasoning turned off, though.
+    let offers_summary = caps.is_some_and(|c| c.reasoning.exposure == Some(ExposureMode::Summary));
+    let reasoning_on = cfg.effort != Some(llm_xlate_core::Effort::None);
+    let summary = summary_token(&cfg.expose).or_else(|| {
+        (cfg.expose == ReasoningExposure::Full && offers_summary && reasoning_on).then_some("auto")
+    });
+    if let Some(s) = summary {
         ob = ob.set("summary", Value::from(s));
     }
     if ob.is_empty() {
@@ -743,16 +750,14 @@ pub(crate) fn build_reasoning_value(
     }
 }
 
-/// The `reasoning.summary` token for a reasoning exposure — emitted only on genuine client summary
-/// intent.
+/// The `reasoning.summary` token a client's own summary request maps to.
 ///
 /// A `Summary(_)` exposure comes only from a Responses client that explicitly asked for a summary
 /// (or that sent an `effort`, which the decoder maps to `auto`). `Full` is the *decoder default*
-/// the Chat and Anthropic decoders hard-set so their clients always see reasoning text — a
-/// response-path rendering preference, not a request-side summary request. The Responses request
-/// API has no "full" concept, so `Full` must never synthesize a `summary` field (nor the
-/// misleading `reasoning.summary` downgrade it used to): a Chat client sending only
-/// `reasoning_effort:"low"` must not be forced into `summary:"detailed"` (plan §7.2).
+/// the Chat and Anthropic decoders hard-set so their clients always see reasoning text; the
+/// Responses request API has no "full" concept, so it maps to no level here, and in particular
+/// never to `detailed` (plan §7.2). [`build_reasoning_value`] asks for `auto` on its behalf where
+/// the backend declares summary exposure.
 fn summary_token(expose: &ReasoningExposure) -> Option<&'static str> {
     match expose {
         ReasoningExposure::None | ReasoningExposure::Full => None,

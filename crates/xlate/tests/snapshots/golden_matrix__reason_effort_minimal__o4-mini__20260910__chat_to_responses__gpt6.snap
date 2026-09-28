@@ -18,7 +18,8 @@ expression: rendered
     }
   ],
   "reasoning": {
-    "effort": "minimal"
+    "effort": "minimal",
+    "summary": "auto"
   },
   "max_output_tokens": 128
 }
