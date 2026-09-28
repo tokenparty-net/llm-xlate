@@ -139,9 +139,13 @@ pub async fn handle(
     let mut resolved_summary = Vec::new();
     for call in &reqs.reasoning_for_calls {
         let key = crate::sidecar::SidecarKey::new(route.family.clone(), route.upstream_model.clone(), call.clone());
-        if let Some(blob) = deps.sidecar.get(&key) {
-            resolved_summary.push(json!({"call_id": call.as_str(), "kind": format!("{:?}", blob.kind), "len": blob.data.len()}));
-            resolutions.reasoning.insert(call.clone(), blob);
+        if let Some(resolved) = deps.sidecar.get(&key) {
+            let (kind, len) = match &resolved.opaque {
+                Some(blob) => (format!("{:?}", blob.kind), blob.data.len()),
+                None => ("Text".to_string(), resolved.text.as_deref().map_or(0, str::len)),
+            };
+            resolved_summary.push(json!({"call_id": call.as_str(), "kind": kind, "len": len}));
+            resolutions.reasoning.insert(call.clone(), resolved);
         }
     }
     if !resolved_summary.is_empty() {
@@ -438,23 +442,24 @@ fn make_binding(route: &Route, ir_response: Option<&IrResponse>) -> BackendBindi
     binding
 }
 
-/// Teach the sidecar every opaque reasoning blob that precedes a tool call in an aggregated
-/// response, keyed by `(provider family, upstream model, call id)` (plan §4.5). A later tool turn
-/// whose transcript does not carry the blob (a Chat client replaying an Anthropic thinking turn,
-/// or a Responses `store:false` encrypted-reasoning turn) resolves it back out.
+/// Teach the sidecar the reasoning that precedes each tool call in an aggregated response, keyed
+/// by `(provider family, upstream model, call id)` (plan §4.5): its opaque carrier, or its plain
+/// text when it has none. A later tool turn whose transcript does not carry it (a Chat client
+/// replaying an Anthropic thinking turn, a Responses `store:false` encrypted-reasoning turn, or
+/// any client that drops `reasoning_content`) resolves it back out.
 fn learn_sidecar(deps: &Deps, route: &Route, ir_response: &IrResponse) {
-    let mut last_blob: Option<llm_xlate_core::ir::OpaqueBlob> = None;
+    let mut last: Option<llm_xlate_core::ir::ReasoningItem> = None;
     for item in &ir_response.items {
         match item {
             Item::Reasoning(ri) => {
-                if let Some(blob) = &ri.opaque {
-                    last_blob = Some(blob.clone());
+                if let Some(carrier) = ri.replay_carrier() {
+                    last = Some(carrier);
                 }
             }
             Item::ToolCall { call_id, .. } => {
-                if let Some(blob) = &last_blob {
+                if let Some(carrier) = &last {
                     let key = SidecarKey::new(route.family.clone(), route.upstream_model.clone(), call_id.clone());
-                    deps.sidecar.put(key, blob.clone());
+                    deps.sidecar.put(key, carrier.clone());
                 }
             }
             _ => {}

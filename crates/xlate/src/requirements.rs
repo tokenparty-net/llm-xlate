@@ -13,7 +13,7 @@ use std::collections::{BTreeMap, HashSet};
 
 use llm_xlate_core::caps::{Capabilities, ReplayMode};
 use llm_xlate_core::ir::{
-    CallId, IrRequest, Item, MediaSource, OpaqueBlob, Part, Protocol, ProviderFamily, ResponseId,
+    CallId, IrRequest, Item, MediaSource, Part, Protocol, ProviderFamily, ReasoningItem, ResponseId,
 };
 
 /// What the router must resolve before [`crate::lower::lower`] can run (plan §4).
@@ -70,8 +70,9 @@ impl PartialOrd for FileRef {
 /// `BTreeMap`s (not `HashMap`s) so iteration and any derived output are deterministic.
 #[derive(Debug, Clone, Default)]
 pub struct Resolutions {
-    /// Opaque reasoning blobs to inject before their tool calls, keyed by [`CallId`].
-    pub reasoning: BTreeMap<CallId, OpaqueBlob>,
+    /// Reasoning to inject before their tool calls, keyed by [`CallId`]: an opaque carrier, or
+    /// plain text for a backend that replays text (see [`ReasoningItem::replay_carrier`]).
+    pub reasoning: BTreeMap<CallId, ReasoningItem>,
     /// Foreign → target-family file id substitutions.
     pub files: BTreeMap<FileRef, FileRef>,
 }
@@ -157,14 +158,18 @@ pub(crate) fn run_has_replayable_reasoning(
     target_family: &ProviderFamily,
     caps: &Capabilities,
 ) -> bool {
-    let text_replay = caps.reasoning.replay == Some(ReplayMode::TextField);
     run.iter().any(|it| match it {
-        Item::Reasoning(r) => {
-            r.opaque.as_ref().is_some_and(|b| &b.family == target_family)
-                || (text_replay && (r.text.is_some() || !r.summary.is_empty()))
-        }
+        Item::Reasoning(r) => replayable(r, target_family, caps),
         _ => false,
     })
+}
+
+/// Whether one reasoning item can be replayed to this backend: an opaque carrier it minted, or
+/// text when its replay slot is a text field.
+pub(crate) fn replayable(r: &ReasoningItem, target_family: &ProviderFamily, caps: &Capabilities) -> bool {
+    let text_replay = caps.reasoning.replay == Some(ReplayMode::TextField);
+    r.opaque.as_ref().is_some_and(|b| &b.family == target_family)
+        || (text_replay && (r.text.is_some() || !r.summary.is_empty()))
 }
 
 /// Visit every [`MediaSource`] in a request's instructions and items, in order.

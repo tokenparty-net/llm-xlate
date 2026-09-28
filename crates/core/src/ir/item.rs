@@ -193,6 +193,20 @@ pub struct ReasoningItem {
     pub id: Option<ItemId>,
 }
 
+impl ReasoningItem {
+    /// What a router keeps to replay this reasoning on the next tool turn when the client
+    /// cannot carry it back: the opaque carrier alone when there is one (the signature or
+    /// ciphertext is what the backend checks), else the plain reasoning text. `None` when
+    /// nothing here is replayable (only a summary, or empty text).
+    pub fn replay_carrier(&self) -> Option<ReasoningItem> {
+        if let Some(blob) = &self.opaque {
+            return Some(ReasoningItem { opaque: Some(blob.clone()), ..Default::default() });
+        }
+        let text = self.text.as_ref().filter(|t| !t.is_empty())?;
+        Some(ReasoningItem { text: Some(text.clone()), ..Default::default() })
+    }
+}
+
 /// An opaque, provider-bound blob: signed thinking, redacted thinking, encrypted reasoning,
 /// or a compaction block.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

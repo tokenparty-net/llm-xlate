@@ -116,7 +116,7 @@ fn reasoning_tool_loop() -> IrRequest {
 #[test]
 fn reasoning_required_resolved_inserts_blob() {
     let mut res = Resolutions::new();
-    res.reasoning.insert(CallId::new("call_1"), blob(ProviderFamily::Anthropic));
+    res.reasoning.insert(CallId::new("call_1"), resolved_blob(ProviderFamily::Anthropic));
     let l = low_res(reasoning_tool_loop(), &preset::claude_5(), Protocol::Anthropic, &res);
     // A reasoning item now sits immediately before the tool call.
     let pos = l.req.items.iter().position(|i| matches!(i, Item::ToolCall { .. })).unwrap();
@@ -181,6 +181,52 @@ fn reasoning_required_satisfied_by_text_when_textfield_replay() {
     let l = low(req, &text_replay_required_caps(), Protocol::OaiChat);
     assert!(l.req.items.iter().any(|i| matches!(i, Item::Reasoning(_))));
     assert!(kind_of(&l, "reasoning.required").is_none());
+}
+
+#[test]
+fn reasoning_required_resolved_by_text_for_a_textfield_backend() {
+    // The client dropped its `reasoning_content`; the router's sidecar remembered the text.
+    let mut res = Resolutions::new();
+    res.reasoning.insert(CallId::new("call_1"), resolved_text("the clock will say"));
+    let l = low_res(reasoning_tool_loop(), &text_replay_required_caps(), Protocol::OaiChat, &res);
+    let pos = l.req.items.iter().position(|i| matches!(i, Item::ToolCall { .. })).unwrap();
+    match &l.req.items[pos - 1] {
+        Item::Reasoning(r) => assert_eq!(r.text.as_deref(), Some("the clock will say")),
+        other => panic!("expected the restored reasoning before the call, got {other:?}"),
+    }
+    assert!(kind_of(&l, "reasoning.required").is_none());
+}
+
+#[test]
+fn resolved_text_does_not_satisfy_a_signature_backend() {
+    // Text is no use to a backend that checks a signature: still unresolved, still rejected.
+    let mut res = Resolutions::new();
+    res.reasoning.insert(CallId::new("call_1"), resolved_text("the clock will say"));
+    let e = lower(reasoning_tool_loop(), &preset::claude_5(), Protocol::Anthropic, &res, &cfg()).unwrap_err();
+    assert_eq!(e.kind, ErrorKind::IncompatibleHistory);
+}
+
+#[test]
+fn parallel_calls_get_their_shared_text_once() {
+    // One turn, two calls, the same reasoning before both: it goes back in once, ahead of the
+    // first call, not once per call.
+    let mut req = req_with_items(vec![
+        user("q"),
+        tool_call("call_1", "clock"),
+        tool_call("call_2", "calculator"),
+        tool_result("call_1", "9pm"),
+        tool_result("call_2", "4"),
+    ]);
+    req.reasoning.effort = Some(Effort::Medium);
+    let mut res = Resolutions::new();
+    res.reasoning.insert(CallId::new("call_1"), resolved_text("both, then answer"));
+    res.reasoning.insert(CallId::new("call_2"), resolved_text("both, then answer"));
+    let l = low_res(req, &text_replay_required_caps(), Protocol::OaiChat, &res);
+    let reasoning: Vec<usize> = l.req.items.iter().enumerate()
+        .filter_map(|(i, it)| matches!(it, Item::Reasoning(_)).then_some(i))
+        .collect();
+    let first_call = l.req.items.iter().position(|i| matches!(i, Item::ToolCall { .. })).unwrap();
+    assert_eq!(reasoning, vec![first_call - 1]);
 }
 
 #[test]
@@ -794,7 +840,7 @@ fn tools_id_pattern_ok() {
     let req = req_with_items(vec![tool_call("call_abc-1", "search"), tool_result("call_abc-1", "r")]);
     // supply resolution so required reasoning does not error first
     let mut res = Resolutions::new();
-    res.reasoning.insert(CallId::new("call_abc-1"), blob(ProviderFamily::Anthropic));
+    res.reasoning.insert(CallId::new("call_abc-1"), resolved_blob(ProviderFamily::Anthropic));
     let l = low_res(req, &preset::claude_5(), Protocol::Anthropic, &res);
     assert!(l.req.items.iter().any(|i| matches!(i, Item::ToolCall { .. })));
 }

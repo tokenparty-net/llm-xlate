@@ -64,6 +64,16 @@ pub fn blob(family: ProviderFamily) -> OpaqueBlob {
     OpaqueBlob::new(family, OpaqueKind::Signature, "resolved-sig")
 }
 
+/// A resolved opaque reasoning carrier of `family` (for `Resolutions`).
+pub fn resolved_blob(family: ProviderFamily) -> ReasoningItem {
+    ReasoningItem { opaque: Some(blob(family)), ..Default::default() }
+}
+
+/// A resolved plain-text reasoning carrier (for `Resolutions`).
+pub fn resolved_text(text: &str) -> ReasoningItem {
+    ReasoningItem { text: Some(text.to_string()), ..Default::default() }
+}
+
 /// A user message carrying an image `FileRef`.
 pub fn img_fileref(family: ProviderFamily, id: &str) -> Item {
     Item::Message {

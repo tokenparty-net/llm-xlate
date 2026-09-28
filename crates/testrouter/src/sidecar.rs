@@ -1,8 +1,9 @@
-//! The opaque-reasoning-blob sidecar behind a trait seam (plan §4.5, §9).
+//! The reasoning sidecar behind a trait seam (plan §4.5, §9).
 //!
-//! Keyed by `(provider family, upstream model, call id)`, the sidecar caches the opaque reasoning
-//! carriers a backend emitted so a later tool turn can replay them even when the client transcript
-//! does not carry one. Two implementations sit behind [`Sidecar`]: an in-memory [`MemorySidecar`]
+//! Keyed by `(provider family, upstream model, call id)`, the sidecar caches the reasoning a
+//! backend emitted before a tool call (an opaque carrier, or plain text for a backend that
+//! replays text; see `ReasoningItem::replay_carrier`) so a later tool turn can replay it even
+//! when the client transcript does not carry it. Two implementations sit behind [`Sidecar`]: an in-memory [`MemorySidecar`]
 //! (test harness / R0/R1) and a durable [`FileSidecar`] that persists each blob under `sidecar/`.
 
 use std::collections::HashMap;
@@ -11,7 +12,7 @@ use std::sync::Mutex;
 
 use sha2::{Digest, Sha256};
 
-use llm_xlate_core::ir::{CallId, OpaqueBlob, ProviderFamily};
+use llm_xlate_core::ir::{CallId, ProviderFamily, ReasoningItem};
 
 /// The sidecar key: which backend produced the blob, and the tool call it belongs to.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -31,12 +32,12 @@ impl SidecarKey {
     }
 }
 
-/// A cache of opaque reasoning blobs keyed by [`SidecarKey`] (plan §4.5).
+/// A cache of replayable reasoning keyed by [`SidecarKey`] (plan §4.5).
 pub trait Sidecar: Send + Sync {
     /// Store a blob for a `(family, model, call_id)`.
-    fn put(&self, key: SidecarKey, blob: OpaqueBlob);
+    fn put(&self, key: SidecarKey, blob: ReasoningItem);
     /// Fetch a blob for a `(family, model, call_id)`.
-    fn get(&self, key: &SidecarKey) -> Option<OpaqueBlob>;
+    fn get(&self, key: &SidecarKey) -> Option<ReasoningItem>;
     /// Number of cached blobs (introspection).
     fn len(&self) -> usize;
     /// Whether the sidecar is empty.
@@ -48,7 +49,7 @@ pub trait Sidecar: Send + Sync {
 /// In-memory [`Sidecar`] — enough for R0/R1. Not durable across restarts.
 #[derive(Default)]
 pub struct MemorySidecar {
-    map: Mutex<HashMap<SidecarKey, OpaqueBlob>>,
+    map: Mutex<HashMap<SidecarKey, ReasoningItem>>,
 }
 
 impl MemorySidecar {
@@ -59,10 +60,10 @@ impl MemorySidecar {
 }
 
 impl Sidecar for MemorySidecar {
-    fn put(&self, key: SidecarKey, blob: OpaqueBlob) {
+    fn put(&self, key: SidecarKey, blob: ReasoningItem) {
         self.map.lock().unwrap().insert(key, blob);
     }
-    fn get(&self, key: &SidecarKey) -> Option<OpaqueBlob> {
+    fn get(&self, key: &SidecarKey) -> Option<ReasoningItem> {
         self.map.lock().unwrap().get(key).cloned()
     }
     fn len(&self) -> usize {
@@ -92,7 +93,7 @@ impl FileSidecar {
 }
 
 impl Sidecar for FileSidecar {
-    fn put(&self, key: SidecarKey, blob: OpaqueBlob) {
+    fn put(&self, key: SidecarKey, blob: ReasoningItem) {
         let _guard = self.write_lock.lock().unwrap();
         let path = self.path_for(&key);
         if let Ok(bytes) = serde_json::to_vec(&blob) {
@@ -103,7 +104,7 @@ impl Sidecar for FileSidecar {
         }
     }
 
-    fn get(&self, key: &SidecarKey) -> Option<OpaqueBlob> {
+    fn get(&self, key: &SidecarKey) -> Option<ReasoningItem> {
         let bytes = std::fs::read(self.path_for(key)).ok()?;
         serde_json::from_slice(&bytes).ok()
     }

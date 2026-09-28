@@ -4,7 +4,7 @@ mod common;
 use common::*;
 
 use llm_xlate::caps::preset;
-use llm_xlate::ir::{Protocol, ProviderFamily, ResponseId};
+use llm_xlate::ir::{Protocol, ProviderFamily, ReasoningItem, ResponseId};
 use llm_xlate::requirements::{requirements, FileRef};
 use pretty_assertions::assert_eq;
 
@@ -132,4 +132,25 @@ fn reasoning_foreign_opaque_still_needs_resolution() {
     ]);
     let r = requirements(&req, &preset::claude_5(), Protocol::Anthropic);
     assert_eq!(r.reasoning_for_calls, vec![llm_xlate::ir::CallId::new("call_1")]);
+}
+
+#[test]
+fn the_replay_carrier_is_the_opaque_blob_else_the_text() {
+    // An opaque carrier is kept alone: it is what the backend checks, and before plain text
+    // was kept, it was all a router stored.
+    let signed = ReasoningItem {
+        text: Some("thinking".into()),
+        summary: vec!["a summary".into()],
+        opaque: Some(blob(ProviderFamily::Anthropic)),
+        id: None,
+    };
+    assert_eq!(signed.replay_carrier(), Some(resolved_blob(ProviderFamily::Anthropic)));
+    // No carrier: the plain text, and nothing else.
+    let plain = ReasoningItem { text: Some("thinking".into()), summary: vec!["a summary".into()], ..Default::default() };
+    assert_eq!(plain.replay_carrier(), Some(resolved_text("thinking")));
+    // A summary alone, or empty text, is nothing to replay.
+    let summary_only = ReasoningItem { summary: vec!["a summary".into()], ..Default::default() };
+    assert_eq!(summary_only.replay_carrier(), None);
+    let empty = ReasoningItem { text: Some(String::new()), ..Default::default() };
+    assert_eq!(empty.replay_carrier(), None);
 }

@@ -89,7 +89,13 @@ pub(crate) fn run(
                     })
                     .collect();
                 if !calls.is_empty() {
-                    let all_resolved = calls.iter().all(|c| res.reasoning.contains_key(c));
+                    // Resolved only by reasoning this backend can take back (text is no use to
+                    // a backend that checks a signature).
+                    let all_resolved = calls.iter().all(|c| {
+                        res.reasoning.get(c).is_some_and(|r| {
+                            crate::requirements::replayable(r, &target_family, caps)
+                        })
+                    });
                     if all_resolved {
                         insert_resolved_reasoning(req, range, res);
                     } else if cfg.unresolved_reasoning == UnresolvedReasoning::Fail {
@@ -203,8 +209,9 @@ fn snap_effort(e: Effort, levels: &[Effort]) -> Option<Effort> {
     lower.or_else(|| levels.iter().copied().filter(|l| *l != Effort::None && *l > e).min())
 }
 
-/// Insert a resolved opaque reasoning item immediately before each tool call in `range` whose
-/// `call_id` has an entry in `res.reasoning`.
+/// Insert a resolved reasoning item immediately before each tool call in `range` whose `call_id`
+/// has an entry in `res.reasoning`. Parallel calls from one turn resolve to the same plain text;
+/// that goes in once, before the first of them, rather than once per call.
 fn insert_resolved_reasoning(
     req: &mut llm_xlate_core::ir::IrRequest,
     range: std::ops::Range<usize>,
@@ -215,17 +222,19 @@ fn insert_resolved_reasoning(
     // mid-context instruction anchors can be shifted by the same amount (see `retain_items`).
     let mut inserted_before = vec![0usize; old.len()];
     let mut out = Vec::with_capacity(old.len() + range.len());
+    let mut last_text: Option<&ReasoningItem> = None;
     for (i, item) in old.into_iter().enumerate() {
         if range.contains(&i) {
             if let Item::ToolCall { call_id, .. } = &item {
-                if let Some(blob) = res.reasoning.get(call_id) {
-                    out.push(Item::Reasoning(ReasoningItem {
-                        text: None,
-                        summary: Vec::new(),
-                        opaque: Some(blob.clone()),
-                        id: None,
-                    }));
-                    inserted_before[i] += 1;
+                if let Some(resolved) = res.reasoning.get(call_id) {
+                    let repeat = resolved.opaque.is_none() && last_text == Some(resolved);
+                    if !repeat {
+                        out.push(Item::Reasoning(ReasoningItem { id: None, ..resolved.clone() }));
+                        inserted_before[i] += 1;
+                    }
+                    if resolved.opaque.is_none() {
+                        last_text = Some(resolved);
+                    }
                 }
             }
         }

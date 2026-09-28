@@ -572,9 +572,15 @@ async fn filesidecar_put_get_len() {
     assert!(sc.is_empty());
     let key = SidecarKey::new(ProviderFamily::Anthropic, "claude-sonnet-5", CallId::new("toolu_1"));
     let blob = OpaqueBlob::new(ProviderFamily::Anthropic, OpaqueKind::Signature, "c2ln");
-    sc.put(key.clone(), blob.clone());
+    let carrier = ReasoningItem { opaque: Some(blob), ..Default::default() };
+    sc.put(key.clone(), carrier.clone());
     assert_eq!(sc.len(), 1);
-    assert_eq!(sc.get(&key), Some(blob));
+    assert_eq!(sc.get(&key), Some(carrier));
+    // Plain-text reasoning persists the same way.
+    let text_key = SidecarKey::new(ProviderFamily::OpenAI, "kimi-k2-7-code", CallId::new("call_9"));
+    let text = ReasoningItem { text: Some("thinking".into()), ..Default::default() };
+    sc.put(text_key.clone(), text.clone());
+    assert_eq!(sc.get(&text_key), Some(text));
     // A different call id is a distinct entry.
     let other = SidecarKey::new(ProviderFamily::Anthropic, "claude-sonnet-5", CallId::new("toolu_2"));
     assert!(sc.get(&other).is_none());
