@@ -110,15 +110,35 @@ fn reasoning_text_still_required_without_textfield_replay() {
 }
 
 #[test]
-fn reasoning_not_required_when_caps_say_no() {
-    // gpt4o has required_on_last_tool_turn = false.
+fn reasoning_is_asked_for_even_when_not_required() {
+    // gpt4o has required_on_last_tool_turn = false, but a client that dropped reasoning still
+    // gets back whatever the router kept: the lookup is asked for regardless.
     let req = req_with_items(vec![
         user("q"),
         tool_call("call_1", "search"),
         tool_result("call_1", "res"),
     ]);
     let r = requirements(&req, &preset::gpt4o(), Protocol::OaiChat);
-    assert!(r.reasoning_for_calls.is_empty());
+    assert_eq!(r.reasoning_for_calls, vec![llm_xlate::ir::CallId::new("call_1")]);
+}
+
+#[test]
+fn reasoning_is_asked_for_across_the_turn_in_progress_only() {
+    // Two tool rounds since the user's last message are both asked for; the round before that
+    // message belongs to a finished turn and is not.
+    let req = req_with_items(vec![
+        user("first"),
+        tool_call("call_old", "search"),
+        tool_result("call_old", "res"),
+        user("second"),
+        tool_call("call_1", "search"),
+        tool_result("call_1", "res"),
+        tool_call("call_2", "clock"),
+        tool_result("call_2", "9pm"),
+    ]);
+    let r = requirements(&req, &preset::gpt4o(), Protocol::OaiChat);
+    let ids: Vec<&str> = r.reasoning_for_calls.iter().map(|c| c.as_str()).collect();
+    assert_eq!(ids, vec!["call_1", "call_2"]);
 }
 
 #[test]

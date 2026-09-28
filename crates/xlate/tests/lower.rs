@@ -8,8 +8,8 @@ use llm_xlate::codec::{ForeignProviderTool, MidInstructionFallback, TranslatorCo
 use llm_xlate::degrade::DegradationKind;
 use llm_xlate::error::ErrorKind;
 use llm_xlate::ir::{
-    CallId, Effort, IrRequest, Item, OutputFormat, Part, Protocol, ProviderFamily, ToolChoice,
-    ToolDef, Verbosity,
+    CallId, Effort, IrRequest, Item, OpaqueBlob, OpaqueKind, OutputFormat, Part, Protocol,
+    ProviderFamily, ReasoningItem, ToolChoice, ToolDef, Verbosity,
 };
 use llm_xlate::lower::lower;
 use llm_xlate::requirements::{FileRef, Resolutions};
@@ -227,6 +227,96 @@ fn parallel_calls_get_their_shared_text_once() {
         .collect();
     let first_call = l.req.items.iter().position(|i| matches!(i, Item::ToolCall { .. })).unwrap();
     assert_eq!(reasoning, vec![first_call - 1]);
+}
+
+/// The reasoning items of a lowered request, as (index, text, has an opaque carrier).
+fn reasoning_items(l: &llm_xlate::lower::Lowered) -> Vec<(usize, Option<String>, bool)> {
+    l.req
+        .items
+        .iter()
+        .enumerate()
+        .filter_map(|(i, it)| match it {
+            Item::Reasoning(r) => Some((i, r.text.clone(), r.opaque.is_some())),
+            _ => None,
+        })
+        .collect()
+}
+
+/// A Chat backend with a text replay slot that does not require reasoning back.
+fn text_replay_caps() -> Capabilities {
+    let mut caps = preset::gpt4o();
+    caps.reasoning.replay = Some(ReplayMode::TextField);
+    caps
+}
+
+#[test]
+fn dropped_text_is_restored_even_when_not_required() {
+    let mut res = Resolutions::new();
+    res.reasoning.insert(CallId::new("call_1"), resolved_text("the clock will say"));
+    let l = low_res(reasoning_tool_loop(), &text_replay_caps(), Protocol::OaiChat, &res);
+    let call = l.req.items.iter().position(|i| matches!(i, Item::ToolCall { .. })).unwrap();
+    assert_eq!(reasoning_items(&l), vec![(call - 1, Some("the clock will say".into()), false)]);
+}
+
+#[test]
+fn dropped_encrypted_reasoning_is_restored_for_a_responses_backend() {
+    // A Chat Completions client can't carry OpenAI's encrypted reasoning back; the router can.
+    let mut res = Resolutions::new();
+    let encrypted = ReasoningItem {
+        opaque: Some(OpaqueBlob::new(ProviderFamily::OpenAI, OpaqueKind::Encrypted, "gAAAA-cipher")),
+        ..Default::default()
+    };
+    res.reasoning.insert(CallId::new("call_1"), encrypted);
+    let l = low_res(reasoning_tool_loop(), &preset::gpt5_responses(), Protocol::OaiResponses, &res);
+    let call = l.req.items.iter().position(|i| matches!(i, Item::ToolCall { .. })).unwrap();
+    assert_eq!(reasoning_items(&l), vec![(call - 1, None, true)]);
+}
+
+#[test]
+fn reasoning_the_backend_cannot_take_is_not_restored() {
+    // Text is no use to a signature backend; with nothing required, it is simply left out.
+    let mut caps = preset::claude_5();
+    caps.reasoning.required_on_last_tool_turn = Tri::No;
+    let mut res = Resolutions::new();
+    res.reasoning.insert(CallId::new("call_1"), resolved_text("the clock will say"));
+    let l = low_res(reasoning_tool_loop(), &caps, Protocol::Anthropic, &res);
+    assert!(reasoning_items(&l).is_empty());
+}
+
+#[test]
+fn every_round_of_the_turn_in_progress_is_restored() {
+    let mut req = req_with_items(vec![
+        user("first"),
+        tool_call("call_old", "search"),
+        tool_result("call_old", "r"),
+        user("second"),
+        tool_call("call_1", "search"),
+        tool_result("call_1", "r"),
+        tool_call("call_2", "clock"),
+        tool_result("call_2", "9pm"),
+    ]);
+    req.reasoning.effort = Some(Effort::Medium);
+    let mut res = Resolutions::new();
+    res.reasoning.insert(CallId::new("call_old"), resolved_text("finished turn"));
+    res.reasoning.insert(CallId::new("call_1"), resolved_text("search first"));
+    res.reasoning.insert(CallId::new("call_2"), resolved_text("then the clock"));
+    let l = low_res(req, &text_replay_caps(), Protocol::OaiChat, &res);
+    let texts: Vec<String> = reasoning_items(&l).into_iter().filter_map(|(_, t, _)| t).collect();
+    assert_eq!(texts, vec!["search first".to_string(), "then the clock".to_string()]);
+}
+
+#[test]
+fn dropped_reasoning_is_restored_with_reasoning_off_too() {
+    // As if the client had sent it: a client's own reasoning goes through with reasoning off.
+    let req = req_with_items(vec![
+        user("q"),
+        tool_call("call_1", "search"),
+        tool_result("call_1", "r"),
+    ]);
+    let mut res = Resolutions::new();
+    res.reasoning.insert(CallId::new("call_1"), resolved_text("the clock will say"));
+    let l = low_res(req, &text_replay_caps(), Protocol::OaiChat, &res);
+    assert_eq!(reasoning_items(&l).len(), 1);
 }
 
 #[test]

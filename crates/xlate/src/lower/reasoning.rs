@@ -1,7 +1,8 @@
 //! Pass 2: reasoning / effort lowering (plan §7.2).
 //!
-//! Handles, in order: replay vs drop of existing reasoning items; resolution of reasoning that
-//! the backend *requires* on the last tool-bearing turn; the Responses reasoning-pairing rule;
+//! Handles, in order: replay vs drop of existing reasoning items; restoring reasoning the client
+//! dropped from the turn in progress (whatever the router resolved); the check for reasoning the
+//! backend *requires* on the last tool-bearing turn; the Responses reasoning-pairing rule;
 //! effort snapping to the model's supported levels; clearing reasoning when the backend has no
 //! reasoning mode; and clearing a rejected/ignored explicit budget.
 
@@ -11,7 +12,7 @@ use llm_xlate_core::degrade::Degradations;
 use llm_xlate_core::error::XlateError;
 use llm_xlate_core::ir::{Effort, Item, Protocol, ReasoningExposure, ReasoningItem, Role};
 
-use crate::requirements::{last_assistant_run, run_has_replayable_reasoning};
+use crate::requirements::{current_turn_runs, last_assistant_run, replayable, run_has_replayable_reasoning};
 
 pub(crate) fn run(
     req: &mut llm_xlate_core::ir::IrRequest,
@@ -62,7 +63,17 @@ pub(crate) fn run(
         .collect();
     crate::lower::retain_items(req, &keep_replay);
 
-    // (b) Reasoning required on the last tool-bearing turn (§7.2).
+    // (b) Restore reasoning the client dropped (§7.2). Every run of the turn in progress that
+    // carries none this backend can take gets what the router resolved, ahead of its tool calls
+    // — required or not, exactly as if the client had sent it. Back to front, so the ranges of
+    // earlier runs stay valid as items go in.
+    for range in current_turn_runs(&req.items).into_iter().rev() {
+        if !run_has_replayable_reasoning(&req.items[range.clone()], &target_family, caps) {
+            insert_resolved_reasoning(req, range, res, &target_family, caps);
+        }
+    }
+
+    // (b2) Reasoning required on the last tool-bearing turn, and none to restore.
     //
     // Anthropic only requires a thinking block to be replayed on a tool_use turn that *had*
     // extended thinking; a tool call produced with thinking disabled (or adaptively skipped) is
@@ -79,37 +90,22 @@ pub(crate) fn run(
         if let Some(range) = last_assistant_run(&req.items) {
             let is_active_continuation =
                 req.items[range.end..].iter().all(|it| matches!(it, Item::ToolResult { .. }));
-            let run = &req.items[range.clone()];
-            if is_active_continuation && !run_has_replayable_reasoning(run, &target_family, caps) {
-                let calls: Vec<_> = run
-                    .iter()
-                    .filter_map(|it| match it {
-                        Item::ToolCall { call_id, .. } => Some(call_id.clone()),
-                        _ => None,
-                    })
-                    .collect();
-                if !calls.is_empty() {
-                    // Resolved only by reasoning this backend can take back (text is no use to
-                    // a backend that checks a signature).
-                    let all_resolved = calls.iter().all(|c| {
-                        res.reasoning.get(c).is_some_and(|r| {
-                            crate::requirements::replayable(r, &target_family, caps)
-                        })
-                    });
-                    if all_resolved {
-                        insert_resolved_reasoning(req, range, res);
-                    } else if cfg.unresolved_reasoning == UnresolvedReasoning::Fail {
-                        return Err(XlateError::incompatible_history(
-                            "the backend requires reasoning on the last tool turn but none is \
-                             available to replay",
-                        ));
-                    } else {
-                        degr.dropped(
-                            "reasoning.required",
-                            "unresolved required reasoning stripped; tool calls left in place",
-                        );
-                    }
+            let run = &req.items[range];
+            let has_calls = run.iter().any(|it| matches!(it, Item::ToolCall { .. }));
+            if is_active_continuation
+                && has_calls
+                && !run_has_replayable_reasoning(run, &target_family, caps)
+            {
+                if cfg.unresolved_reasoning == UnresolvedReasoning::Fail {
+                    return Err(XlateError::incompatible_history(
+                        "the backend requires reasoning on the last tool turn but none is \
+                         available to replay",
+                    ));
                 }
+                degr.dropped(
+                    "reasoning.required",
+                    "unresolved required reasoning stripped; tool calls left in place",
+                );
             }
         }
     }
@@ -210,12 +206,15 @@ fn snap_effort(e: Effort, levels: &[Effort]) -> Option<Effort> {
 }
 
 /// Insert a resolved reasoning item immediately before each tool call in `range` whose `call_id`
-/// has an entry in `res.reasoning`. Parallel calls from one turn resolve to the same plain text;
-/// that goes in once, before the first of them, rather than once per call.
+/// has an entry in `res.reasoning` this backend can take back. Parallel calls from one turn
+/// resolve to the same plain text; that goes in once, before the first of them, rather than once
+/// per call.
 fn insert_resolved_reasoning(
     req: &mut llm_xlate_core::ir::IrRequest,
     range: std::ops::Range<usize>,
     res: &crate::requirements::Resolutions,
+    target_family: &llm_xlate_core::ir::ProviderFamily,
+    caps: &Capabilities,
 ) {
     let old = std::mem::take(&mut req.items);
     // `inserted_before[i]` counts the reasoning items spliced in ahead of old item `i`, so the
@@ -226,7 +225,9 @@ fn insert_resolved_reasoning(
     for (i, item) in old.into_iter().enumerate() {
         if range.contains(&i) {
             if let Item::ToolCall { call_id, .. } = &item {
-                if let Some(resolved) = res.reasoning.get(call_id) {
+                if let Some(resolved) =
+                    res.reasoning.get(call_id).filter(|r| replayable(r, target_family, caps))
+                {
                     let repeat = resolved.opaque.is_none() && last_text == Some(resolved);
                     if !repeat {
                         out.push(Item::Reasoning(ReasoningItem { id: None, ..resolved.clone() }));

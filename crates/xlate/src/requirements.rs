@@ -14,6 +14,7 @@ use std::collections::{BTreeMap, HashSet};
 use llm_xlate_core::caps::{Capabilities, ReplayMode};
 use llm_xlate_core::ir::{
     CallId, IrRequest, Item, MediaSource, Part, Protocol, ProviderFamily, ReasoningItem, ResponseId,
+    Role,
 };
 
 /// What the router must resolve before [`crate::lower::lower`] can run (plan §4).
@@ -21,9 +22,10 @@ use llm_xlate_core::ir::{
 /// All three lists/fields are produced in deterministic item order.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Requirements {
-    /// Tool-call ids on the last tool-bearing assistant turn that need an opaque reasoning
-    /// blob replayed (the backend requires it, and the transcript does not carry one). The
-    /// router looks each up in its sidecar and supplies it via [`Resolutions::reasoning`].
+    /// Tool-call ids in the turn in progress (the assistant runs since the user's last message)
+    /// whose run carries no reasoning the backend can take back. The router looks each up in
+    /// its sidecar and supplies what it has via [`Resolutions::reasoning`], so a client that
+    /// drops reasoning gets it restored, whether or not the backend requires it.
     pub reasoning_for_calls: Vec<CallId>,
     /// File ids referenced in the transcript that were minted by a provider family other than
     /// the target's. The router bridges each to a target-family file id via
@@ -107,15 +109,16 @@ pub fn requirements(req: &IrRequest, caps: &Capabilities, target: Protocol) -> R
         }
     });
 
-    // ── reasoning required on the last tool turn ─────────────────────────────────────────
+    // ── reasoning to restore ─────────────────────────────────────────────────────────────
+    // Asked for on every run of the turn in progress that lacks it, required or not: whatever
+    // the router has is put back, as if the client had sent it (§7.2).
     let mut reasoning_for_calls = Vec::new();
-    if caps.reasoning.required_on_last_tool_turn.is_yes() {
-        if let Some(range) = last_assistant_run(&req.items) {
-            if !run_has_replayable_reasoning(&req.items[range.clone()], &target_family, caps) {
-                for item in &req.items[range] {
-                    if let Item::ToolCall { call_id, .. } = item {
-                        reasoning_for_calls.push(call_id.clone());
-                    }
+    for range in current_turn_runs(&req.items) {
+        let run = &req.items[range];
+        if !run_has_replayable_reasoning(run, &target_family, caps) {
+            for item in run {
+                if let Item::ToolCall { call_id, .. } = item {
+                    reasoning_for_calls.push(call_id.clone());
                 }
             }
         }
@@ -140,6 +143,30 @@ pub(crate) fn last_assistant_run(items: &[Item]) -> Option<std::ops::Range<usize
         start -= 1;
     }
     Some(start..end)
+}
+
+/// The assistant-side runs of the turn in progress — everything after the user's last message —
+/// in order. Each is a maximal stretch of assistant-side items (reasoning, text, tool calls)
+/// between tool results. Runs before the last user message belong to finished turns.
+pub(crate) fn current_turn_runs(items: &[Item]) -> Vec<std::ops::Range<usize>> {
+    let from = items
+        .iter()
+        .rposition(|it| matches!(it, Item::Message { role: Role::User, .. }))
+        .map_or(0, |i| i + 1);
+    let mut runs = Vec::new();
+    let mut i = from;
+    while i < items.len() {
+        if items[i].is_assistant_side() {
+            let start = i;
+            while i < items.len() && items[i].is_assistant_side() {
+                i += 1;
+            }
+            runs.push(start..i);
+        } else {
+            i += 1;
+        }
+    }
+    runs
 }
 
 /// Whether a run already carries reasoning the target backend can replay, so no sidecar lookup
