@@ -9,7 +9,7 @@ use llm_xlate::degrade::DegradationKind;
 use llm_xlate::error::ErrorKind;
 use llm_xlate::ir::{
     CallId, Effort, IrRequest, Item, OpaqueBlob, OpaqueKind, OutputFormat, Part, Protocol,
-    ProviderFamily, ReasoningItem, ToolChoice, ToolDef, Verbosity,
+    ProviderFamily, ReasoningExposure, ReasoningItem, ToolChoice, ToolDef, Verbosity,
 };
 use llm_xlate::lower::lower;
 use llm_xlate::requirements::{FileRef, Resolutions};
@@ -415,6 +415,39 @@ fn reasoning_effort_snaps_minimal_up_to_low() {
     let l = low(req, &caps, Protocol::Anthropic);
     assert_eq!(l.req.reasoning.effort, Some(Effort::Low));
     assert!(has_field(&l, "reasoning.effort"));
+}
+
+#[test]
+fn reasoning_effort_none_snaps_up_where_unlisted() {
+    // gpt-6-astra and gpt-6.1-sol reject `reasoning.effort: "none"`: an effort-only endpoint
+    // whose levels omit `none` cannot turn reasoning off, so `none` becomes its lowest level.
+    let mut caps = preset::gpt5_responses();
+    caps.reasoning.effort_levels = Some(vec![Effort::Low, Effort::Medium, Effort::High]);
+    let mut req = req_with_items(vec![user("hi")]);
+    req.reasoning.effort = Some(Effort::None);
+    let l = low(req, &caps, Protocol::OaiResponses);
+    assert_eq!(l.req.reasoning.effort, Some(Effort::Low));
+    assert_eq!(kind_of(&l, "reasoning.effort"), Some(DegradationKind::Downgraded));
+    // Reasoning the client turned off is not surfaced to it.
+    assert_eq!(l.req.reasoning.expose, ReasoningExposure::None);
+
+    // Listed, it is kept.
+    caps.reasoning.effort_levels = Some(vec![Effort::None, Effort::Low, Effort::High]);
+    let mut req = req_with_items(vec![user("hi")]);
+    req.reasoning.effort = Some(Effort::None);
+    let l = low(req, &caps, Protocol::OaiResponses);
+    assert_eq!(l.req.reasoning.effort, Some(Effort::None));
+    assert!(!has_field(&l, "reasoning.effort"));
+}
+
+#[test]
+fn reasoning_effort_none_still_disables_adaptive_thinking() {
+    // On an Anthropic adaptive backend `none` means "thinking off", which is always possible.
+    let mut req = req_with_items(vec![user("hi")]);
+    req.reasoning.effort = Some(Effort::None);
+    let l = low(req, &preset::claude_5(), Protocol::Anthropic);
+    assert_eq!(l.req.reasoning.effort, Some(Effort::None));
+    assert!(!has_field(&l, "reasoning.effort"));
 }
 
 #[test]

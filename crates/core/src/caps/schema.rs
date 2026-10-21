@@ -906,12 +906,14 @@ impl Capabilities {
         self.transport.protocols.as_ref().is_some_and(|ps| ps.contains(&p))
     }
 
-    /// Whether an effort level is supported. [`Effort::None`] (no thinking) is always
-    /// supported; otherwise the reasoning mode must be enabled and, when `effort_levels` is
-    /// set, must list the level.
+    /// Whether an effort level is supported. The reasoning mode must be enabled and, when
+    /// `effort_levels` is set, must list the level. [`Effort::None`] (no thinking) is always
+    /// supported, except under [`ReasoningMode::EffortOnly`] with `effort_levels` set: there
+    /// `none` is a wire effort value like any other (`reasoning.effort: "none"`), which some
+    /// models reject, so it must be listed.
     pub fn effort_supported(&self, e: Effort) -> bool {
         if e == Effort::None {
-            return true;
+            return !self.none_effort_unlisted();
         }
         match self.reasoning.mode {
             Some(ReasoningMode::None) | None => false,
@@ -920,6 +922,12 @@ impl Capabilities {
                 None => true,
             },
         }
+    }
+
+    /// An effort-only endpoint that lists its effort levels without `none`.
+    pub fn none_effort_unlisted(&self) -> bool {
+        self.reasoning.mode == Some(ReasoningMode::EffortOnly)
+            && self.reasoning.effort_levels.as_ref().is_some_and(|l| !l.contains(&Effort::None))
     }
 
     /// Whether a captured client `x-anthropic-<name>:` system header block may be forwarded

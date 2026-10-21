@@ -138,9 +138,19 @@ pub(crate) fn run(
         crate::lower::retain_items(req, &keep);
     }
 
-    // (d) Effort snapping to supported levels (§7.2).
+    // (d) Effort snapping to supported levels (§7.2). An effort-only endpoint that does not
+    // list `none` cannot turn reasoning off: `none` snaps up to its lowest level.
     if let (Some(e), Some(levels)) = (req.reasoning.effort, &caps.reasoning.effort_levels) {
-        if let Some(s) = snap_effort(e, levels) {
+        let snapped = if e == Effort::None {
+            caps.none_effort_unlisted().then(|| levels.iter().copied().min()).flatten()
+        } else {
+            snap_effort(e, levels)
+        };
+        if let Some(s) = snapped {
+            if e == Effort::None {
+                // The client turned reasoning off: it runs anyway, but stays out of sight.
+                req.reasoning.expose = ReasoningExposure::None;
+            }
             req.reasoning.effort = Some(s);
             degr.downgraded(
                 "reasoning.effort",

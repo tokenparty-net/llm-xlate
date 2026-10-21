@@ -159,6 +159,19 @@ fn preset_claude_5_adaptive_sampling_rejected_native_system() {
 }
 
 #[test]
+fn none_effort_must_be_listed_on_effort_only_endpoints() {
+    let mut c = preset::gpt5_responses();
+    c.reasoning.effort_levels = Some(vec![Effort::Low, Effort::High]);
+    assert!(!c.effort_supported(Effort::None));
+    c.reasoning.effort_levels = Some(vec![Effort::None, Effort::Low, Effort::High]);
+    assert!(c.effort_supported(Effort::None));
+    // Unlisted levels place no constraint; neither does a non-effort-only mode.
+    c.reasoning.effort_levels = None;
+    assert!(c.effort_supported(Effort::None));
+    assert!(preset::claude_5().effort_supported(Effort::None));
+}
+
+#[test]
 fn preset_gpt4o_no_reasoning_both_protocols() {
     let c = preset::gpt4o();
     assert_eq!(c.reasoning.mode, Some(ReasoningMode::None));

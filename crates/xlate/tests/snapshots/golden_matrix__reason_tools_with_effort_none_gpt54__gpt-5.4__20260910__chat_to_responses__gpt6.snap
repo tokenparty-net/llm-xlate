@@ -37,7 +37,7 @@ expression: rendered
     }
   ],
   "reasoning": {
-    "effort": "none"
+    "effort": "minimal"
   },
   "max_output_tokens": 128
 }
@@ -45,3 +45,4 @@ expression: rendered
 content-type: application/json
 upstream_streams: false
 --- degraded ---
+reasoning.effort=downgraded

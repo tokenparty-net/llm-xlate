@@ -149,9 +149,12 @@ background = true
 match = "gpt-5*|o1*|o3*|o4*|o5*"
 verified_at = "2026-09-01"
 
+# `none` is listed because an effort-only endpoint must list it to receive it (an unlisted
+# `none` snaps up to the lowest level); this keeps the family's long-standing pass-through.
+# GPT-6 Astra (above) rejects it, so that block leaves it out.
 [model.reasoning]
 mode = "effort_only"
-effort_levels = ["minimal", "low", "medium", "high", "xhigh"]
+effort_levels = ["none", "minimal", "low", "medium", "high", "xhigh"]
 exposure = "summary"
 replay = "encrypted_item"
 required_on_last_tool_turn = false
