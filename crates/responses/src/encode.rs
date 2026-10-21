@@ -723,14 +723,16 @@ pub(crate) fn build_reasoning_value(
     }
     let mut ob = Ob::new();
     if let Some(e) = cfg.effort {
-        let token = e.openai_token();
+        // `max` goes on the wire only where the endpoint lists it (plan §7.2); elsewhere it
+        // falls back to `xhigh`.
+        let mut token = e.openai_token();
         if e == llm_xlate_core::Effort::Max {
             let max_listed =
                 caps.and_then(|c| c.reasoning.effort_levels.as_ref()).is_some_and(|l| l.contains(&llm_xlate_core::Effort::Max));
-            if !max_listed {
-                if let Some(d) = degr.as_deref_mut() {
-                    d.downgraded("reasoning.effort", "`max` unavailable on Responses; using xhigh");
-                }
+            if max_listed {
+                token = "max";
+            } else if let Some(d) = degr.as_deref_mut() {
+                d.downgraded("reasoning.effort", "`max` unavailable on Responses; using xhigh");
             }
         }
         ob = ob.set("effort", Value::from(token));

@@ -531,6 +531,18 @@ fn effort_max_downgrades_to_xhigh() {
 }
 
 #[test]
+fn effort_max_is_sent_where_listed() {
+    // The ChatGPT backend's models take `max` on the wire; an endpoint listing it gets it.
+    let mut ir = IrRequest::default();
+    ir.reasoning.effort = Some(Effort::Max);
+    let mut c = caps();
+    c.reasoning.effort_levels = Some(vec![Effort::Low, Effort::Medium, Effort::High, Effort::XHigh, Effort::Max]);
+    let enc = encode(&ir, &c);
+    assert_eq!(json(&enc.body)["reasoning"]["effort"], "max");
+    assert!(!enc.degradations.iter().any(|d| d.field == "reasoning.effort"));
+}
+
+#[test]
 fn reasoning_full_exposure_asks_for_an_auto_summary_where_offered() {
     // `Full` is the Chat/Anthropic decoder default: those clients show reasoning text, and a
     // Responses backend returns reasoning only as a summary, only when asked. Where the backend

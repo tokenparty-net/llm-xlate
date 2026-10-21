@@ -573,6 +573,18 @@ fn matrix_reasoning_effort_max_downgrades_to_xhigh() {
 }
 
 #[test]
+fn matrix_reasoning_effort_max_is_sent_where_listed() {
+    let mut ir = IrRequest::default();
+    ir.reasoning.effort = Some(Effort::Max);
+    let mut caps = gpt5_chat();
+    caps.reasoning.effort_levels = Some(vec![Effort::Low, Effort::High, Effort::XHigh, Effort::Max]);
+    let enc = encode_request(&ir, &caps);
+    let out = String::from_utf8(enc.body.to_vec()).unwrap();
+    assert!(out.contains("\"reasoning_effort\":\"max\""), "{out}");
+    assert!(!enc.degradations.iter().any(|d| d.field == "reasoning_effort"));
+}
+
+#[test]
 fn matrix_developer_instruction_native_on_gpt4o() {
     let mut ir = IrRequest::default();
     ir.instructions.push(Instruction::developer_text("be terse"));

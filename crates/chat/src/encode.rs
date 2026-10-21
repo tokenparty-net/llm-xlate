@@ -861,7 +861,14 @@ fn encode_reasoning(
         degr.dropped("reasoning_effort", "target cannot use tools with reasoning; effort dropped");
         return;
     }
-    let token = if effort == Effort::Max {
+    let max_listed = caps
+        .reasoning
+        .effort_levels
+        .as_ref()
+        .is_some_and(|l| l.contains(&Effort::Max));
+    let token = if effort == Effort::Max && max_listed {
+        "max"
+    } else if effort == Effort::Max {
         let supports_xhigh = caps
             .reasoning
             .effort_levels
