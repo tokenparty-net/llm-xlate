@@ -134,17 +134,31 @@ fn tool_call_done_disagreement_is_malformed() {
 }
 
 #[test]
-fn sequence_gap_poisons_decoder() {
-    // Manually craft a stream whose second event skips a sequence number.
+fn sequence_gap_is_tolerated() {
+    // A proxy dropped events 1..=4 without renumbering; the rest still decodes.
     let mut s = String::new();
     s.push_str("event: response.created\ndata: {\"type\":\"response.created\",\"sequence_number\":0,\"response\":{\"id\":\"r\",\"model\":\"m\"}}\n\n");
     s.push_str("event: response.output_item.added\ndata: {\"type\":\"response.output_item.added\",\"sequence_number\":5,\"output_index\":0,\"item\":{\"id\":\"msg_1\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[]}}\n\n");
     s.push_str("event: response.output_text.delta\ndata: {\"type\":\"response.output_text.delta\",\"sequence_number\":6,\"output_index\":0,\"delta\":\"hi\"}\n\n");
     let events = run_decoder(s.as_bytes());
-    // Start emitted, then the gap raises an error and nothing further.
     assert!(matches!(events[0], IrEvent::Start { .. }));
-    assert!(matches!(events[1], IrEvent::Error(ref e) if e.kind == ErrorKind::UpstreamMalformed));
-    assert_eq!(events.len(), 2);
+    assert!(!events.iter().any(|e| matches!(e, IrEvent::Error(_))), "{events:?}");
+    assert!(events.iter().any(|e| matches!(e, IrEvent::Delta { delta: Delta::Text(t), .. } if t == "hi")), "{events:?}");
+}
+
+#[test]
+fn replayed_sequence_number_is_dropped() {
+    // The delta at sequence 2 arrives twice; it must be applied once.
+    let mut s = String::new();
+    s.push_str("event: response.created\ndata: {\"type\":\"response.created\",\"sequence_number\":0,\"response\":{\"id\":\"r\",\"model\":\"m\"}}\n\n");
+    s.push_str("event: response.output_item.added\ndata: {\"type\":\"response.output_item.added\",\"sequence_number\":1,\"output_index\":0,\"item\":{\"id\":\"msg_1\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[]}}\n\n");
+    for _ in 0..2 {
+        s.push_str("event: response.output_text.delta\ndata: {\"type\":\"response.output_text.delta\",\"sequence_number\":2,\"output_index\":0,\"delta\":\"hi\"}\n\n");
+    }
+    let events = run_decoder(s.as_bytes());
+    let deltas = events.iter().filter(|e| matches!(e, IrEvent::Delta { delta: Delta::Text(_), .. })).count();
+    assert_eq!(deltas, 1, "{events:?}");
+    assert!(!events.iter().any(|e| matches!(e, IrEvent::Error(_))), "{events:?}");
 }
 
 #[test]

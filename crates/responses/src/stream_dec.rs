@@ -1,9 +1,11 @@
 //! [`ResponsesStreamDecoder`]: an OpenAI Responses SSE stream → [`IrEvent`]s (provider-facing).
 //!
 //! Built on [`SseParser`]. Every Responses stream event carries a monotonic `sequence_number`
-//! and a `type` (in both the `event:` line and the JSON `data`); a gap or regression in the
-//! sequence poisons the decoder — it emits a single [`XlateError`] (`UpstreamMalformed`) and
-//! nothing further (plan §8).
+//! and a `type` (in both the `event:` line and the JSON `data`). A gap in the sequence is
+//! tolerated: proxies in front of a backend drop private event types without renumbering, and
+//! failing a whole turn over a skipped number lost far more than the skipped event ever
+//! carried. A duplicate or regressed number is a replayed event, which is dropped so its delta
+//! is not applied twice.
 //!
 //! Provider-hosted tool items (`web_search_call`, `mcp_call`, …) stream as
 //! `ItemStart{kind: ProviderToolCall}` → [`Delta::ProviderRaw`] (the finished raw block at
@@ -29,7 +31,7 @@ pub struct ResponsesStreamDecoder {
     parser: SseParser,
     /// Upstream model from `response.created`, stamped onto opaque reasoning carriers.
     model: String,
-    /// Last seen `sequence_number` (for gap/regression detection).
+    /// Last seen `sequence_number` (for replay detection).
     last_seq: Option<u64>,
     /// Once malformed, emit nothing further.
     poisoned: bool,
@@ -55,19 +57,12 @@ impl ResponsesStreamDecoder {
             return;
         };
 
-        // Sequence-number discipline: every event carries one; a gap or regression is fatal.
+        // Sequence numbers only move forward: a gap is skipped-over, a replay is dropped.
         if let Some(seq) = get_u64(&root, "sequence_number") {
-            match self.last_seq {
-                Some(prev) if seq != prev + 1 => {
-                    self.poisoned = true;
-                    out.push(IrEvent::Error(XlateError::upstream_malformed(format!(
-                        "responses stream sequence_number gap: expected {}, got {seq}",
-                        prev + 1
-                    ))));
-                    return;
-                }
-                _ => self.last_seq = Some(seq),
+            if self.last_seq.is_some_and(|prev| seq <= prev) {
+                return;
             }
+            self.last_seq = Some(seq);
         }
 
         let ty = get_str(&root, "type").unwrap_or_default().to_string();
