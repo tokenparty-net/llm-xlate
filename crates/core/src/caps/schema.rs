@@ -651,6 +651,11 @@ pub struct StateCap {
     /// ChatGPT-subscription backend behind a Codex connector rejects `user` outright
     /// (`400 "Unsupported parameter: user"`), so it must declare this `No`.
     pub end_user_identifier: Tri,
+    /// Whether the backend accepts the OpenAI top-level `metadata` map (Chat and Responses).
+    /// Same lossy semantics as `end_user_identifier`: `Yes` ⇒ forwarded; `No`/`Unknown` ⇒
+    /// dropped with a `Dropped` degradation. The ChatGPT-subscription backend behind a Codex
+    /// connector rejects it (`400 "Unsupported parameter: metadata"`).
+    pub metadata: Tri,
     /// `include: ["reasoning.encrypted_content"]` supported.
     pub encrypted_reasoning_include: Tri,
     /// Compaction mechanism.
@@ -664,7 +669,7 @@ impl StateCap {
         overlay_fields!(self, o;
             opt: compaction;
             tri: store, previous_response_id, conversation_api, background,
-                 end_user_identifier, encrypted_reasoning_include, zdr);
+                 end_user_identifier, metadata, encrypted_reasoning_include, zdr);
     }
 }
 

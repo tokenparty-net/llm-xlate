@@ -1065,7 +1065,11 @@ fn encode_meta(
         }
     }
     if !req.meta.metadata.is_empty() {
-        out.insert("metadata".into(), Value::Object(req.meta.metadata.clone()));
+        if caps.state.metadata.is_yes() {
+            out.insert("metadata".into(), Value::Object(req.meta.metadata.clone()));
+        } else {
+            degr.dropped("metadata", "target does not support `metadata`");
+        }
     }
     if caps.state.end_user_identifier.is_yes() {
         if let Some(u) = &req.meta.user {

@@ -148,7 +148,11 @@ pub(crate) fn encode_request(
 
     // Metadata / identifiers.
     if !req.meta.metadata.is_empty() {
-        top = top.set("metadata", Value::Object(req.meta.metadata.clone()));
+        if caps.state.metadata.is_yes() {
+            top = top.set("metadata", Value::Object(req.meta.metadata.clone()));
+        } else {
+            degr.dropped("metadata", "target does not support `metadata`");
+        }
     }
     if caps.state.end_user_identifier.is_yes() {
         if let Some(u) = &req.meta.user {

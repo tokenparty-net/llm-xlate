@@ -473,6 +473,20 @@ fn end_user_identifier_supported_and_dropped() {
 }
 
 #[test]
+fn metadata_supported_and_dropped() {
+    // The ChatGPT-subscription backend behind the Codex connector rejects top-level `metadata`
+    // with `400 "Unsupported parameter: metadata"`, so it is gated on `state.metadata`.
+    let mut ir = IrRequest::default();
+    ir.meta.metadata.insert("k".into(), "v".into());
+    ir.items.push(Item::user_text("x"));
+    let b = body(&ir, &caps());
+    assert_eq!(b["metadata"]["k"], "v");
+    let enc = encode(&ir, &preset::openai_compatible());
+    assert!(json(&enc.body).get("metadata").is_none());
+    assert!(enc.degradations.iter().any(|d| d.field == "metadata"));
+}
+
+#[test]
 fn tool_choice_named_and_downgrade() {
     let mut ir = IrRequest::default();
     ir.tool_choice = ToolChoice::Named("f".into());
