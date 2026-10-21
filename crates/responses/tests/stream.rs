@@ -134,6 +134,37 @@ fn tool_call_done_disagreement_is_malformed() {
 }
 
 #[test]
+fn error_event_keeps_its_type_and_message() {
+    // The ChatGPT backend nests the error under `error`; OpenAI flattens it onto the event.
+    // Either way the client must get the backend's own message, classified by its type
+    // (an `invalid_request_error` is the caller's fault, not a generic server error).
+    let nested = "event: error\ndata: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"code\":\"invalid_value\",\"message\":\"Error while downloading file. Upstream status code: 400.\",\"param\":\"url\"}}\n\n";
+    let flat = "event: error\ndata: {\"type\":\"error\",\"sequence_number\":0,\"code\":\"invalid_value\",\"message\":\"Error while downloading file. Upstream status code: 400.\",\"param\":\"url\"}\n\n";
+    for (label, stream) in [("nested", nested), ("flat", flat)] {
+        let events = run_decoder(stream.as_bytes());
+        match &events[..] {
+            [IrEvent::Error(e)] => {
+                assert_eq!(e.message, "Error while downloading file. Upstream status code: 400.", "{label}");
+                if label == "nested" {
+                    assert_eq!(e.kind, ErrorKind::InvalidRequest, "{label}");
+                }
+            }
+            other => panic!("{label}: {other:?}"),
+        }
+    }
+}
+
+#[test]
+fn failed_response_is_classified_by_its_error_type() {
+    let stream = sse(&[
+        ("response.created", json!({"response":{"id":"r","model":"m"}})),
+        ("response.failed", json!({"response":{"id":"r","error":{"type":"invalid_request_error","message":"bad image"}}})),
+    ]);
+    let events = run_decoder(stream.as_bytes());
+    assert!(events.iter().any(|e| matches!(e, IrEvent::Error(x) if x.kind == ErrorKind::InvalidRequest && x.message == "bad image")), "{events:?}");
+}
+
+#[test]
 fn sequence_gap_is_tolerated() {
     // A proxy dropped events 1..=4 without renumbering; the rest still decodes.
     let mut s = String::new();

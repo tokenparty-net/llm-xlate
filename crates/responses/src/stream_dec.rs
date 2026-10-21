@@ -220,8 +220,11 @@ impl ResponsesStreamDecoder {
                 out.push(IrEvent::Error(err));
             }
             "error" => {
+                // OpenAI flattens the error onto the event; the ChatGPT backend nests it
+                // under `error`. Read whichever carries it.
                 self.poisoned = true;
-                out.push(IrEvent::Error(error_from_value(root)));
+                let err = root.get("error").filter(|e| e.is_object()).unwrap_or(root);
+                out.push(IrEvent::Error(error_from_value(err)));
             }
             // `response.content_part.added/done`, `*.done` text/summary/refusal events,
             // hosted-tool progress events, and unknown events: no IR effect.

@@ -58,7 +58,9 @@ pub(crate) fn error_from_value(err_obj: &Value) -> XlateError {
     let message = get_str(err_obj, "message").unwrap_or("upstream error").to_string();
     let ptype = get_str(err_obj, "type").map(str::to_string);
     let pcode = get_str(err_obj, "code").map(str::to_string);
-    let kind = kind_from(500, ptype.as_deref(), pcode.as_deref());
+    // An error object outside an HTTP response (a stream `error` event, `response.failed`)
+    // has no status of its own: classify it by its type and code alone.
+    let kind = kind_from(0, ptype.as_deref(), pcode.as_deref());
     let mut e = XlateError::new(kind, message).with_provider(ProviderFamily::OpenAI);
     if let Some(t) = ptype {
         e = e.with_provider_type(t);
